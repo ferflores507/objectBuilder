@@ -11,7 +11,7 @@ beforeAll(() => {
 
 describe("schema con consulta", () => {
 
-  test("consulta", async () => {
+  test("consulta", { repeats: 50 }, async () => {
 
     const schema = {
       consulta: {
@@ -24,12 +24,12 @@ describe("schema con consulta", () => {
     const expected = [...Array(10).keys()]
 
     expect(data).toEqual(expected)
-  }, { repeats: 50 })
+  })
 })
 
 describe(("schema server"), () => {
 
-  test("useConsulta", async () => {
+  test("useConsulta", { repeats: 50 }, async () => {
 
     const consulta: Consulta = {
       url: "http://localhost:8000/numeros"
@@ -40,5 +40,5 @@ describe(("schema server"), () => {
     const expected = [...Array(10).keys()]
 
     expect(data).toEqual(expected)
-  }, { repeats: 50 })
+  })
 })
