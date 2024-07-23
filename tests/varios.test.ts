@@ -1,8 +1,8 @@
 import { expect, describe, test } from 'vitest';
-import { LocalDefinitionBuilder } from '../src/builders/LocalDefinitionBuilder';
+import { ObjectBuilder } from '../src/builders/ObjectBuilder';
 import * as varios from '../src/helpers/varios';
 import { Schema } from '../src/models';
-import { ResultBuilderLocal } from '../src/builders/ResultBuilderLocal';
+import { ResultBuilder } from '../src/builders/ResultBuilder';
 
 test("class with method destructure", () => {
     class Form {
@@ -85,8 +85,8 @@ describe("spread", () => {
             }
         }
 
-        const builder = new LocalDefinitionBuilder({})
-        const resultBuilder = await new ResultBuilderLocal(source, builder).withSpread(schema)
+        const builder = new ObjectBuilder({})
+        const resultBuilder = await new ResultBuilder(source, builder).withSpread(schema)
         const resultado = resultBuilder.getTarget()
         const expected = { 
             uno: 1, 

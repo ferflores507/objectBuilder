@@ -1,12 +1,12 @@
 import type { Consulta, Schema } from "../models"
-import { LocalDefinitionBuilder } from "./LocalDefinitionBuilder"
+import { ObjectBuilder } from "./ObjectBuilder"
 import { ResultBuilderBase } from "./ResultBuilderBase"
 import * as varios from "../helpers/varios"
 import useConsulta from "../helpers/useConsulta"
 
-export class ResultBuilderWithAsync extends ResultBuilderBase {
+export class ResultBuilderAsync extends ResultBuilderBase {
 
-    constructor(target: any, builder: LocalDefinitionBuilder, controller: AbortController) {
+    constructor(target: any, builder: ObjectBuilder, controller: AbortController) {
         super(target, builder)
         this.controller = controller
       }
@@ -62,7 +62,7 @@ export class ResultBuilderWithAsync extends ResultBuilderBase {
 
     async withDefinitionsAsync(schemas: Schema[] | undefined) {
         if(schemas) {
-            const promises = schemas.map(schema => this.localBuilder.buildAsync(schema, this.controller))
+            const promises = schemas.map(schema => this.builder.buildAsync(schema, this.controller))
             this.target = await Promise.all(promises)
         }
     }
@@ -79,7 +79,7 @@ export class ResultBuilderWithAsync extends ResultBuilderBase {
 
         if (propiedades) {
             const obj: Record<string, any> = {}
-            const builder = this.localBuilder.withTarget(this.target)
+            const builder = this.builder.withTarget(this.target)
       
             for (const [k, v] of Object.entries(propiedades)) {
                 obj[k] = await builder.buildAsync(v, this.controller);
@@ -91,7 +91,7 @@ export class ResultBuilderWithAsync extends ResultBuilderBase {
 
     async withSpreadAsync(schema: Schema | undefined) {
         if(schema) {
-            const source = await this.localBuilder.buildAsync(schema)
+            const source = await this.builder.buildAsync(schema)
             this.target = varios.spread(this.target, source)
         }
     }

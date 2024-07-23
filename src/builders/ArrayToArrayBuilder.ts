@@ -1,16 +1,16 @@
 import type { ArrayToArraySchema, Join, Schema } from "../models";
 import { ArrayFilterBuilder } from "./ArrayFilterBuilder";
-import { LocalDefinitionBuilder } from "./LocalDefinitionBuilder";
+import { ObjectBuilder } from "./ObjectBuilder";
 
 export class ArrayToArrayBuilder {
 
-    constructor(target: [], builder: LocalDefinitionBuilder) {
+    constructor(target: [], builder: ObjectBuilder) {
         this.target = target
         this.builder = builder
     }
 
     target: any[]
-    builder: LocalDefinitionBuilder
+    builder: ObjectBuilder
 
     build = () => this.target
 
@@ -78,7 +78,7 @@ export class ArrayToArrayBuilder {
             }
 
             this.target = this.target.map(inner => {
-                const group = new LocalDefinitionBuilder(inner)
+                const group = new ObjectBuilder(inner)
                     .build(schema)
 
                 return { inner, group }

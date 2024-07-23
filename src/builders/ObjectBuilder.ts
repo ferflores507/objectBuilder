@@ -1,9 +1,9 @@
 import { getObjPath } from "../helpers/varios"
 import type { Schema } from "../models"
-import { ResultBuilderLocal } from "./ResultBuilderLocal"
-import { ResultBuilderWithAsync } from "./ResultBuilderWithAsync"
+import { ResultBuilder } from "./ResultBuilder"
+import { ResultBuilderAsync } from "./ResultBuilderAsync"
 
-export class LocalDefinitionBuilder {
+export class ObjectBuilder {
   constructor(source: Record<string, any>, target?: any) {
     this.source = source
     this.target = target
@@ -17,21 +17,21 @@ export class LocalDefinitionBuilder {
   getInitialTarget = (schema: Schema | undefined) => schema == null ? null : (this.target ?? this.source)
 
   withTarget(value: any) {
-    return new LocalDefinitionBuilder(this.source, value)
+    return new ObjectBuilder(this.source, value)
   }
 
   build(schema: Schema | undefined) {
 
     const target = this.getInitialTarget(schema)
 
-    return new ResultBuilderLocal(target, this)
+    return new ResultBuilder(target, this)
       .build(schema)
   }
 
   async buildAsync(schema: Schema | undefined, controller: AbortController = new AbortController()) {
 
     const target = this.getInitialTarget(schema)
-    const builder = new ResultBuilderWithAsync(target, this, controller)
+    const builder = new ResultBuilderAsync(target, this, controller)
 
     try {
       const resultado = await builder.buildAsync(schema)
@@ -57,6 +57,6 @@ export class LocalDefinitionBuilder {
   buildWithOuter(inner: any, schema: Schema | undefined) {
     const source = { inner, outer: this.getSource() }
 
-    return new LocalDefinitionBuilder(source).build(schema)
+    return new ObjectBuilder(source).build(schema)
   }
 }

@@ -1,17 +1,17 @@
 import { Calc } from "../helpers/calc"
 import type { ArrayToArraySchema, CalcMethod, Schema } from "../models"
 import { ArrayToArrayBuilder } from "./ArrayToArrayBuilder"
-import { LocalDefinitionBuilder } from "./LocalDefinitionBuilder"
+import { ObjectBuilder } from "./ObjectBuilder"
 import * as varios from "../helpers/varios"
 
 export class ResultBuilderBase {
-    constructor(target: any, builder: LocalDefinitionBuilder) {
+    constructor(target: any, builder: ObjectBuilder) {
         this.target = target
-        this.localBuilder = builder
+        this.builder = builder
       }
 
     protected target: unknown
-    protected localBuilder: LocalDefinitionBuilder
+    protected builder: ObjectBuilder
 
     getTarget = () => this.target
 
@@ -35,7 +35,7 @@ export class ResultBuilderBase {
 
     withCheckout(schema: Schema | undefined) {
         if(schema) {
-            this.target = new LocalDefinitionBuilder(this.target).build(schema)
+            this.target = new ObjectBuilder(this.target).build(schema)
         }
 
         return this
@@ -43,8 +43,8 @@ export class ResultBuilderBase {
 
     withSchemaFrom(source: Schema | undefined) {
         if(source) {
-            const schema = this.localBuilder.build(source) as Schema
-            this.target = this.localBuilder.build(schema)
+            const schema = this.builder.build(source) as Schema
+            this.target = this.builder.build(schema)
         }
 
         return this
@@ -53,7 +53,7 @@ export class ResultBuilderBase {
     withSet(path: string | undefined) {
         if(path) {
             const paths = path.split(".")
-            const source = this.localBuilder.getSource()
+            const source = this.builder.getSource()
 
             varios.setUpdateProp(source, paths, this.target)
         }
@@ -63,14 +63,14 @@ export class ResultBuilderBase {
 
     withEquals(schema: Schema | undefined) {
         if(schema) {
-            this.target = varios.esIgual(this.target, this.localBuilder.build(schema))
+            this.target = varios.esIgual(this.target, this.builder.build(schema))
         }
 
         return this
     }
 
     withArrayToArraySchema(schema: ArrayToArraySchema | undefined) {
-        this.target = new ArrayToArrayBuilder(this.target as [], this.localBuilder)
+        this.target = new ArrayToArrayBuilder(this.target as [], this.builder)
             .withSchema(schema)
             .build()
 
@@ -124,7 +124,7 @@ export class ResultBuilderBase {
     withPath(path: string | undefined) {
 
         if(path) {
-            const resultado = this.localBuilder.getSourcePathValue(path)
+            const resultado = this.builder.getSourcePathValue(path)
 
             this.target = resultado
         }
