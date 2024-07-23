@@ -1,5 +1,4 @@
 import type { Schema } from "../models"
-import { LocalDefinitionBuilder } from "./LocalDefinitionBuilder"
 import { ResultBuilderBase } from "./ResultBuilderBase"
 import * as varios from "../helpers/varios"
 

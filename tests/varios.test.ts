@@ -1,6 +1,5 @@
-import { expect, describe, test, vi } from 'vitest';
+import { expect, describe, test } from 'vitest';
 import { LocalDefinitionBuilder } from '../src/builders/LocalDefinitionBuilder';
-// import { nextTick, reactive, watch } from 'vue';
 import * as varios from '../src/helpers/varios';
 import { Schema } from '../src/models';
 import { ResultBuilderLocal } from '../src/builders/ResultBuilderLocal';
