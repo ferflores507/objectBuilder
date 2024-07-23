@@ -1,7 +1,6 @@
 import { expect, describe, test } from 'vitest';
-import { ObjectBuilder } from '../src/builders/ObjectBuilder';
+import { ObjectBuilder, Schema } from "../";
 import * as varios from '../src/helpers/varios';
-import { Schema } from '../src/models';
 import { ResultBuilder } from '../src/builders/ResultBuilder';
 
 test("class with method destructure", () => {

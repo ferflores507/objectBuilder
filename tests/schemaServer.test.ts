@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from "vitest"
-import { ObjectBuilder } from "../src/builders/ObjectBuilder"
+import { ObjectBuilder } from "../"
 import { Consulta } from "../src/models"
 import useConsulta from "../src/helpers/useConsulta"
 import { setupServer } from "../src/helpers/schemaServer"

@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { Schema } from '../src/models'
-import { ObjectBuilder } from '../src/builders/ObjectBuilder'
+import { ObjectBuilder, Schema } from "../"
 
 describe.each([true, false])("spread", (useAsync) => {
 
