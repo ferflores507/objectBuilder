@@ -9,6 +9,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@types/node": "^20.14.11"
+    "@types/node": "^20.14.11",
+    "vitest": "^2.0.4"
   }
 }
