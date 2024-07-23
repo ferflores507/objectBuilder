@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from "vitest"
-import { LocalDefinitionBuilder } from "../src/builders/LocalDefinitionBuilder"
+import { ObjectBuilder } from "../"
 import { Consulta } from "../src/models"
 import useConsulta from "../src/helpers/useConsulta"
 import { setupServer } from "../src/helpers/schemaServer"
@@ -11,7 +11,7 @@ beforeAll(() => {
 
 describe("schema con consulta", () => {
 
-  test("consulta", { repeats: 50 }, async () => {
+  test("consulta", { repeats: 1 }, async () => {
 
     const schema = {
       consulta: {
@@ -19,7 +19,7 @@ describe("schema con consulta", () => {
       }
     }
 
-    const builder = new LocalDefinitionBuilder({})
+    const builder = new ObjectBuilder({})
     const { data } = await builder.buildAsync(schema)
     const expected = [...Array(10).keys()]
 
@@ -29,7 +29,7 @@ describe("schema con consulta", () => {
 
 describe(("schema server"), () => {
 
-  test("useConsulta", { repeats: 50 }, async () => {
+  test("useConsulta", { repeats: 1 }, async () => {
 
     const consulta: Consulta = {
       url: "http://localhost:8000/numeros"

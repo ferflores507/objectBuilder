@@ -1,9 +1,8 @@
 import type { Schema } from "../models"
-import { LocalDefinitionBuilder } from "./LocalDefinitionBuilder"
 import { ResultBuilderBase } from "./ResultBuilderBase"
 import * as varios from "../helpers/varios"
 
-export class ResultBuilderLocal extends ResultBuilderBase {
+export class ResultBuilder extends ResultBuilderBase {
 
     build(schema: Schema | undefined) {
 
@@ -13,7 +12,7 @@ export class ResultBuilderLocal extends ResultBuilderBase {
             .withDefinitions(definitions)
             .withPropiedades(propiedades)
             .withSpread(spread)
-            .withArrayToArraySchema(schema)
+            .withArraySchema(schema)
             .withEquals(equals)
             .withReduce(reduce)
             .withSet(set)
@@ -23,7 +22,7 @@ export class ResultBuilderLocal extends ResultBuilderBase {
 
     withDefinitions(schemas: Schema[] | undefined) {
         if(schemas) {
-            this.target = schemas?.map(schema => this.localBuilder.build(schema))
+            this.target = schemas?.map(schema => this.builder.build(schema))
         }
 
         return this
@@ -43,7 +42,7 @@ export class ResultBuilderLocal extends ResultBuilderBase {
 
         if (propiedades) {
             const obj: Record<string, any> = {}
-            const builder = this.localBuilder.withTarget(this.target)
+            const builder = this.builder.withTarget(this.target)
       
             for (const [k, v] of Object.entries(propiedades)) {
               obj[k] = builder.build(v);
@@ -57,7 +56,7 @@ export class ResultBuilderLocal extends ResultBuilderBase {
 
     withSpread(schema: Schema | undefined) {
         if(schema) {  
-            const source = this.localBuilder.build(schema)
+            const source = this.builder.build(schema)
             this.target = varios.spread(this.target, source)
         }
 

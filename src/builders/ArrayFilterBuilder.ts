@@ -1,9 +1,9 @@
 import type { Schema } from "../models"
-import { LocalDefinitionBuilder } from "./LocalDefinitionBuilder"
+import { ObjectBuilder } from "./ObjectBuilder"
 
 export class ArrayFilterBuilder {
 
-    constructor(source: unknown, builder: LocalDefinitionBuilder) {
+    constructor(source: unknown, builder: ObjectBuilder) {
         this.source = source
         this.items = source as [] ?? []
         this.builder = builder
@@ -12,7 +12,7 @@ export class ArrayFilterBuilder {
     
     private readonly source: unknown
     private readonly items: any[]
-    private builder: LocalDefinitionBuilder
+    private builder: ObjectBuilder
     private isValidation = false
     private schema?: Schema
     private min: number

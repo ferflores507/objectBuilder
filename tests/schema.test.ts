@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { Schema } from '../src/models'
-import { LocalDefinitionBuilder } from '../src/builders/LocalDefinitionBuilder'
+import { ObjectBuilder, Schema } from "../"
 
 describe.each([true, false])("spread", (useAsync) => {
 
@@ -56,7 +55,7 @@ describe.each([true, false])("spread", (useAsync) => {
       subUno: 1
     }
 
-    const builder = new LocalDefinitionBuilder(source, initialTarget)
+    const builder = new ObjectBuilder(source, initialTarget)
     const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
 
     expect(resultado).toEqual(expected)
@@ -75,7 +74,7 @@ describe("entries", () => {
       entries: true
     }
 
-    const builder = new LocalDefinitionBuilder(source)
+    const builder = new ObjectBuilder(source)
     const resultado = builder.build(schema)
 
     const expected = [
@@ -111,7 +110,7 @@ describe.each([true, false])("calc", (useAsync) => {
       calc
     }
 
-    const builder = new LocalDefinitionBuilder({})
+    const builder = new ObjectBuilder({})
     const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
 
     expect(resultado).toBe(total)
@@ -155,7 +154,7 @@ describe("nested propiedades", () => {
       }
     }
   
-    const builder = new LocalDefinitionBuilder(source)
+    const builder = new ObjectBuilder(source)
     const resultado = await builder.build(schema)
 
     const expected = { 
@@ -180,7 +179,7 @@ describe.each([true, false])("test simple", (useAsync) => {
       path: "nombre"
     }
 
-    const builder = new LocalDefinitionBuilder(source)
+    const builder = new ObjectBuilder(source)
     const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
 
     expect(resultado).toBe(source.nombre)
@@ -206,7 +205,7 @@ describe("comparacion", () => {
         }
       }
 
-      const builder = new LocalDefinitionBuilder(source)
+      const builder = new ObjectBuilder(source)
       const resultado = await builder.build(schema)
 
       expect(resultado).toBe(expected)
@@ -255,7 +254,7 @@ describe("array", () => {
       }
     }
 
-    const builder = new LocalDefinitionBuilder({})
+    const builder = new ObjectBuilder({})
     const resultado = builder.build(schema)
 
     const expected = [
@@ -331,7 +330,7 @@ describe("array", () => {
       }
     ]
 
-    const builder = new LocalDefinitionBuilder({})
+    const builder = new ObjectBuilder({})
     const resultado = builder.build(schema)
     
     expect(resultado).toEqual(expected)
@@ -369,7 +368,7 @@ describe("array", () => {
     }
 
     const expected = [{ id: 1, nombre: "Melany" }, ...ids]
-    const builder = new LocalDefinitionBuilder({})
+    const builder = new ObjectBuilder({})
     const resultado = builder.build(schema)
     
     expect(resultado).toEqual(expected)
@@ -391,7 +390,7 @@ describe("array", () => {
     }
 
     const expected = numbers.map(id => ({ id }))
-    const builder = new LocalDefinitionBuilder({})
+    const builder = new ObjectBuilder({})
     const resultado = builder.build(schema)
     
     expect(resultado).toEqual(expected)
@@ -410,7 +409,7 @@ describe("array", () => {
       }
     }
 
-    const builder = new LocalDefinitionBuilder(source)
+    const builder = new ObjectBuilder(source)
     const resultado = builder.build(schema)
     
     expect(resultado).toEqual({ ...expected })
@@ -449,7 +448,7 @@ describe("array", () => {
       }
     }
 
-    const builder = new LocalDefinitionBuilder({})
+    const builder = new ObjectBuilder({})
     const resultado = await builder.build(schema)
 
     expect(resultado.inner).toBe(true)
@@ -474,7 +473,7 @@ describe("array", () => {
         }
       }
 
-      const definitionBuilder = new LocalDefinitionBuilder(source)
+      const definitionBuilder = new ObjectBuilder(source)
       const resultado = await definitionBuilder.build(schema)
 
       expect(resultado).toBe(true)
@@ -501,7 +500,7 @@ describe("array", () => {
         }
       }
 
-      const builder = new LocalDefinitionBuilder(source)
+      const builder = new ObjectBuilder(source)
       const resultado = await builder.build(schema)
 
       expect(resultado).toBe(true)
@@ -523,7 +522,7 @@ describe("array", () => {
       }
     }
 
-    const definitionBuilder = new LocalDefinitionBuilder(source)
+    const definitionBuilder = new ObjectBuilder(source)
     const resultado = await definitionBuilder.build(schema)
     const expected = [source]
 
@@ -552,7 +551,7 @@ describe("array", () => {
       }
     }
 
-    const builder = new LocalDefinitionBuilder(source)
+    const builder = new ObjectBuilder(source)
     const { total } = await builder.build(schema)
 
     expect(total).toBe(source.length - 1)
@@ -573,7 +572,7 @@ describe("array", () => {
         // }
       }
 
-      const builder = new LocalDefinitionBuilder({})
+      const builder = new ObjectBuilder({})
       const resultado = builder.build(schema)
 
       value ? expect(items).toEqual(resultado) : expect(items).not.toEqual(resultado)
@@ -610,7 +609,7 @@ describe("reduce", () => {
       ]
     }
 
-    const builder = new LocalDefinitionBuilder(source)
+    const builder = new ObjectBuilder(source)
     const resultado = await builder.build(schema)
     const expected = [4, 10].map(id => ({ id, nombre: "Melany" }))
 
@@ -635,7 +634,7 @@ describe("relative path", () => {
       }
     }
 
-    const builder = new LocalDefinitionBuilder(source)
+    const builder = new ObjectBuilder(source)
     const resultado = await builder.build(schema)
 
     expect(resultado).toEqual({ nombre: "Melany" })
@@ -654,7 +653,7 @@ test.todo("flat", async () => {
     }
   }
 
-  const builder = new LocalDefinitionBuilder({})
+  const builder = new ObjectBuilder({})
   const resultado = await builder.build(schema)
 
   expect(resultado).toEqual({ nombre: "Melany" })
@@ -674,7 +673,7 @@ test.todo("flat (path)", async () => {
     path: "usuario"
   }
 
-  const builder = new LocalDefinitionBuilder(source)
+  const builder = new ObjectBuilder(source)
   const resultado = await builder.build(schema)
 
   expect(resultado).toEqual({ nombre: "Melany", provincia: "Santiago" })
@@ -703,7 +702,7 @@ describe.each([true, false])("unpack", (useAsync) => {
       ]
     }
 
-    const builder = new LocalDefinitionBuilder({})
+    const builder = new ObjectBuilder({})
     const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
 
     expect(resultado).toEqual({ nombre: "Melany", id: 7 })
@@ -720,7 +719,7 @@ describe.each([true, false])("unpack", (useAsync) => {
       }
     }
 
-    const builder = new LocalDefinitionBuilder({})
+    const builder = new ObjectBuilder({})
     const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
 
     expect(resultado).toEqual({ nombre: "Fernando", id: 7 })
@@ -737,7 +736,7 @@ describe.each([true, false])("unpack", (useAsync) => {
       path: "usuario"
     }
 
-    const builder = new LocalDefinitionBuilder(source)
+    const builder = new ObjectBuilder(source)
     const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
 
     expect(resultado).toEqual({ nombre: "Melany", id: 1 })
@@ -772,7 +771,7 @@ describe.each([true, false])("basico", (useAsync) => {
       }
     }
 
-    const builder = new LocalDefinitionBuilder(source)
+    const builder = new ObjectBuilder(source)
     const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
 
     const expected = {
@@ -793,7 +792,7 @@ describe.each([true, false])("basico", (useAsync) => {
       const: 1,
       set: "detalles.id"
     }
-    const builder = new LocalDefinitionBuilder(source)
+    const builder = new ObjectBuilder(source)
     useAsync ? await builder.buildAsync(schema) : builder.build(schema)
 
     const expected = {
@@ -838,7 +837,7 @@ describe.each([true, false])("basico", (useAsync) => {
     ]
 
     test.each(cases)("case", (schema) => {
-      const builder = new LocalDefinitionBuilder({})
+      const builder = new ObjectBuilder({})
       const resultado = builder.build(schema)
 
       expect(resultado).toBe(true)
@@ -872,7 +871,7 @@ describe.each([true, false])("basico", (useAsync) => {
       }
     }
 
-    const builder = new LocalDefinitionBuilder({})
+    const builder = new ObjectBuilder({})
     const resultado = useAsync ? builder.build(schema) : builder.build(schema)
     const expected = {
       inner: [
@@ -915,7 +914,7 @@ describe.each([true, false])("basico", (useAsync) => {
       }
     }
 
-    const builder = new LocalDefinitionBuilder(source)
+    const builder = new ObjectBuilder(source)
     const resultado = useAsync ? builder.build(schema) : builder.build(schema)
     const expected = [
       {
@@ -948,7 +947,7 @@ describe.each([true, false])("basico", (useAsync) => {
       ]
     }
 
-    const builder = new LocalDefinitionBuilder(source)
+    const builder = new ObjectBuilder(source)
     const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
     const expected = ["Melany", "Flores"]
 
@@ -968,7 +967,7 @@ describe.each([true, false])("basico", (useAsync) => {
       }
     }
 
-    const builder = new LocalDefinitionBuilder({})
+    const builder = new ObjectBuilder({})
     const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
 
     expect(resultado).toEqual({ nombre: "Melany", id: 1 })
@@ -987,7 +986,7 @@ describe.each([true, false])("basico", (useAsync) => {
       }
     }
 
-    const builder = new LocalDefinitionBuilder({})
+    const builder = new ObjectBuilder({})
     const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
 
     expect(resultado).toEqual({ nombre: "Melany", id: 1 })
@@ -1002,7 +1001,7 @@ describe.each([true, false])("basico", (useAsync) => {
       }
     }
 
-    const builder = new LocalDefinitionBuilder({})
+    const builder = new ObjectBuilder({})
     const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
 
     expect(resultado).toEqual({ nombre: "Fernando", id: 7 })
@@ -1018,7 +1017,7 @@ describe.each([true, false])("basico", (useAsync) => {
       path: "usuario"
     }
 
-    const builder = new LocalDefinitionBuilder(source)
+    const builder = new ObjectBuilder(source)
     const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
 
     expect(resultado).toEqual({ nombre: "Melany", id: 1 })
