@@ -9,9 +9,9 @@ beforeAll(() => {
   server.listen()
 })
 
-describe.skip("schema con consulta", () => {
+describe("schema con consulta", () => {
 
-  test("consulta", { repeats: 50 }, async () => {
+  test("consulta", { repeats: 1 }, async () => {
 
     const schema = {
       consulta: {
@@ -27,9 +27,9 @@ describe.skip("schema con consulta", () => {
   })
 })
 
-describe.skip(("schema server"), () => {
+describe(("schema server"), () => {
 
-  test("useConsulta", { repeats: 50 }, async () => {
+  test("useConsulta", { repeats: 1 }, async () => {
 
     const consulta: Consulta = {
       url: "http://localhost:8000/numeros"
