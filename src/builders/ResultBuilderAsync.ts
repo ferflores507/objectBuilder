@@ -22,7 +22,7 @@ export class ResultBuilderAsync extends ResultBuilderBase {
         await this.withDefinitionsAsync(definitions)
         await this.withPropiedadesAsync(propiedades)
         await this.withSpreadAsync(spread)
-        await this.withArrayToArraySchema(schema) // await solo para alinear 
+        await this.withArraySchema(schema) // await solo para alinear 
         await this.withEquals(equals) // await solo para alinear
         await this.withReduceAsync(reduce)
         await this.withSet(set)

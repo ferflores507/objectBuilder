@@ -1,6 +1,6 @@
 import { Calc } from "../helpers/calc"
-import type { ArrayToArraySchema, CalcMethod, Schema } from "../models"
-import { ArrayToArrayBuilder } from "./ArrayToArrayBuilder"
+import type { ArraySchema, CalcMethod, Schema } from "../models"
+import { ArrayBuilder } from "./ArrayBuilder"
 import { ObjectBuilder } from "./ObjectBuilder"
 import * as varios from "../helpers/varios"
 
@@ -69,8 +69,8 @@ export class ResultBuilderBase {
         return this
     }
 
-    withArrayToArraySchema(schema: ArrayToArraySchema | undefined) {
-        this.target = new ArrayToArrayBuilder(this.target as [], this.builder)
+    withArraySchema(schema: ArraySchema | undefined) {
+        this.target = new ArrayBuilder(this.target as [], this.builder)
             .withSchema(schema)
             .build()
 

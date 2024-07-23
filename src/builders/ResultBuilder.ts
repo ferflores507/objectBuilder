@@ -12,7 +12,7 @@ export class ResultBuilder extends ResultBuilderBase {
             .withDefinitions(definitions)
             .withPropiedades(propiedades)
             .withSpread(spread)
-            .withArrayToArraySchema(schema)
+            .withArraySchema(schema)
             .withEquals(equals)
             .withReduce(reduce)
             .withSet(set)

@@ -1,8 +1,8 @@
-import type { ArrayToArraySchema, Join, Schema } from "../models";
+import type { ArraySchema, Join, Schema } from "../models";
 import { ArrayFilterBuilder } from "./ArrayFilterBuilder";
 import { ObjectBuilder } from "./ObjectBuilder";
 
-export class ArrayToArrayBuilder {
+export class ArrayBuilder {
 
     constructor(target: [], builder: ObjectBuilder) {
         this.target = target
@@ -14,7 +14,7 @@ export class ArrayToArrayBuilder {
 
     build = () => this.target
 
-    validar(schema: ArrayToArraySchema | undefined) {
+    validar(schema: ArraySchema | undefined) {
         const { filter, find, items, contains, map, groupJoin } = schema ?? {}
 
         const isEmpty = [filter, find, items, contains, map, groupJoin].every(x => x == null)
@@ -23,7 +23,7 @@ export class ArrayToArrayBuilder {
         return isArray || isEmpty
     }
 
-    withSchema(schema: ArrayToArraySchema | undefined) {
+    withSchema(schema: ArraySchema | undefined) {
         if(this.validar(schema) == false) {
             throw "El elemento debe ser de tipo arreglo."
         }
@@ -36,7 +36,7 @@ export class ArrayToArrayBuilder {
             .withGroupJoin(groupJoin)
     }
 
-    withFilter(schema: ArrayToArraySchema | undefined) {
+    withFilter(schema: ArraySchema | undefined) {
         const { filter, find, items, contains } = schema ?? {}
 
         this.target = new ArrayFilterBuilder(this.target, this.builder)

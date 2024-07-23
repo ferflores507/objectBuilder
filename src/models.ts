@@ -5,7 +5,7 @@ export type Join = {
     match: Schema
 }
 
-export type ArrayToArraySchema = Partial<{
+export type ArraySchema = Partial<{
     filter: Schema,
     find: Schema,
     items: Schema,
@@ -45,4 +45,4 @@ export type Schema = Partial<{
     spread: Schema
     then: Record<string, any>
     unpack: string[]
-}> & ArrayToArraySchema
+}> & ArraySchema
