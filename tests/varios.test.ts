@@ -3,6 +3,33 @@ import { ObjectBuilder, Schema } from "../";
 import * as varios from '../src/helpers/varios';
 import { ResultBuilder } from '../src/builders/ResultBuilder';
 
+describe("getObjPath works with custom separator or default: '.'", () => {
+    const cases = [
+        {
+            path: "user.address.country",
+        },
+        {
+            path: "user/address/country",
+            separator: "/"
+        }
+    ]
+
+    test.each(cases)("with path $path and $separator as separator", ({ path, separator }) => {
+        const country = "Panama"
+        const source = {
+            user: {
+                address: {
+                    country
+                }
+            }
+        }
+
+        const value = varios.getObjPath(source, path, separator)
+
+        expect(value).toBe(country)
+    })
+})
+
 test("class with method destructure", () => {
     class Form {
         id = 0
