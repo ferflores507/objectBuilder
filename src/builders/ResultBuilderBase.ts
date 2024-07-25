@@ -22,7 +22,9 @@ export class ResultBuilderBase {
             schemaFrom, 
             entries, 
             calc, 
-            unpack
+            unpack,
+            stringify,
+            parse
         } = schema ?? {}
 
         return this.withConst(value)
@@ -31,6 +33,24 @@ export class ResultBuilderBase {
             .withEntries(entries)
             .withCalc(calc)
             .withUnpack(unpack)
+            .withStringify(stringify)
+            .withParse(parse)
+    }
+
+    withStringify(stringify: true | undefined) {
+        if(stringify) {
+            this.target = JSON.stringify(this.target)
+        }
+
+        return this
+    }
+
+    withParse(parse: true | undefined) {
+        if(parse) {
+            this.target = JSON.parse(this.target as string)
+        }
+
+        return this
     }
 
     withCheckout(schema: Schema | undefined) {

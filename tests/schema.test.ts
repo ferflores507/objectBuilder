@@ -746,6 +746,32 @@ describe.each([true, false])("unpack", (useAsync) => {
 
 describe.each([true, false])("basico", (useAsync) => {
 
+  test("stringify", async () => {
+    const source = { id: 1 }
+    const schema = {
+      stringify: true
+    }
+
+    const builder = new ObjectBuilder(source)
+    const result = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
+    const expected = JSON.stringify(source)
+
+    expect(result).toBe(expected)
+  })
+
+  test("parse", async () => {
+    const expected = { id: 1 }
+    const source = JSON.stringify(expected)
+    const schema = {
+      parse: true
+    }
+
+    const builder = new ObjectBuilder(source)
+    const result = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
+
+    expect(result).toEqual(expected)
+  })
+
   test("schemaFrom", async () => {
     const source = {
       info: {

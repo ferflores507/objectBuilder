@@ -36,12 +36,14 @@ export type Schema = Partial<{
     flat: true
     if: Record<string, any>
     path: string
+    parse: true
     propiedades: Record<string, Schema>
     reduce: Schema[]
     required: string[]
     schemaFrom: Schema
     set: string
     some: any
+    stringify: true
     spread: Schema
     then: Record<string, any>
     unpack: string[]
