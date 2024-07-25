@@ -11,10 +11,10 @@ export const getFormData = (source: {}) => {
     return data
 }
 
-export const getObjPath = (obj: Record<string, any>, path: string | undefined) => {
+export const getObjPath = (obj: Record<string, any>, path: string | undefined, separator = ".") => {
     return path
       ?.toString()
-      .split(".")
+      .split(separator)
       .reduce((p, c) => p?.[c], obj);
   }
 
