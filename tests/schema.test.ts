@@ -3,6 +3,38 @@ import { ObjectBuilder, Schema } from "../"
 
 describe.each([true, false])("spread", (useAsync) => {
 
+  describe("targetPath", () => {
+
+    test("set value from a sibling property", async () => {
+      const source = {}
+      
+      const schema: Schema = {
+        propiedades: {
+          title: {
+            const: "One"
+          },
+          value: {
+            const: 1
+          },
+          titleCopy: {
+            targetPath: "title"
+          }
+        }
+      }
+
+      const builder = new ObjectBuilder(source)
+      const result = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
+      const expected = {
+        title: "One",
+        value: 1,
+        titleCopy: "One"
+      }
+    
+      expect(result).toEqual(expected)
+    })
+  
+  })
+
   const cases: Array<{ tipo: string, schema: Schema, expected: any }> = [
     {
       tipo: "simple",
