@@ -30,22 +30,14 @@ export class ResultBuilderBase {
         } = schema ?? {}
 
         return this.withConst(value)
-            .withPath(path)
-            .withTargetPath(targetPath)
+            .withPath(this.builder.getSource(), path)
+            .withPath(this.target, targetPath)
             .withSchemaFrom(schemaFrom)
             .withEntries(entries)
             .withCalc(calc)
             .withUnpack(unpack)
             .withStringify(stringify)
             .withParse(parse)
-    }
-
-    withTargetPath(path: string | undefined) {
-        if(path) {
-            this.target = getObjPath(this.target, path)
-        }
-
-        return this
     }
 
     withStringify(stringify: true | undefined) {
@@ -152,12 +144,9 @@ export class ResultBuilderBase {
         return this
     }
 
-    withPath(path: string | undefined) {
-
+    withPath(source: {}, path: string | undefined) {
         if(path) {
-            const resultado = this.builder.getSourcePathValue(path)
-
-            this.target = resultado
+            this.target = getObjPath(source, path)
         }
 
         return this
