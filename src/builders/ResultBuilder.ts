@@ -42,10 +42,9 @@ export class ResultBuilder extends ResultBuilderBase {
 
         if (propiedades) {
             const obj: Record<string, any> = {}
-            const builder = this.builder.withTarget(this.target)
       
             for (const [k, v] of Object.entries(propiedades)) {
-              obj[k] = builder.build(v);
+              obj[k] = this.builder.withTarget(obj).build(v);
             }
       
             this.target = obj

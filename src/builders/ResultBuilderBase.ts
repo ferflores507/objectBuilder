@@ -3,6 +3,7 @@ import type { ArraySchema, CalcMethod, Schema } from "../models"
 import { ArrayBuilder } from "./ArrayBuilder"
 import { ObjectBuilder } from "./ObjectBuilder"
 import * as varios from "../helpers/varios"
+import { getObjPath } from "../helpers/varios"
 
 export class ResultBuilderBase {
     constructor(target: any, builder: ObjectBuilder) {
@@ -17,7 +18,8 @@ export class ResultBuilderBase {
 
     withSchema(schema: Schema | undefined) {
         const { 
-            path, 
+            path,
+            targetPath,
             "const": value,
             schemaFrom, 
             entries, 
@@ -28,7 +30,8 @@ export class ResultBuilderBase {
         } = schema ?? {}
 
         return this.withConst(value)
-            .withPath(path)
+            .withPath(this.builder.getSource(), path)
+            .withPath(this.target, targetPath)
             .withSchemaFrom(schemaFrom)
             .withEntries(entries)
             .withCalc(calc)
@@ -141,12 +144,9 @@ export class ResultBuilderBase {
         return this
     }
 
-    withPath(path: string | undefined) {
-
+    withPath(source: {}, path: string | undefined) {
         if(path) {
-            const resultado = this.builder.getSourcePathValue(path)
-
-            this.target = resultado
+            this.target = getObjPath(source, path)
         }
 
         return this
