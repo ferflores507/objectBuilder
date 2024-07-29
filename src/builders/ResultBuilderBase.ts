@@ -40,6 +40,15 @@ export class ResultBuilderBase {
             .withParse(parse)
     }
 
+    withUse(path: string | undefined) {
+        if(path) {
+            const func = this.builder.getSourcePathValue(path)
+            this.target = func(this.target)
+        }
+
+        return this
+    }
+
     withStringify(stringify: true | undefined) {
         if(stringify) {
             this.target = JSON.stringify(this.target)
