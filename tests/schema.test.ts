@@ -21,7 +21,7 @@ describe("targetPath", () => {
     }
 
     const builder = new ObjectBuilder(source)
-    const result = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
+    const [result, resultAsync] = [builder.build(schema), await builder.buildAsync(schema)]
     const expected = {
       title: "One",
       value: 1,
@@ -29,6 +29,7 @@ describe("targetPath", () => {
     }
   
     expect(result).toEqual(expected)
+    expect(resultAsync).toEqual(expected)
   })
 
 })
