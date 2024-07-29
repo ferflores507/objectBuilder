@@ -243,10 +243,9 @@ describe("basico", () => {
   test.each(cases)("$name", async ({ name, source, schema, expected }) => {
 
     const builder = new ObjectBuilder(source)
-    const [resultado, resultadoAsync] = await buildResultsAsync(builder, schema)
+    const results = await buildResultsAsync(builder, schema)
   
-    expect(resultado).toEqual(expected)
-    expect(resultadoAsync).toEqual(expected)
+    expect(results).toEqual([expected, expected]) // until an everyIsEqual or toEqualAll is implemented
   })
 
 })
