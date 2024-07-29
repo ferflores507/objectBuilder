@@ -1,6 +1,41 @@
 import { describe, expect, test } from 'vitest'
 import { ObjectBuilder, Schema } from "../"
 
+describe("use", () => {
+
+  const cases = [
+    {
+      use: "first",
+      expected: "a"
+    },
+    {
+      use: "last",
+      expected: "c"
+    }
+  ]
+
+  test.each(cases)("use %s", async ({ use, expected }) => {
+    const source = {
+      items: ["a", "b", "c"],
+      first: (array: any[]) => array[0],
+      last: (array: any[]) => array[array.length - 1]
+    }
+
+    const builder = new ObjectBuilder(source)
+    const schema = { 
+      path: "items",
+      use 
+    }
+
+    // To be refactored in function to return array of both results
+    const [resultado, resultadoAsync] = [builder.build(schema), await builder.buildAsync(schema)]
+    
+    expect(resultado).toEqual(expected)
+    expect(resultadoAsync).toEqual(expected)
+  })
+
+})
+
 describe.each([true, false])("spread", (useAsync) => {
 
   describe("targetPath", () => {
