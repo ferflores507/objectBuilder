@@ -1,39 +1,40 @@
 import { describe, expect, test } from 'vitest'
 import { ObjectBuilder, Schema } from "../"
 
-describe.each([true, false])("spread", (useAsync) => {
+describe("targetPath", () => {
 
-  describe("targetPath", () => {
-
-    test("set value from a sibling property", async () => {
-      const source = {}
-      
-      const schema: Schema = {
-        propiedades: {
-          title: {
-            const: "One"
-          },
-          value: {
-            const: 1
-          },
-          titleCopy: {
-            targetPath: "title"
-          }
+  test("set value from a sibling property", async () => {
+    const source = {}
+    
+    const schema: Schema = {
+      propiedades: {
+        title: {
+          const: "One"
+        },
+        value: {
+          const: 1
+        },
+        titleCopy: {
+          targetPath: "title"
         }
       }
+    }
 
-      const builder = new ObjectBuilder(source)
-      const result = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
-      const expected = {
-        title: "One",
-        value: 1,
-        titleCopy: "One"
-      }
-    
-      expect(result).toEqual(expected)
-    })
+    const builder = new ObjectBuilder(source)
+    const [result, resultAsync] = [builder.build(schema), await builder.buildAsync(schema)]
+    const expected = {
+      title: "One",
+      value: 1,
+      titleCopy: "One"
+    }
   
+    expect(result).toEqual(expected)
+    expect(resultAsync).toEqual(expected)
   })
+
+})
+
+describe.each([true, false])("spread", (useAsync) => {
 
   const cases: Array<{ tipo: string, schema: Schema, expected: any }> = [
     {
