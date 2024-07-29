@@ -54,26 +54,8 @@ const cases: Case[] = [
       id: 4
     }
   },
-  // {
-  //   name: "set", // no es posible porque se tiene que hacer expect a source que se muto
-  //   source: {
-  //     nombre: "Melany",
-  //     apellido: "Flores"
-  //   },
-  //   schema: {
-  //     const: 1,
-  //     set: "detalles.id"
-  //   },
-  //   expected: {
-  //     nombre: "Melany",
-  //     apellido: "Flores",
-  //     detalles: {
-  //       id: 1
-  //     }
-  //   }
-  // },
   {
-    name: "definitions", // no es posible porque se tiene que hacer expect a source que se muto
+    name: "definitions",
     source: {},
     schema: {
       const: {
