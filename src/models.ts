@@ -48,4 +48,5 @@ export type Schema = Partial<{
     targetPath: string
     then: Record<string, any>
     unpack: string[]
+    use: string
 }> & ArraySchema
