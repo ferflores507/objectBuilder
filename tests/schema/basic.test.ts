@@ -234,13 +234,16 @@ const cases: Case[] = [
   }
 ]
 
+const buildResultsAsync = async (builder: ObjectBuilder, schema: Schema) => {
+  return [builder.build(schema), await builder.buildAsync(schema)]
+}
+
 describe("basico", () => {
 
   test.each(cases)("$name", async ({ name, source, schema, expected }) => {
 
     const builder = new ObjectBuilder(source)
-    const resultado = builder.build(schema)
-    const resultadoAsync = await builder.buildAsync(schema)
+    const [resultado, resultadoAsync] = await buildResultsAsync(builder, schema)
   
     expect(resultado).toEqual(expected)
     expect(resultadoAsync).toEqual(expected)
@@ -248,7 +251,7 @@ describe("basico", () => {
 
 })
 
-describe.each([true, false])("basico old", (useAsync) => {
+describe("basico old", () => {
   
     test("set", async () => {
       const source = {
@@ -261,7 +264,8 @@ describe.each([true, false])("basico old", (useAsync) => {
         set: "detalles.id"
       }
       const builder = new ObjectBuilder(source)
-      useAsync ? await builder.buildAsync(schema) : builder.build(schema)
+      
+      await buildResultsAsync(builder, schema)
   
       const expected = {
         ...source,
@@ -304,11 +308,11 @@ describe.each([true, false])("basico old", (useAsync) => {
         }
       ]
   
-      test.each(cases)("case", (schema) => {
+      test.each(cases)("case", async (schema) => {
         const builder = new ObjectBuilder({})
-        const resultado = builder.build(schema)
-  
-        expect(resultado).toBe(true)
+        const results = await buildResultsAsync(builder, schema)
+
+        expect(results.every(r => r === true)).toBe(true)
       })
     })
       
