@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { ObjectBuilder, Schema } from "../.."
+import { buildResultsAsync } from "./buildResultsASync"
 
 type Case = {
   name: string,
@@ -215,10 +216,6 @@ const cases: Case[] = [
     }
   }
 ]
-
-const buildResultsAsync = async (builder: ObjectBuilder, schema: Schema) => {
-  return [builder.build(schema), await builder.buildAsync(schema)]
-}
 
 describe("basico", () => {
 
