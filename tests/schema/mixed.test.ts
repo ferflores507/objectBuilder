@@ -711,44 +711,48 @@ describe("relative path", () => {
 
 })
 
-test.todo("flat", async () => {
-
-  const schema: Schema = {
-    flat: true,
-    propiedades: {
-      propsA: {
-        const: { nombre: "Melany" },
-      }
-    }
-  }
-
-  const builder = new ObjectBuilder({})
-  const resultado = await builder.build(schema)
-
-  expect(resultado).toEqual({ nombre: "Melany" })
-})
-
-test.todo("flat (path)", async () => {
-
-  const source = {
-    usuario: {
-      personal: { nombre: "Melany" },
-      direccion: { provincia: "Santiago" }
-    }
-  }
-
-  const schema: Schema = {
-    flat: true,
-    path: "usuario"
-  }
-
-  const builder = new ObjectBuilder(source)
-  const resultado = await builder.build(schema)
-
-  expect(resultado).toEqual({ nombre: "Melany", provincia: "Santiago" })
-})
-
 describe("mixed", () => {
+
+  describe.todo("flat", () => {
+
+    test("flat", async () => {
+
+      const schema: Schema = {
+        flat: true,
+        propiedades: {
+          propsA: {
+            const: { nombre: "Melany" },
+          }
+        }
+      }
+    
+      const builder = new ObjectBuilder({})
+      const resultado = await builder.build(schema)
+    
+      expect(resultado).toEqual({ nombre: "Melany" })
+    })
+    
+    test("flat (path)", async () => {
+    
+      const source = {
+        usuario: {
+          personal: { nombre: "Melany" },
+          direccion: { provincia: "Santiago" }
+        }
+      }
+    
+      const schema: Schema = {
+        flat: true,
+        path: "usuario"
+      }
+    
+      const builder = new ObjectBuilder(source)
+      const resultado = await builder.build(schema)
+    
+      expect(resultado).toEqual({ nombre: "Melany", provincia: "Santiago" })
+    })
+
+  })
 
   describe("unpack", () => {
     const cases = [
