@@ -687,31 +687,31 @@ describe("reduce", () => {
 
 })
 
-describe("relative path", () => {
+describe("mixed", () => {
 
-  test("propiedad nombre asignada con path nombre y relative = true es igual a detalles.personal.nombre (Melany)", async () => {
+  describe("checkout", () => {
 
-    const source = { detalles: { personal: { nombre: "Melany" } } }
-    const schema: Schema = {
-      path: "detalles.personal",
-      checkout: {
-        propiedades: {
-          nombre: {
-            path: "nombre"
+    test("path", async () => {
+  
+      const source = { detalles: { personal: { nombre: "Melany" } } }
+      const schema: Schema = {
+        path: "detalles.personal",
+        checkout: {
+          propiedades: {
+            nombre: {
+              path: "nombre"
+            }
           }
         }
       }
-    }
-
-    const builder = new ObjectBuilder(source)
-    const resultado = await builder.build(schema)
-
-    expect(resultado).toEqual({ nombre: "Melany" })
+      const expected = { nombre: "Melany" }
+      const builder = new ObjectBuilder(source)
+      const results = await buildResultsAsync(builder, schema)
+  
+      expect(results.every(r => r === expected)).toBe(true)
+    })
+  
   })
-
-})
-
-describe("mixed", () => {
 
   describe.todo("flat", () => {
 
