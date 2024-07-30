@@ -165,7 +165,7 @@ describe("entries", () => {
   })
 })
 
-describe.each([true, false])("calc", (useAsync) => {
+describe("calc", () => {
 
   test.each([
     ["sumar", 115],
@@ -180,9 +180,9 @@ describe.each([true, false])("calc", (useAsync) => {
     }
 
     const builder = new ObjectBuilder({})
-    const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
+    const results = await buildResultsAsync(builder, schema)
 
-    expect(resultado).toBe(total)
+    expect(results.every(r => r === total)).toBe(true)
   })
 })
 
