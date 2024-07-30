@@ -186,56 +186,53 @@ describe.each([true, false])("calc", (useAsync) => {
   })
 })
 
-describe("nested propiedades", () => {
+test("nested propiedades", async () => {
 
-  test("nested with parent definition works with both relative = true and regular path", async () => {
-
-    const source = {
-      objOne: {
-        id: 1
-      },
-      objTwo: {
-        id: 1
-      },
-      publicacion: {
-        mensaje: "prueba"
-      }
+  const source = {
+    objOne: {
+      id: 1
+    },
+    objTwo: {
+      id: 1
+    },
+    publicacion: {
+      mensaje: "prueba"
     }
+  }
 
-    const schema: Schema = {
-      propiedades: {
-        mensajeRoot: {
-          path: "publicacion.mensaje",
-        },
-        nested: {
-          propiedades: {
-            mensaje: {
-              path: "publicacion.mensaje"
-            },
-            objectsIdsAreEqual: {
-              path: "objOne.id",
-              equals: {
-                path: "objTwo.id"
-              }
+  const schema: Schema = {
+    propiedades: {
+      mensajeRoot: {
+        path: "publicacion.mensaje",
+      },
+      nested: {
+        propiedades: {
+          mensaje: {
+            path: "publicacion.mensaje"
+          },
+          objectsIdsAreEqual: {
+            path: "objOne.id",
+            equals: {
+              path: "objTwo.id"
             }
           }
         }
       }
     }
+  }
 
-    const builder = new ObjectBuilder(source)
-    const resultado = await builder.build(schema)
+  const builder = new ObjectBuilder(source)
+  const resultado = await builder.build(schema)
 
-    const expected = {
-      mensajeRoot: "prueba",
-      nested: {
-        mensaje: "prueba",
-        objectsIdsAreEqual: true
-      }
+  const expected = {
+    mensajeRoot: "prueba",
+    nested: {
+      mensaje: "prueba",
+      objectsIdsAreEqual: true
     }
+  }
 
-    expect(resultado).toEqual(expected)
-  })
+  expect(resultado).toEqual(expected)
 })
 
 describe("comparacion", () => {
