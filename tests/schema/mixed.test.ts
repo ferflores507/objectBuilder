@@ -412,25 +412,23 @@ describe("array", () => {
               activo: true
             }
           },
-          checkout: {
-            propiedades: {
-              inner: {
-                definitions: [
-                  {
-                    const: false
-                  },
-                  {
-                    path: "detalles.activo"
-                  },
-                  {
-                    const: false
-                  }
-                ],
-                contains: {
-                  path: "inner",
-                  equals: {
-                    const: true
-                  }
+          propiedades: {
+            inner: {
+              definitions: [
+                {
+                  const: false
+                },
+                {
+                  targetPath: "detalles.activo"
+                },
+                {
+                  const: false
+                }
+              ],
+              contains: {
+                path: "inner",
+                equals: {
+                  const: true
                 }
               }
             }

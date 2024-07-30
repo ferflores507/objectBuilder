@@ -65,21 +65,19 @@ const cases: Case[] = [
           activo: true
         }
       },
-      checkout: {
-        propiedades: {
-          inner: {
-            definitions: [
-              {
-                const: false
-              },
-              {
-                path: "detalles.activo"
-              },
-              {
-                const: false
-              }
-            ]
-          }
+      propiedades: {
+        inner: {
+          definitions: [
+            {
+              const: false
+            },
+            {
+              targetPath: "detalles.activo"
+            },
+            {
+              const: false
+            }
+          ]
         }
       }
     },
@@ -101,24 +99,22 @@ const cases: Case[] = [
     },
     schema: {
       path: "detalles",
-      checkout: {
-        definitions: [
-          {
-            propiedades: {
-              titulo: {
-                path: "nombre"
-              }
-            }
-          },
-          {
-            propiedades: {
-              habilitado: {
-                path: "activo"
-              }
+      definitions: [
+        {
+          propiedades: {
+            titulo: {
+              targetPath: "nombre"
             }
           }
-        ]
-      }
+        },
+        {
+          propiedades: {
+            habilitado: {
+              targetPath: "activo"
+            }
+          }
+        }
+      ]
     },
     expected: [
       {
