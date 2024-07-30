@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { ObjectBuilder, Schema } from "../.."
+import { buildResultsAsync } from './buildResultsASync'
 
 describe("use", () => {
 
@@ -747,67 +748,66 @@ test.todo("flat (path)", async () => {
   expect(resultado).toEqual({ nombre: "Melany", provincia: "Santiago" })
 })
 
-describe.each([true, false])("unpack", (useAsync) => {
+describe("mixed", () => {
 
-  test("propiedades", async () => {
-
-    const schema: Schema = {
-      propiedades: {
-        nombre: {
-          const: "Melany",
+  describe("unpack", () => {
+    const cases = [
+      {
+        name: "propiedades",
+        source: {},
+        schema: {
+          propiedades: {
+            nombre: {
+              const: "Melany",
+            },
+            cedula: {
+              const: "9-123",
+            },
+            id: {
+              const: 7
+            }
+          },
+          reduce: [
+            {
+              unpack: ["nombre", "id"],
+            }
+          ]
         },
-        cedula: {
-          const: "9-123",
-        },
-        id: {
-          const: 7
-        }
+        expected: { nombre: "Melany", id: 7 }
       },
-      reduce: [
-        {
+      {
+        name: "const",
+        source: {},
+        schema: {
+          const: {
+            nombre: "Fernando",
+            apellido: "Flores",
+            id: 7
+          },
           unpack: ["nombre", "id"],
-        }
-      ]
-    }
-
-    const builder = new ObjectBuilder({})
-    const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
-
-    expect(resultado).toEqual({ nombre: "Melany", id: 7 })
-  })
-
-  test("const", async () => {
-
-    const schema: Schema = {
-      unpack: ["nombre", "id"],
-      const: {
-        nombre: "Fernando",
-        apellido: "Flores",
-        id: 7
+        },
+        expected: { nombre: "Fernando", id: 7 }
+      },
+      {
+        name: "path",
+        source: {
+          usuario: { nombre: "Melany", id: 1, cedula: "9-123" }
+        },
+        schema: {
+          unpack: ["nombre", "id"],
+          path: "usuario"
+        },
+        expected: { nombre: "Melany", id: 1 }
       }
-    }
-
-    const builder = new ObjectBuilder({})
-    const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
-
-    expect(resultado).toEqual({ nombre: "Fernando", id: 7 })
-  })
-
-  test("path", async () => {
-
-    const source = {
-      usuario: { nombre: "Melany", id: 1, cedula: "9-123" }
-    }
-
-    const schema: Schema = {
-      unpack: ["nombre", "id"],
-      path: "usuario"
-    }
-
-    const builder = new ObjectBuilder(source)
-    const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
-
-    expect(resultado).toEqual({ nombre: "Melany", id: 1 })
+    ]
+  
+    test.each(cases)("$name", async ({ name, source, schema, expected }) => {
+  
+      const builder = new ObjectBuilder(source)
+      const results = await buildResultsAsync(builder, schema)
+    
+      expect(results).toEqual([expected, expected])
+    })
   })
 
 })
