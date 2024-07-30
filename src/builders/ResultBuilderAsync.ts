@@ -14,7 +14,7 @@ export class ResultBuilderAsync extends ResultBuilderBase {
       controller: AbortController
 
     async buildAsync(schema: Schema | undefined) {
-        const { propiedades, spread, definitions, reduce, equals, set, delay, consulta, use } = schema ?? {}
+        const { propiedades, spread, definitions, reduce, equals, set, delay, consulta, checkout, use } = schema ?? {}
 
         this.withSchema(schema)
         await this.withDelay(delay)
@@ -26,6 +26,7 @@ export class ResultBuilderAsync extends ResultBuilderBase {
         await this.withEquals(equals) // await solo para alinear
         await this.withReduceAsync(reduce)
         await this.withSet(set)
+        await this.withCheckout(checkout)
         await this.withUse(use)
 
         return this.getTarget()
