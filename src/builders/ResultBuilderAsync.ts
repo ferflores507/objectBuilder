@@ -82,7 +82,7 @@ export class ResultBuilderAsync extends ResultBuilderBase {
             const obj: Record<string, any> = {}
       
             for (const [k, v] of Object.entries(propiedades)) {
-              obj[k] = await this.builder.withTarget(obj).buildAsync(v, this.controller);
+              obj[k] = await this.buildAsync(v);
             }
       
             this.target = obj
