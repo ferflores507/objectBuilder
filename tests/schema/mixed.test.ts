@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { ObjectBuilder, Schema } from "../"
+import { ObjectBuilder, Schema } from "../.."
 
 describe("use", () => {
 
