@@ -28,11 +28,9 @@ describe("use", () => {
       use
     }
 
-    // To be refactored in function to return array of both results
-    const [resultado, resultadoAsync] = [builder.build(schema), await builder.buildAsync(schema)]
+    const results = await buildResultsAsync(builder, schema)
 
-    expect(resultado).toEqual(expected)
-    expect(resultadoAsync).toEqual(expected)
+    expect(results).toEqual([expected, expected])
   })
 
 })
@@ -57,15 +55,14 @@ describe("targetPath", () => {
     }
 
     const builder = new ObjectBuilder(source)
-    const [result, resultAsync] = [builder.build(schema), await builder.buildAsync(schema)]
+    const results = await buildResultsAsync(builder, schema)
     const expected = {
       title: "One",
       value: 1,
       titleCopy: "One"
     }
 
-    expect(result).toEqual(expected)
-    expect(resultAsync).toEqual(expected)
+    expect(results).toEqual([expected, expected])
   })
 
 })
