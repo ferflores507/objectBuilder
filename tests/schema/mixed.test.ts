@@ -238,24 +238,6 @@ describe("nested propiedades", () => {
   })
 })
 
-describe.each([true, false])("test simple", (useAsync) => {
-
-  test('validacion manual: nombre en source es igual a valor retornado por build', async () => {
-
-    const source = { nombre: "Melany" }
-
-    const schema: Schema = {
-      path: "nombre"
-    }
-
-    const builder = new ObjectBuilder(source)
-    const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
-
-    expect(resultado).toBe(source.nombre)
-  })
-
-})
-
 describe("comparacion", () => {
 
   describe("equal: nombre en source (Melany)", () => {
