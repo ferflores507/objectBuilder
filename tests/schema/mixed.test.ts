@@ -592,13 +592,15 @@ describe("array", () => {
           const: "Melany"
         }
       },
-      checkout: {
-        propiedades: {
-          total: {
-            path: "length"
+      reduce: [
+        {
+          propiedades: {
+            total: {
+              targetPath: "length"
+            }
           }
         }
-      }
+      ]
     }
 
     const builder = new ObjectBuilder(source)
