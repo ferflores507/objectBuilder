@@ -452,6 +452,20 @@ describe("array", () => {
         expected: {
           inner: true
         }
+      },
+      {
+        name: "filtrar por nombre de item es igual nombre en source",
+        source: { nombre: "Fernando" },
+        schema: {
+          const: Array(3).fill({ nombre: "Melany" }).toSpliced(1, 0, { nombre: "Fernando" }),
+          filter: {
+            path: "inner.nombre",
+            equals: {
+              path: "outer.nombre"
+            }
+          }
+        },
+        expected: [{ nombre: "Fernando" }]
       }
     ]
 
@@ -576,27 +590,6 @@ describe("array", () => {
       expect(resultado).toBe(true)
     })
 
-  })
-
-  test("filtrar por nombre de item es igual a store.nombre", async () => {
-
-    const source = { nombre: "Fernando" }
-
-    const schema: Schema = {
-      const: Array(3).fill({ nombre: "Melany" }).toSpliced(1, 0, source),
-      filter: {
-        path: "inner.nombre",
-        equals: {
-          path: "outer.nombre"
-        }
-      }
-    }
-
-    const definitionBuilder = new ObjectBuilder(source)
-    const resultado = await definitionBuilder.build(schema)
-    const expected = [source]
-
-    expect(resultado).toEqual(expected)
   })
 
   test("reduce: filtrar array y luego asignar length a propiedad total por medio de target", async () => {
