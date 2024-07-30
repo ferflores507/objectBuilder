@@ -286,6 +286,208 @@ describe("comparacion", () => {
 
 describe("array", () => {
 
+  describe("mixed", () => {
+    const cases = [
+      {
+        name: "groupJoin",
+        source: {},
+        schema: {
+          const: [
+            {
+              nameId: 1,
+              nombre: "nombre",
+            },
+            {
+              nameId: 2,
+              nombre: "cedula",
+            }
+          ],
+          groupJoin: {
+            items: {
+              const: [
+                {
+                  nombre: "nombre",
+                  valor: "Melany"
+                },
+                {
+                  nombre: "nombre",
+                  valor: "Melany"
+                }
+              ]
+            },
+            match: {
+              find: {
+                path: "inner.nombre",
+                equals: {
+                  path: "outer.nombre"
+                }
+              }
+            }
+          }
+        },
+        expected: [
+          {
+            inner: {
+              nameId: 1,
+              nombre: "nombre",
+            },
+            group: {
+              nombre: "nombre",
+              valor: "Melany"
+            }
+          },
+          {
+            inner: {
+              nameId: 2,
+              nombre: "cedula"
+            },
+            group: undefined
+          }
+        ]
+      },
+      {
+        name: "map join dos",
+        source: {},
+        schema: { // 36 lineas
+          const: [
+            {
+              nameId: 1,
+              nombre: "nombre",
+            },
+            {
+              nameId: 2,
+              nombre: "cedula",
+            }
+          ],
+          map: {
+            path: "inner",
+            checkout: {
+              spread: {
+                const: [
+                  {
+                    nombre: "nombre",
+                    valor: "Melany"
+                  },
+                  {
+                    nombre: "nombre",
+                    valor: "Melany"
+                  }
+                ],
+                find: {
+                  path: "inner.nombre",
+                  equals: {
+                    path: "outer.nombre"
+                  }
+                }
+              }
+            }
+          }
+        },
+        expected: [
+          {
+            nameId: 1,
+            nombre: "nombre",
+            valor: "Melany"
+          },
+          {
+            nameId: 2,
+            nombre: "cedula"
+          }
+        ]
+      },
+      {
+        name: "",
+        source: {},
+        schema: {},
+        expected: {}
+      },
+      {
+        name: "",
+        source: {},
+        schema: {},
+        expected: {}
+      }
+    ]
+
+    test.each(cases)("$name", async ({ source, schema, expected }) => {
+      const builder = new ObjectBuilder(source)
+      const results = await buildResultsAsync(builder, schema)
+
+      expect(results).toEqual([expected, expected])
+    })
+
+  })
+
+  describe("mixed 2", () => {
+
+    const cases = [
+      {
+        name: "find",
+        source: [
+          1, 
+          "dos", 
+          { nombre: "Mari" }, 
+          { nombre: "Melany" }
+        ],
+        schema: {
+          find: {
+            path: "inner.nombre",
+            equals: {
+              const: "Melany"
+            }
+          }
+        },
+        expected: { nombre: "Melany" }
+      },
+      {
+        name: "some are true: from inner definition",
+        source: {},
+        schema: {
+          const: {
+            detalles: {
+              nombre: "Melany",
+              activo: true
+            }
+          },
+          checkout: {
+            propiedades: {
+              inner: {
+                definitions: [
+                  {
+                    const: false
+                  },
+                  {
+                    path: "detalles.activo"
+                  },
+                  {
+                    const: false
+                  }
+                ],
+                contains: {
+                  path: "inner",
+                  equals: {
+                    const: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        expected: {
+          inner: true
+        }
+      }
+    ]
+
+    test.each(cases)("$name", async ({ source, schema, expected }) => {
+      const builder = new ObjectBuilder(source)
+      const results = await buildResultsAsync(builder, schema)
+
+      expect(results).toEqual([expected, expected])
+    })
+
+  })
+
   test("groupJoin", () => {
 
     const schema: Schema = { // 33 lineas (pero hace falta el map con flat: true)
@@ -463,64 +665,6 @@ describe("array", () => {
     const resultado = builder.build(schema)
 
     expect(resultado).toEqual(expected)
-  })
-
-  test("find", () => {
-    const expected = { nombre: "Melany" }
-    const source = [1, "dos", { nombre: "Mari" }, expected]
-
-    const schema = {
-      find: {
-        path: "inner.nombre",
-        equals: {
-          const: expected.nombre
-        }
-      }
-    }
-
-    const builder = new ObjectBuilder(source)
-    const resultado = builder.build(schema)
-
-    expect(resultado).toEqual({ ...expected })
-  })
-
-  test("some are true: from inner definition", async () => {
-    const schema: Schema = {
-      const: {
-        detalles: {
-          nombre: "Melany",
-          activo: true
-        }
-      },
-      checkout: {
-        propiedades: {
-          inner: {
-            definitions: [
-              {
-                const: false
-              },
-              {
-                path: "detalles.activo"
-              },
-              {
-                const: false
-              }
-            ],
-            contains: {
-              path: "inner",
-              equals: {
-                const: true
-              }
-            }
-          }
-        }
-      }
-    }
-
-    const builder = new ObjectBuilder({})
-    const resultado = await builder.build(schema)
-
-    expect(resultado.inner).toBe(true)
   })
 
   describe("array item validation (source items are all equal to filterSchema)", () => {
