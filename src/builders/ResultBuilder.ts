@@ -23,7 +23,9 @@ export class ResultBuilder extends ResultBuilderBase {
 
     withDefinitions(schemas: Schema[] | undefined) {
         if(schemas) {
-            this.target = schemas?.map(schema => this.builder.build(schema))
+            this.target = schemas?.map(schema => this.builder
+                .withTarget(this.target)
+                .build(schema))
         }
 
         return this

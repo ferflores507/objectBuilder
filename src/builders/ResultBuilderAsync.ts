@@ -63,7 +63,10 @@ export class ResultBuilderAsync extends ResultBuilderBase {
 
     async withDefinitionsAsync(schemas: Schema[] | undefined) {
         if(schemas) {
-            const promises = schemas.map(schema => this.builder.buildAsync(schema, this.controller))
+            const promises = schemas.map(schema => this.builder
+                .withTarget(this.target)
+                .buildAsync(schema, this.controller))
+                
             this.target = await Promise.all(promises)
         }
     }
