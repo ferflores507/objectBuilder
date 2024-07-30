@@ -70,7 +70,7 @@ describe("targetPath", () => {
 
 })
 
-describe.each([true, false])("spread", (useAsync) => {
+describe("spread", () => {
 
   const cases: Array<{ tipo: string, schema: Schema, expected: any }> = [
     {
@@ -125,9 +125,9 @@ describe.each([true, false])("spread", (useAsync) => {
     }
 
     const builder = new ObjectBuilder(source, initialTarget)
-    const resultado = useAsync ? await builder.buildAsync(schema) : builder.build(schema)
+    const results = await buildResultsAsync(builder, schema)
 
-    expect(resultado).toEqual(expected)
+    expect(results).toEqual([expected, expected])
   })
 })
 
