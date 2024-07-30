@@ -22,12 +22,12 @@ describe("use", () => {
       last: (array: any[]) => array[array.length - 1]
     }
 
-    const builder = new ObjectBuilder(source)
     const schema = {
       path: "items",
       use
     }
 
+    const builder = new ObjectBuilder(source)
     const results = await buildResultsAsync(builder, schema)
 
     expect(results).toEqual([expected, expected])
@@ -129,7 +129,7 @@ describe("spread", () => {
 })
 
 describe("entries", () => {
-  test("default key, value", () => {
+  test("default key, value", async () => {
     const source = {
       nombre: "Melany",
       cedula: "9-123-456",
@@ -141,7 +141,7 @@ describe("entries", () => {
     }
 
     const builder = new ObjectBuilder(source)
-    const resultado = builder.build(schema)
+    const results = await buildResultsAsync(builder, schema)
 
     const expected = [
       {
@@ -157,8 +157,8 @@ describe("entries", () => {
         value: "18/09/2019"
       }
     ]
-
-    expect(resultado).toEqual(expected)
+    
+    expect(results).toEqual([expected, expected])
   })
 })
 
@@ -169,7 +169,7 @@ describe("calc", () => {
     ["restar", 85],
     ["multiplicar", 5000],
     ["dividir", 2]
-  ])("%s 100, 10, 5 da: %s", async (calc, total) => {
+  ])("%s 100, 10, 5 da: %s", async (calc, expected) => {
 
     const schema: Schema = {
       const: [100, 10, 5],
@@ -179,7 +179,7 @@ describe("calc", () => {
     const builder = new ObjectBuilder({})
     const results = await buildResultsAsync(builder, schema)
 
-    expect(results.every(r => r === total)).toBe(true)
+    expect(results).toEqual([expected, expected])
   })
 })
 
@@ -217,10 +217,9 @@ test("nested propiedades", async () => {
       }
     }
   }
-
+  
   const builder = new ObjectBuilder(source)
-  const resultado = await builder.build(schema)
-
+  const results = await buildResultsAsync(builder, schema)
   const expected = {
     mensajeRoot: "prueba",
     nested: {
@@ -229,7 +228,7 @@ test("nested propiedades", async () => {
     }
   }
 
-  expect(resultado).toEqual(expected)
+  expect(results).toEqual([expected, expected])
 })
 
 describe("comparacion", () => {
@@ -251,9 +250,9 @@ describe("comparacion", () => {
       }
 
       const builder = new ObjectBuilder(source)
-      const resultado = await builder.build(schema)
-
-      expect(resultado).toBe(expected)
+      const results = await buildResultsAsync(builder, schema)
+      
+      expect(results).toEqual([expected, expected])
     })
 
   })
@@ -370,18 +369,6 @@ describe("array", () => {
             nombre: "cedula"
           }
         ]
-      },
-      {
-        name: "",
-        source: {},
-        schema: {},
-        expected: {}
-      },
-      {
-        name: "",
-        source: {},
-        schema: {},
-        expected: {}
       }
     ]
 
@@ -478,7 +465,7 @@ describe("array", () => {
 
   })
 
-  test("map join", () => {
+  test("map join", async () => {
 
     const ids = [2, 3, 4].map(id => ({ id }))
 
@@ -509,14 +496,14 @@ describe("array", () => {
       }
     }
 
-    const expected = [{ id: 1, nombre: "Melany" }, ...ids]
     const builder = new ObjectBuilder({})
-    const resultado = builder.build(schema)
+    const results = await buildResultsAsync(builder, schema)
+    const expected = [{ id: 1, nombre: "Melany" }, ...ids]
 
-    expect(resultado).toEqual(expected)
+    expect(results).toEqual([expected, expected])
   })
 
-  test("map", () => {
+  test("map", async () => {
 
     const numbers = [1, 2, 3, 4]
 
@@ -531,11 +518,11 @@ describe("array", () => {
       }
     }
 
-    const expected = numbers.map(id => ({ id }))
     const builder = new ObjectBuilder({})
-    const resultado = builder.build(schema)
+    const results = await buildResultsAsync(builder, schema)
+    const expected = numbers.map(id => ({ id }))
 
-    expect(resultado).toEqual(expected)
+    expect(results).toEqual([expected, expected])
   })
 
   describe("array item validation (source items are all equal to filterSchema)", () => {
@@ -557,10 +544,11 @@ describe("array", () => {
         }
       }
 
-      const definitionBuilder = new ObjectBuilder(source)
-      const resultado = await definitionBuilder.build(schema)
+      const builder = new ObjectBuilder({})
+      const results = await buildResultsAsync(builder, schema)
+      const expected = true
 
-      expect(resultado).toBe(true)
+      expect(results).toEqual([expected, expected])
     })
 
   })
@@ -585,9 +573,10 @@ describe("array", () => {
       }
 
       const builder = new ObjectBuilder(source)
-      const resultado = await builder.build(schema)
+      const results = await buildResultsAsync(builder, schema)
+      const expected = true
 
-      expect(resultado).toBe(true)
+      expect(results).toEqual([expected, expected])
     })
 
   })
@@ -615,9 +604,10 @@ describe("array", () => {
     }
 
     const builder = new ObjectBuilder(source)
-    const { total } = await builder.build(schema)
+    const results = await buildResultsAsync(builder, schema)
+    const expected = { total: source.length - 1 }
 
-    expect(total).toBe(source.length - 1)
+    expect(results).toEqual([expected, expected])
   })
 
   describe.todo("orderBy", () => {
@@ -673,10 +663,10 @@ describe("mixed", () => {
     }
 
     const builder = new ObjectBuilder(source)
-    const resultado = await builder.build(schema)
+    const results = await buildResultsAsync(builder, schema)
     const expected = [4, 10].map(id => ({ id, nombre: "Melany" }))
 
-    expect(resultado).toEqual(expected)
+    expect(results).toEqual([expected, expected])
   })
 
   describe("checkout", () => {
@@ -694,11 +684,12 @@ describe("mixed", () => {
           }
         }
       }
-      const expected = { nombre: "Melany" }
+      
       const builder = new ObjectBuilder(source)
       const results = await buildResultsAsync(builder, schema)
+      const expected = { nombre: "Melany" }
 
-      expect(results.every(r => r === expected)).toBe(true)
+      expect(results).toEqual([expected, expected])
     })
 
   })
@@ -717,9 +708,10 @@ describe("mixed", () => {
       }
 
       const builder = new ObjectBuilder({})
-      const resultado = await builder.build(schema)
+      const results = await buildResultsAsync(builder, schema)
+      const expected = { nombre: "Melany" }
 
-      expect(resultado).toEqual({ nombre: "Melany" })
+      expect(results).toEqual([expected, expected])
     })
 
     test("flat (path)", async () => {
@@ -736,10 +728,11 @@ describe("mixed", () => {
         path: "usuario"
       }
 
-      const builder = new ObjectBuilder(source)
-      const resultado = await builder.build(schema)
+      const builder = new ObjectBuilder({})
+      const results = await buildResultsAsync(builder, schema)
+      const expected = { nombre: "Melany", provincia: "Santiago" }
 
-      expect(resultado).toEqual({ nombre: "Melany", provincia: "Santiago" })
+      expect(results).toEqual([expected, expected])
     })
 
   })
