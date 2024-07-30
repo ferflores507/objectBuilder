@@ -23,14 +23,14 @@ describe("use", () => {
     }
 
     const builder = new ObjectBuilder(source)
-    const schema = { 
+    const schema = {
       path: "items",
-      use 
+      use
     }
 
     // To be refactored in function to return array of both results
     const [resultado, resultadoAsync] = [builder.build(schema), await builder.buildAsync(schema)]
-    
+
     expect(resultado).toEqual(expected)
     expect(resultadoAsync).toEqual(expected)
   })
@@ -41,7 +41,7 @@ describe("targetPath", () => {
 
   test("set value from a sibling property", async () => {
     const source = {}
-    
+
     const schema: Schema = {
       propiedades: {
         title: {
@@ -63,7 +63,7 @@ describe("targetPath", () => {
       value: 1,
       titleCopy: "One"
     }
-  
+
     expect(result).toEqual(expected)
     expect(resultAsync).toEqual(expected)
   })
@@ -191,8 +191,8 @@ describe("nested propiedades", () => {
   test("nested with parent definition works with both relative = true and regular path", async () => {
 
     const source = {
-      objOne: { 
-        id: 1 
+      objOne: {
+        id: 1
       },
       objTwo: {
         id: 1
@@ -201,7 +201,7 @@ describe("nested propiedades", () => {
         mensaje: "prueba"
       }
     }
-  
+
     const schema: Schema = {
       propiedades: {
         mensajeRoot: {
@@ -222,18 +222,18 @@ describe("nested propiedades", () => {
         }
       }
     }
-  
+
     const builder = new ObjectBuilder(source)
     const resultado = await builder.build(schema)
 
-    const expected = { 
-      mensajeRoot: "prueba", 
-      nested: { 
-        mensaje: "prueba", 
-        objectsIdsAreEqual: true 
-      } 
+    const expected = {
+      mensajeRoot: "prueba",
+      nested: {
+        mensaje: "prueba",
+        objectsIdsAreEqual: true
+      }
     }
-    
+
     expect(resultado).toEqual(expected)
   })
 })
@@ -345,12 +345,12 @@ describe("array", () => {
         group: undefined
       }
     ]
-    
+
     expect(resultado).toEqual(expected)
   })
 
   test("map join dos", () => {
-    
+
     const schema = { // 36 lineas
       const: [
         {
@@ -401,16 +401,16 @@ describe("array", () => {
 
     const builder = new ObjectBuilder({})
     const resultado = builder.build(schema)
-    
+
     expect(resultado).toEqual(expected)
   })
 
   test("map join", () => {
 
     const ids = [2, 3, 4].map(id => ({ id }))
-    
+
     const schema = {
-      const: [{ id: 1}, ...ids],
+      const: [{ id: 1 }, ...ids],
       map: {
         propiedades: {
           id: {
@@ -439,14 +439,14 @@ describe("array", () => {
     const expected = [{ id: 1, nombre: "Melany" }, ...ids]
     const builder = new ObjectBuilder({})
     const resultado = builder.build(schema)
-    
+
     expect(resultado).toEqual(expected)
   })
 
   test("map", () => {
 
     const numbers = [1, 2, 3, 4]
-    
+
     const schema = {
       const: numbers,
       map: {
@@ -461,13 +461,13 @@ describe("array", () => {
     const expected = numbers.map(id => ({ id }))
     const builder = new ObjectBuilder({})
     const resultado = builder.build(schema)
-    
+
     expect(resultado).toEqual(expected)
   })
 
   test("find", () => {
     const expected = { nombre: "Melany" }
-    const source = [1, "dos", { nombre: "Mari"}, expected]
+    const source = [1, "dos", { nombre: "Mari" }, expected]
 
     const schema = {
       find: {
@@ -480,7 +480,7 @@ describe("array", () => {
 
     const builder = new ObjectBuilder(source)
     const resultado = builder.build(schema)
-    
+
     expect(resultado).toEqual({ ...expected })
   })
 
@@ -649,9 +649,9 @@ describe("array", () => {
   })
 })
 
-describe("reduce", () => {
+describe("mixed", () => {
 
-  test.todo("orderBy y después filter", async () => {
+  test.todo("reduce, orderBy and filter", async () => {
     const source = { nombre: "Melany" }
 
     const schema: Schema = {
@@ -685,14 +685,10 @@ describe("reduce", () => {
     expect(resultado).toEqual(expected)
   })
 
-})
-
-describe("mixed", () => {
-
   describe("checkout", () => {
 
     test("path", async () => {
-  
+
       const source = { detalles: { personal: { nombre: "Melany" } } }
       const schema: Schema = {
         path: "detalles.personal",
@@ -707,10 +703,10 @@ describe("mixed", () => {
       const expected = { nombre: "Melany" }
       const builder = new ObjectBuilder(source)
       const results = await buildResultsAsync(builder, schema)
-  
+
       expect(results.every(r => r === expected)).toBe(true)
     })
-  
+
   })
 
   describe.todo("flat", () => {
@@ -725,30 +721,30 @@ describe("mixed", () => {
           }
         }
       }
-    
+
       const builder = new ObjectBuilder({})
       const resultado = await builder.build(schema)
-    
+
       expect(resultado).toEqual({ nombre: "Melany" })
     })
-    
+
     test("flat (path)", async () => {
-    
+
       const source = {
         usuario: {
           personal: { nombre: "Melany" },
           direccion: { provincia: "Santiago" }
         }
       }
-    
+
       const schema: Schema = {
         flat: true,
         path: "usuario"
       }
-    
+
       const builder = new ObjectBuilder(source)
       const resultado = await builder.build(schema)
-    
+
       expect(resultado).toEqual({ nombre: "Melany", provincia: "Santiago" })
     })
 
@@ -804,12 +800,12 @@ describe("mixed", () => {
         expected: { nombre: "Melany", id: 1 }
       }
     ]
-  
+
     test.each(cases)("$name", async ({ name, source, schema, expected }) => {
-  
+
       const builder = new ObjectBuilder(source)
       const results = await buildResultsAsync(builder, schema)
-    
+
       expect(results).toEqual([expected, expected])
     })
   })
