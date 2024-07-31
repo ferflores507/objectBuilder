@@ -35,7 +35,7 @@ describe("use", () => {
 
 })
 
-describe("targetPath", () => {
+describe("sibling", () => {
 
   test("set value from a sibling property", async () => {
     const source = {}
