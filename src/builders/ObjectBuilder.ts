@@ -61,10 +61,4 @@ export class ObjectBuilder {
       cancel: () => controller.abort("cancel")
     }
   }
-
-  buildWithOuter(inner: any, schema: Schema | undefined) {
-    const source = { inner, outer: this.getSource() }
-
-    return new ObjectBuilder(source).build(schema)
-  }
 }
