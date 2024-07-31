@@ -3,23 +3,28 @@ import type { Schema } from "../models"
 import { ResultBuilder } from "./ResultBuilder"
 import { ResultBuilderAsync } from "./ResultBuilderAsync"
 
+type BuilderOptions = Partial<{
+  siblings: Record<string, any>
+}>
+
 export class ObjectBuilder {
-  constructor(source: Record<string, any>, target?: any, siblings: Record<string, any> = {}) {
+  constructor(source: Record<string, any>, target?: any, options?: BuilderOptions) {
     this.source = source
     this.target = target
-    this.siblings = siblings
+    this.options = options
   }
 
   private readonly source: Record<string, any>
   private readonly target: any
-  readonly siblings: Record<string, any>
+  readonly options?: BuilderOptions
   
   getSource = () => this.source
   getSourcePathValue = (path: string) => getObjPath(this.getSource(), path)
   getInitialTarget = (schema: Schema | undefined) => schema == null ? null : (this.target ?? this.source)
 
-  withSiblings(siblings: Record<string, any>) {
-    return new ObjectBuilder(this.source, this.target, siblings)
+  with(options: BuilderOptions) {
+    options = { ...this.options, ...options }
+    return new ObjectBuilder(this.source, this.target, options)
   }
 
   build(schema: Schema | undefined) {

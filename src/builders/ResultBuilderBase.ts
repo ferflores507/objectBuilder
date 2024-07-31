@@ -33,7 +33,7 @@ export class ResultBuilderBase {
         return this.withConst(value)
             .withPath(this.builder.getSource(), path)
             .withPath(this.target, targetPath)
-            .withPath(this.builder.siblings, sibling)
+            .withPath(this.builder.options?.siblings, sibling)
             .withSchemaFrom(schemaFrom)
             .withEntries(entries)
             .withCalc(calc)

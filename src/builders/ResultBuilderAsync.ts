@@ -86,7 +86,7 @@ export class ResultBuilderAsync extends ResultBuilderBase {
 
         if (propiedades) {
             const obj: Record<string, any> = {}
-            this.builder = this.builder.withSiblings(obj)
+            this.builder = this.builder.with({ siblings: obj })
       
             for (const [k, v] of Object.entries(propiedades)) {
               obj[k] = await this.buildAsync(v);
