@@ -63,7 +63,7 @@ export class ArrayBuilder {
     withMap(schema: Schema | undefined) {
         if(schema) {
             this.target = this.target.map(x => {
-                return this.builder.buildWithOuter(x, schema)
+                return this.builder.with({ target: x }).build(schema)
             })
         }
 
