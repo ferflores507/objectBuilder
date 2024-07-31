@@ -35,6 +35,55 @@ describe("use", () => {
 
 })
 
+test("sibling nested", () => {
+  const source = {}
+  const idCopy = {
+    sibling: "id"
+  }
+  let id = 1
+  const schema = {
+    propiedades: {
+      id: {
+        const: id++
+      },
+      idCopy,
+      children: {
+        propiedades: {
+          id: {
+            const: id++
+          },
+          idCopy,
+          children: {
+            propiedades: {
+              id: {
+                const: id++
+              },
+              idCopy
+            }
+          }
+        }
+      }
+    }
+  }
+
+  const builder = new ObjectBuilder({})
+  const result = builder.build(schema)
+  const expected = {
+    id: 1,
+    idCopy: 1,
+    children: {
+      id: 2,
+      idCopy: 2,
+      children: {
+        id: 3,
+        idCopy: 3
+      }
+    }
+  }
+
+  expect(result).toEqual(expected)
+})
+
 describe("sibling", () => {
 
   test("set value from a sibling property", async () => {
