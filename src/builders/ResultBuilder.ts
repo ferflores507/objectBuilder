@@ -23,7 +23,9 @@ export class ResultBuilder extends ResultBuilderBase {
 
     withDefinitions(schemas: Schema[] | undefined) {
         if(schemas) {
-            this.target = schemas?.map(schema => this.builder.build(schema))
+            this.target = schemas?.map(schema => this.builder
+                .withTarget(this.target)
+                .build(schema))
         }
 
         return this
@@ -45,7 +47,7 @@ export class ResultBuilder extends ResultBuilderBase {
             const obj: Record<string, any> = {}
       
             for (const [k, v] of Object.entries(propiedades)) {
-              obj[k] = this.builder.withTarget(obj).build(v);
+              obj[k] = this.build(v);
             }
       
             this.target = obj
