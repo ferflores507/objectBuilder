@@ -121,7 +121,7 @@ describe("spread", () => {
       subUno: 1
     }
 
-    const builder = new ObjectBuilder(source, initialTarget)
+    const builder = new ObjectBuilder(source, { target: initialTarget })
     const results = await buildResultsAsync(builder, schema)
 
     expect(results).toEqual([expected, expected])
