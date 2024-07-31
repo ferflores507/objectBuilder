@@ -26,12 +26,14 @@ export class ResultBuilderBase {
             calc, 
             unpack,
             stringify,
-            parse
+            parse,
+            sibling
         } = schema ?? {}
 
         return this.withConst(value)
             .withPath(this.builder.getSource(), path)
             .withPath(this.target, targetPath)
+            .withPath(this.builder.siblings, sibling)
             .withSchemaFrom(schemaFrom)
             .withEntries(entries)
             .withCalc(calc)

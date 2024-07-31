@@ -4,17 +4,23 @@ import { ResultBuilder } from "./ResultBuilder"
 import { ResultBuilderAsync } from "./ResultBuilderAsync"
 
 export class ObjectBuilder {
-  constructor(source: Record<string, any>, target?: any) {
+  constructor(source: Record<string, any>, target?: any, siblings: Record<string, any> = {}) {
     this.source = source
     this.target = target
+    this.siblings = siblings
   }
 
   private readonly source: Record<string, any>
   private readonly target: any
+  readonly siblings: Record<string, any>
   
   getSource = () => this.source
   getSourcePathValue = (path: string) => getObjPath(this.getSource(), path)
   getInitialTarget = (schema: Schema | undefined) => schema == null ? null : (this.target ?? this.source)
+
+  withSiblings(siblings: Record<string, any>) {
+    return new ObjectBuilder(this.source, this.target, siblings)
+  }
 
   build(schema: Schema | undefined) {
 
