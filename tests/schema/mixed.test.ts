@@ -49,7 +49,7 @@ describe("targetPath", () => {
           const: 1
         },
         titleCopy: {
-          targetPath: "title"
+          sibling: "title"
         }
       }
     }
