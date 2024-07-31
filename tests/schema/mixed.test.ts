@@ -341,9 +341,9 @@ describe("array", () => {
             },
             match: {
               find: {
-                path: "inner.nombre",
+                targetPath: "nombre",
                 equals: {
-                  path: "outer.nombre"
+                  path: "nombre"
                 }
               }
             }
@@ -384,7 +384,6 @@ describe("array", () => {
             }
           ],
           map: {
-            path: "inner",
             checkout: {
               spread: {
                 const: [
@@ -398,9 +397,9 @@ describe("array", () => {
                   }
                 ],
                 find: {
-                  path: "inner.nombre",
+                  targetPath: "nombre",
                   equals: {
-                    path: "outer.nombre"
+                    path: "nombre"
                   }
                 }
               }
@@ -443,7 +442,7 @@ describe("array", () => {
         ],
         schema: {
           find: {
-            path: "inner.nombre",
+            targetPath: "nombre",
             equals: {
               const: "Melany"
             }
@@ -475,7 +474,6 @@ describe("array", () => {
                 }
               ],
               contains: {
-                path: "inner",
                 equals: {
                   const: true
                 }
@@ -493,9 +491,9 @@ describe("array", () => {
         schema: {
           const: Array(3).fill({ nombre: "Melany" }).toSpliced(1, 0, { nombre: "Fernando" }),
           filter: {
-            path: "inner.nombre",
+            targetPath: "nombre",
             equals: {
-              path: "outer.nombre"
+              path: "nombre"
             }
           }
         },
@@ -519,11 +517,6 @@ describe("array", () => {
     const schema = {
       const: [{ id: 1 }, ...ids],
       map: {
-        propiedades: {
-          id: {
-            path: "inner.id"
-          }
-        },
         checkout: {
           spread: {
             const: [
@@ -533,9 +526,9 @@ describe("array", () => {
               }
             ],
             find: {
-              path: "inner.id",
+              targetPath: "id",
               equals: {
-                path: "outer.id"
+                path: "id"
               }
             }
           }
@@ -558,9 +551,7 @@ describe("array", () => {
       const: numbers,
       map: {
         propiedades: {
-          id: {
-            path: "inner"
-          }
+          id: {}
         }
       }
     }
@@ -584,7 +575,7 @@ describe("array", () => {
       const schema: Schema = {
         const: Array(2).fill(source),
         contains: {
-          path: "inner.nombre",
+          targetPath: "nombre",
           equals: {
             const: "Melany"
           }
@@ -612,7 +603,6 @@ describe("array", () => {
       schema = {
         ...schema,
         items: {
-          path: "inner",
           equals: {
             const: "Melany"
           }
@@ -636,7 +626,7 @@ describe("array", () => {
     const schema: Schema = {
       const: source,
       filter: {
-        path: "inner.nombre",
+        targetPath: "nombre",
         equals: {
           const: "Melany"
         }
