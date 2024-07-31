@@ -13,6 +13,9 @@ export class ResultBuilderBase {
 
     protected target: unknown
     protected builder: ObjectBuilder
+    private get options() {
+        return this.builder.options
+    }
 
     getTarget = () => this.target
 
@@ -33,7 +36,7 @@ export class ResultBuilderBase {
         return this.withConst(value)
             .withPath(this.builder.getSource(), path)
             .withPath(this.target, targetPath)
-            .withPath(this.builder.options?.siblings, sibling)
+            .withPath(this.options?.siblings, sibling)
             .withSchemaFrom(schemaFrom)
             .withEntries(entries)
             .withCalc(calc)
