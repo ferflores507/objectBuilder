@@ -13,6 +13,10 @@ export class ResultBuilderAsync extends ResultBuilderBase {
 
       controller: AbortController
 
+    clone() {
+        return new ResultBuilderAsync(this.target, this.builder, this.controller)
+    }
+
     async buildAsync(schema: Schema | undefined) {
         const { propiedades, spread, definitions, reduce, equals, set, delay, consulta, checkout, use } = schema ?? {}
 
@@ -64,9 +68,7 @@ export class ResultBuilderAsync extends ResultBuilderBase {
 
     async withDefinitionsAsync(schemas: Schema[] | undefined) {
         if(schemas) {
-            const promises = schemas.map(schema => this.builder
-                .withTarget(this.target)
-                .buildAsync(schema, this.controller))
+            const promises = schemas.map(schema => this.clone().buildAsync(schema))
                 
             this.target = await Promise.all(promises)
         }

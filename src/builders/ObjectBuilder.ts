@@ -16,10 +16,6 @@ export class ObjectBuilder {
   getSourcePathValue = (path: string) => getObjPath(this.getSource(), path)
   getInitialTarget = (schema: Schema | undefined) => schema == null ? null : (this.target ?? this.source)
 
-  withTarget(value: any) {
-    return new ObjectBuilder(this.source, value)
-  }
-
   build(schema: Schema | undefined) {
 
     const target = this.getInitialTarget(schema)

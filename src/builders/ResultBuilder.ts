@@ -4,6 +4,10 @@ import * as varios from "../helpers/varios"
 
 export class ResultBuilder extends ResultBuilderBase {
 
+    clone() {
+        return new ResultBuilder(this.target, this.builder)
+    }
+
     build(schema: Schema | undefined) {
 
         const { propiedades, spread, reduce, definitions, equals, set, checkout, use } = schema ?? {}
@@ -23,9 +27,7 @@ export class ResultBuilder extends ResultBuilderBase {
 
     withDefinitions(schemas: Schema[] | undefined) {
         if(schemas) {
-            this.target = schemas?.map(schema => this.builder
-                .withTarget(this.target)
-                .build(schema))
+            this.target = schemas?.map(schema => this.clone().build(schema))
         }
 
         return this
