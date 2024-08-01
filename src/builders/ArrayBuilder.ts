@@ -1,22 +1,14 @@
 import type { ArraySchema } from "../models";
+import { ArrayBuilderBase } from "./ArrayBuilderBase";
 import { ArrayResultBuilder } from "./ArrayResultBuilder";
-import { ObjectBuilder } from "./ObjectBuilder";
 
-export class ArrayBuilder {
-
-    constructor(target: [], builder: ObjectBuilder) {
-        this.target = target
-        this.builder = builder
-    }
-
-    target: any[]
-    builder: ObjectBuilder
+export class ArrayBuilder extends ArrayBuilderBase {
 
     validar(schema: ArraySchema | undefined) {
         const { filter, find, items, contains, map, groupJoin } = schema ?? {}
 
         const isEmpty = [filter, find, items, contains, map, groupJoin].every(x => x == null)
-        const isArray = Array.isArray(this.target)
+        const isArray = Array.isArray(this.items)
 
         return isArray || isEmpty
     }
@@ -26,7 +18,7 @@ export class ArrayBuilder {
             throw "El elemento debe ser de tipo arreglo."
         }
 
-        return new ArrayResultBuilder(this.target, this.builder)
+        return new ArrayResultBuilder(this.items, this.builder)
             .withSchema(schema)
             .build()
     }

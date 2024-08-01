@@ -1,16 +1,14 @@
 import type { Schema } from "../models"
+import { ArrayBuilderBase } from "./ArrayBuilderBase"
 import { ObjectBuilder } from "./ObjectBuilder"
 
-export class ArrayFilterBuilder {
+export class ArrayFilterBuilder extends ArrayBuilderBase {
 
     constructor(items: any[], builder: ObjectBuilder) {
-        this.items = items
-        this.builder = builder
+        super(items, builder)
         this.min = this.items.length
     }
     
-    private readonly items: any[]
-    private builder: ObjectBuilder
     private isValidation = false
     private schema?: Schema
     private min: number
