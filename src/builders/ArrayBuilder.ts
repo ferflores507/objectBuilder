@@ -1,5 +1,5 @@
-import type { ArraySchema, Join, Schema } from "../models";
-import { ArrayFilterBuilder } from "./ArrayFilterBuilder";
+import type { ArraySchema } from "../models";
+import { ArrayResultBuilder } from "./ArrayResultBuilder";
 import { ObjectBuilder } from "./ObjectBuilder";
 
 export class ArrayBuilder {
@@ -12,8 +12,6 @@ export class ArrayBuilder {
     target: any[]
     builder: ObjectBuilder
 
-    build = () => this.target
-
     validar(schema: ArraySchema | undefined) {
         const { filter, find, items, contains, map, groupJoin } = schema ?? {}
 
@@ -23,64 +21,13 @@ export class ArrayBuilder {
         return isArray || isEmpty
     }
 
-    withSchema(schema: ArraySchema | undefined) {
+    build(schema: ArraySchema | undefined) {
         if(this.validar(schema) == false) {
             throw "El elemento debe ser de tipo arreglo."
         }
 
-        const { find, map, groupJoin } = schema ?? {}
-        
-        return this.withFilter(schema)
-            .withFind(find)
-            .withMap(map)
-            .withGroupJoin(groupJoin)
-    }
-
-    withFilter(schema: ArraySchema | undefined) {
-        const { filter, find, items, contains } = schema ?? {}
-
-        this.target = new ArrayFilterBuilder(this.target, this.builder)
-                .withFilter(filter)
-                .withFind(find)
-                .withValidation(items)
-                .withContains(contains)
-                // .withMin(minMatches)
-                // .withMax(maxMatches)
-                .build()
-
-        return this
-    }
-
-    withFind(schema: Schema | undefined) {
-
-        if(schema) { 
-            this.target = this.target[0]
-        }
-
-        return this
-    }
-
-    withMap(schema: Schema | undefined) {
-        if(schema) {
-            this.target = this.target.map(x => {
-                return this.builder.with({ target: x }).build(schema)
-            })
-        }
-
-        return this
-    }
-
-    withGroupJoin(join: Join | undefined) {
-        if(join) {
-            const target = this.builder.build(join.items)
-
-            this.target = this.target.map(inner => {
-                const group = new ObjectBuilder(inner, { target }).build(join.match)
-
-                return { inner, group }
-            })
-        }
-
-        return this
+        return new ArrayResultBuilder(this.target, this.builder)
+            .withSchema(schema)
+            .build()
     }
 }
