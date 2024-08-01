@@ -72,14 +72,10 @@ export class ArrayBuilder {
 
     withGroupJoin(join: Join | undefined) {
         if(join) {
-            const schema = {
-                const: this.builder.build(join.items),
-                ...join.match
-            }
+            const target = this.builder.build(join.items)
 
             this.target = this.target.map(inner => {
-                const group = new ObjectBuilder(inner)
-                    .build(schema)
+                const group = new ObjectBuilder(inner, { target }).build(join.match)
 
                 return { inner, group }
             })
