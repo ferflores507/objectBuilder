@@ -1,4 +1,4 @@
-import { getObjPath } from "../helpers/varios"
+import { getPathValue } from "../helpers/varios"
 import type { Schema } from "../models"
 import { ResultBuilder } from "./ResultBuilder"
 import { ResultBuilderAsync } from "./ResultBuilderAsync"
@@ -18,7 +18,7 @@ export class ObjectBuilder {
   readonly options?: BuilderOptions
   
   getSource = () => this.source
-  getSourcePathValue = (path: string) => getObjPath(this.getSource(), path)
+  getSourcePathValue = (path: string) => getPathValue(this.getSource(), path)
   getInitialTarget = (schema: Schema | undefined) => {
     return schema == null ? null : (this.options?.target ?? this.source)
   }

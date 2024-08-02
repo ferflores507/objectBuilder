@@ -24,7 +24,7 @@ describe("getObjPath works with custom separator or default: '.'", () => {
             }
         }
 
-        const value = varios.getObjPath(source, path, separator)
+        const value = varios.getPathValue(source, path, separator)
 
         expect(value).toBe(country)
     })

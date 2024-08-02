@@ -3,7 +3,7 @@ import type { ArraySchema, CalcMethod, Schema } from "../models"
 import { ArrayBuilder } from "./ArrayBuilder"
 import { ObjectBuilder } from "./ObjectBuilder"
 import * as varios from "../helpers/varios"
-import { getObjPath } from "../helpers/varios"
+import { getPathValue } from "../helpers/varios"
 
 export class ResultBuilderBase {
     constructor(target: any, builder: ObjectBuilder) {
@@ -159,7 +159,7 @@ export class ResultBuilderBase {
 
     withPath(source: {}, path: string | undefined) {
         if(path) {
-            this.target = getObjPath(source, path)
+            this.target = getPathValue(source, path)
         }
 
         return this

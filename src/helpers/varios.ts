@@ -11,7 +11,7 @@ export const getFormData = (source: {}) => {
     return data
 }
 
-export const getObjPath = (obj: Record<string, any>, path: string | undefined, separator = ".") => {
+export const getPathValue = (obj: Record<string, any>, path: string | undefined, separator = ".") => {
     return path
       ?.toString()
       .split(separator)
@@ -39,8 +39,8 @@ export const comparar = (a: any, b: any, method = "equal") => {
 }
 
 const ordenar = (objs: any[], orderBy: string) => objs.sort((a,b) => {
-    a = getObjPath(a, orderBy)
-    b = getObjPath(b, orderBy)
+    a = getPathValue(a, orderBy)
+    b = getPathValue(b, orderBy)
     
     return (a > b) ? 1 : ((b > a) ? -1 : 0)
 })
