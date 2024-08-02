@@ -11,11 +11,15 @@ export const getFormData = (source: {}) => {
     return data
 }
 
-export const getPathValue = (obj: Record<string, any>, path: string | undefined, separator = ".") => {
-    return path
-      ?.toString()
-      .split(separator)
-      .reduce((p, c) => p?.[c], obj);
+export const getValueFromPaths = (obj: {}, paths: string[] | undefined) => {
+    return paths?.reduce((p, c) => p?.[c], obj);
+}
+
+export const getPathValue = (obj: Record<string, any>, path: string | string[] | undefined, separator = ".") => {
+
+    const paths = Array.isArray(path) ? path : path?.toString().split(separator)
+
+    return getValueFromPaths(obj, paths)
   }
 
 export const spread = (target: any, source: any) => {
