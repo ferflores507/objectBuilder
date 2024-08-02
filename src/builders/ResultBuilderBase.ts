@@ -108,8 +108,7 @@ export class ResultBuilderBase {
 
     withArraySchema(schema: ArraySchema | undefined) {
         this.target = new ArrayBuilder(this.target as [], this.builder)
-            .withSchema(schema)
-            .build()
+            .build(schema)
 
         return this
     }

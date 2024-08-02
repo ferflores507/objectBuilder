@@ -1,18 +1,14 @@
 import type { Schema } from "../models"
+import { ArrayBuilderBase } from "./ArrayBuilderBase"
 import { ObjectBuilder } from "./ObjectBuilder"
 
-export class ArrayFilterBuilder {
+export class ArrayFilterBuilder extends ArrayBuilderBase {
 
-    constructor(source: unknown, builder: ObjectBuilder) {
-        this.source = source
-        this.items = source as [] ?? []
-        this.builder = builder
+    constructor(items: any[], builder: ObjectBuilder) {
+        super(items, builder)
         this.min = this.items.length
     }
     
-    private readonly source: unknown
-    private readonly items: any[]
-    private builder: ObjectBuilder
     private isValidation = false
     private schema?: Schema
     private min: number
@@ -20,15 +16,9 @@ export class ArrayFilterBuilder {
 
     build() {
 
-        let result = this.source
+        const result = this.schema ? this.filter() : this.items
 
-        if(this.schema) {
-            const filtered = this.filter()
-
-            result = this.isValidation ? this.validate(filtered) : filtered
-        }
-
-        return result
+        return this.isValidation ? this.validate(result) : result
     }
 
     validate(items: any[]) {
@@ -38,12 +28,12 @@ export class ArrayFilterBuilder {
     }
 
     filter() {
-        const matches = []
+        const matches: any[] = []
         const { max, min } = this
 
         for(const item of this.items) {
 
-            if(this.builder.buildWithOuter(item, this.schema) === true) {
+            if(this.builder.with({ target: item }).build(this.schema) === true) {
                 matches.push(item)
             }
             
