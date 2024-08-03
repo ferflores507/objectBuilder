@@ -11,11 +11,11 @@ export const getFormData = (source: {}) => {
     return data
 }
 
-export const getValueFromPaths = (obj: {}, paths: string[] | undefined) => {
+export const getValueFromPaths: any = (obj: {}, paths: string[] | undefined) => {
     return paths?.reduce((p, c) => p?.[c], obj);
 }
 
-export const getPathValue = (obj: Record<string, any>, path: string | string[] | undefined, separator = ".") => {
+export const getPathValue = (obj: {}, path: string | string[] | undefined, separator = ".") => {
 
     const paths = Array.isArray(path) ? path : path?.toString().split(separator)
 

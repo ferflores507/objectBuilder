@@ -47,7 +47,7 @@ export class ResultBuilderAsync extends ResultBuilderBase {
 
     async withDelay(ms: number | undefined) {
 
-        const delay = (ms: number) => new Promise((resolve, reject) => {
+        const delay = (ms: number) => new Promise<void>((resolve, reject) => {
 
             const timeoutID = setTimeout(() => {
                 console.log("delay resolved")

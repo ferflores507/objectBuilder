@@ -35,8 +35,8 @@ export class ResultBuilderBase {
 
         return this.withConst(value)
             .withPath(this.builder.getSource(), path)
-            .withPath(this.target, targetPath)
-            .withPath(this.options?.siblings, sibling)
+            .withPath(this.target as {}, targetPath)
+            .withPath(this.options?.siblings as {}, sibling)
             .withSchemaFrom(schemaFrom)
             .withEntries(entries)
             .withCalc(calc)
@@ -72,7 +72,7 @@ export class ResultBuilderBase {
 
     withCheckout(schema: Schema | undefined) {
         if(schema) {
-            this.target = new ObjectBuilder(this.target).build(schema)
+            this.target = new ObjectBuilder(this.target as {}).build(schema)
         }
 
         return this
@@ -92,7 +92,7 @@ export class ResultBuilderBase {
             const paths = path.split(".")
             const source = this.builder.getSource()
 
-            varios.setUpdateProp(source, paths, this.target)
+            varios.setUpdateProp(source as {}, paths, this.target)
         }
 
         return this
@@ -125,7 +125,7 @@ export class ResultBuilderBase {
 
         if (method) {
 
-            const calc = new Calc(...this.target)
+            const calc = new Calc(...this.target as [])
 
             const metodos: Record<CalcMethod, () => number> = {
                 "sumar": () => calc.sumar(),
@@ -142,7 +142,7 @@ export class ResultBuilderBase {
 
     withEntries(entries: true | undefined){
         if(entries){
-          this.target = varios.entries(this.target)
+          this.target = varios.entries(this.target as {})
         }
   
         return this
