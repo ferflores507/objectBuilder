@@ -11,7 +11,7 @@ export const getFormData = (source: {}) => {
     return data
 }
 
-export const getValueFromPaths: any = (obj: {}, paths: string[] | undefined) => {
+export const getValueFromPaths: any = (obj: Record<string, any>, paths: string[] | undefined) => {
     return paths?.reduce((p, c) => p?.[c], obj);
 }
 
