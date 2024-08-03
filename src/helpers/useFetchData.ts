@@ -1,4 +1,4 @@
-function isJsonString(str) {
+function isJsonString(str: string) {
     try {
         JSON.parse(str);
     } catch (e) {
@@ -7,7 +7,7 @@ function isJsonString(str) {
     return true;
 }
 
-const jsonOrString = (str) => {
+const jsonOrString = (str: string) => {
     if(isJsonString(str) === false){
         return str
     }
@@ -17,7 +17,7 @@ const jsonOrString = (str) => {
 
 export default function useFetchData() {
     
-    const fetchData = async (url: string, opciones, signal: AbortSignal) => {
+    const fetchData = async (url: string, opciones: RequestInit | undefined, signal: AbortSignal) => {
         
         console.log("Haciendo fetch con:", { url, opciones })
 
