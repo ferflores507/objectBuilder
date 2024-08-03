@@ -115,7 +115,11 @@ export class ResultBuilderBase {
 
     withUnpack(keys: string[] | undefined) {
         if (keys) {
-            this.target = keys.reduce((prev: {}, key) => ({ ...prev, [key]: this.target[key] }), {})
+            const target = this.target as Record<string, object>
+            
+            this.target = keys.reduce((obj, key) => {
+                return { ...obj, [key]: target[key] }
+            }, {})
         }
 
         return this
