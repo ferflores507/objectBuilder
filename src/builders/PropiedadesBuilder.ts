@@ -3,9 +3,8 @@ import { ObjectBuilder } from "./ObjectBuilder";
 
 export class PropiedadesBuilder {
     constructor(private propiedades: Record<string, Schema>, private builder: ObjectBuilder) {
-        this.result = {}
+        this.result = { ...this.propiedades }
         this.builder = this.builder.with({ siblings: this.result })
-        this.result = { ...propiedades }
     }
 
     private result: Record<string, any>
