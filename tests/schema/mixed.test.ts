@@ -1,6 +1,32 @@
 import { describe, expect, test } from 'vitest'
 import { ObjectBuilder, Schema } from "../.."
 import { buildResultsAsync } from './buildResultsASync'
+import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
+
+test("propiedades builder", () => {
+  const source = {}
+  const propiedades = {
+    uno: {
+      const: 1
+    },
+    dos: {
+      const: 2
+    },
+    tres: {
+      const: 3
+    }
+  }
+  const builder = new ObjectBuilder(source)
+  const propiedadesBuilder = new PropiedadesBuilder(propiedades, builder)
+  const result = propiedadesBuilder.build()
+  const expected = {
+    uno: 1,
+    dos: 2,
+    tres: 3
+  }
+
+  expect(result).toEqual(expected)
+})
 
 describe("use", () => {
 
