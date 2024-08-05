@@ -6,6 +6,7 @@ import { ResultBuilderAsync } from "./ResultBuilderAsync"
 type BuilderOptions = Partial<{
   target: any
   siblings: Record<string, any>
+  stopPropiedades: string[]
 }>
 
 export class ObjectBuilder {
