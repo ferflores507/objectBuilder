@@ -5,95 +5,98 @@ import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 
 describe("propiedades builder", () => {
 
-  test("target path", () => {
-    const target = { detalles: { titulo: "Hola" } }
-    const source = {}
-    const propiedades = {
-      uno: {
-        const: 1
-      },
-      dos: {
-        sibling: "uno"
-      },
-      tres: {
-        const: 3
-      },
-      saludo: {
-        targetPath: "detalles.titulo",
-      },
-      saludoNested: {
-        targetPath: "detalles",
-        propiedades: {
-          titulo: {
-            targetPath: "titulo"
-          }
-        }
-      }
-    }
+  type CaseOptions = {
+    target?: any,
+    source?: any,
+    propiedades: Record<string, Schema>
+    expected: Record<string, any>
+  }
+
+  const expectResultsAsync = async (options: CaseOptions) => {
+    const { source, target, propiedades, expected } = options
     const builder = new ObjectBuilder(source, { target })
     const propiedadesBuilder = new PropiedadesBuilder(propiedades, builder)
-    const result = propiedadesBuilder.build()
-    const expected = {
-      uno: 1,
-      dos: 1,
-      tres: 3,
-      saludo: "Hola",
-      saludoNested: { titulo: "Hola" }
-    }
-  
-    expect(result).toEqual(expected)
-  })
+    const results = [propiedadesBuilder.build(), await propiedadesBuilder.buildAsync()]
 
-  test("sibling", () => {
-    const source = {}
-    const propiedades = {
-      uno: {
-        const: 1
+    expect(results).toEqual([expected, expected])
+  }
+
+  test("target path", async () => {
+    await expectResultsAsync({
+      target: { detalles: { titulo: "Hola" } },
+      propiedades: {
+        uno: {
+          const: 1
+        },
+        dos: {
+          sibling: "uno"
+        },
+        tres: {
+          const: 3
+        },
+        saludo: {
+          targetPath: "detalles.titulo",
+        },
+        saludoNested: {
+          targetPath: "detalles",
+          propiedades: {
+            titulo: {
+              targetPath: "titulo"
+            }
+          }
+        }
       },
-      dos: {
-        sibling: "uno"
-      },
-      tres: {
-        const: 3
+      expected: {
+        uno: 1,
+        dos: 1,
+        tres: 3,
+        saludo: "Hola",
+        saludoNested: { titulo: "Hola" }
       }
-    }
-    const builder = new ObjectBuilder(source)
-    const propiedadesBuilder = new PropiedadesBuilder(propiedades, builder)
-    const result = propiedadesBuilder.build()
-    const expected = {
-      uno: 1,
-      dos: 1,
-      tres: 3
-    }
-  
-    expect(result).toEqual(expected)
+    })
   })
 
-  test("basico", () => {
-    const source = {}
-    const propiedades = {
-      uno: {
-        const: 1
+  test("sibling", async () => {
+    await expectResultsAsync({
+      propiedades: {
+        uno: {
+          const: 1
+        },
+        dos: {
+          sibling: "uno"
+        },
+        tres: {
+          const: 3
+        }
       },
-      dos: {
-        const: 2
-      },
-      tres: {
-        const: 3
+      expected: {
+        uno: 1,
+        dos: 1,
+        tres: 3
       }
-    }
-    const builder = new ObjectBuilder(source)
-    const propiedadesBuilder = new PropiedadesBuilder(propiedades, builder)
-    const result = propiedadesBuilder.build()
-    const expected = {
-      uno: 1,
-      dos: 2,
-      tres: 3
-    }
-  
-    expect(result).toEqual(expected)
+    })
   })
 
+  test("basico", async () => {
+    await expectResultsAsync({
+      propiedades: {
+        uno: {
+          const: 1
+        },
+        dos: {
+          const: 2
+        },
+        tres: {
+          const: 3
+        }
+      },
+      expected: {
+        uno: 1,
+        dos: 2,
+        tres: 3
+      }
+    })
+  })
 })
 
 describe("use", () => {
