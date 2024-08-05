@@ -9,9 +9,10 @@ export class PropiedadesBuilder {
 
     private result: Record<string, any>
     private entries = () => {
-        const validPropiedades = this.propiedades // replace with valid propiedades from builder options
+        const { stopPropiedades } = this.builder.options
         
-        return Object.entries(validPropiedades)
+        return Object.entries(this.propiedades)
+            .filter(([k]) => !stopPropiedades?.includes(k))
     }
 
     getResult() {
