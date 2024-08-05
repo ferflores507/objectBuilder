@@ -48,7 +48,7 @@ export class ResultBuilderBase {
     withUse(path: string | undefined) {
         if(path) {
             const func = this.builder.getSourcePathValue(path)
-            this.target = func(this.target)
+            this.target = func(this.target, this.builder)
         }
 
         return this
