@@ -18,12 +18,6 @@ export class PropiedadesBuilder {
     getResult() {
         return this.result
     }
-
-    // // usar solo si tests fallan por hacer spread de propiedades en constructor
-    // getResult() {
-    //     // result contains only overwrited propiedades
-    //     return { ...this.propiedades, ...this.result }
-    // }
  
     build() {
         for (const [k, v] of this.entries()) {
