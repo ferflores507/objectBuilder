@@ -5,6 +5,45 @@ import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 
 describe("propiedades builder", () => {
 
+  test("target path", () => {
+    const target = { detalles: { titulo: "Hola" } }
+    const source = {}
+    const propiedades = {
+      uno: {
+        const: 1
+      },
+      dos: {
+        sibling: "uno"
+      },
+      tres: {
+        const: 3
+      },
+      saludo: {
+        targetPath: "detalles.titulo",
+      },
+      saludoNested: {
+        targetPath: "detalles",
+        propiedades: {
+          titulo: {
+            targetPath: "titulo"
+          }
+        }
+      }
+    }
+    const builder = new ObjectBuilder(source, { target })
+    const propiedadesBuilder = new PropiedadesBuilder(propiedades, builder)
+    const result = propiedadesBuilder.build()
+    const expected = {
+      uno: 1,
+      dos: 1,
+      tres: 3,
+      saludo: "Hola",
+      saludoNested: { titulo: "Hola" }
+    }
+  
+    expect(result).toEqual(expected)
+  })
+
   test("sibling", () => {
     const source = {}
     const propiedades = {
