@@ -10,13 +10,13 @@ type BuilderOptions = Partial<{
 }>
 
 export class ObjectBuilder {
-  constructor(source: Record<string, any>, options?: BuilderOptions) {
+  constructor(source: Record<string, any>, options: BuilderOptions = {}) {
     this.source = source
     this.options = options
   }
 
   private readonly source: Record<string, any>
-  readonly options?: BuilderOptions
+  readonly options: BuilderOptions
   
   getSource = () => this.source
   getSourcePathValue = (path: string) => getPathValue(this.getSource(), path)
