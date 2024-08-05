@@ -3,6 +3,7 @@ import { ObjectBuilder } from "./ObjectBuilder"
 import { ResultBuilderBase } from "./ResultBuilderBase"
 import * as varios from "../helpers/varios"
 import useConsulta from "../helpers/useConsulta"
+import { PropiedadesBuilder } from "./PropiedadesBuilder"
 
 export class ResultBuilderAsync extends ResultBuilderBase {
 
@@ -85,14 +86,9 @@ export class ResultBuilderAsync extends ResultBuilderBase {
     async withPropiedadesAsync(propiedades: Record<string, any> | undefined) {
 
         if (propiedades) {
-            const obj: Record<string, any> = {}
-            this.builder = this.builder.with({ siblings: obj })
+            const builder = this.builder.with({ target: this.target })
       
-            for (const [k, v] of Object.entries(propiedades)) {
-              obj[k] = await this.buildAsync(v);
-            }
-      
-            this.target = obj
+            this.target = await new PropiedadesBuilder(propiedades, builder).buildAsync()
           }
 
         return this

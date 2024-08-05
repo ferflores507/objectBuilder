@@ -1,6 +1,7 @@
 import type { Schema } from "../models"
 import { ResultBuilderBase } from "./ResultBuilderBase"
 import * as varios from "../helpers/varios"
+import { PropiedadesBuilder } from "./PropiedadesBuilder"
 
 export class ResultBuilder extends ResultBuilderBase {
 
@@ -46,14 +47,9 @@ export class ResultBuilder extends ResultBuilderBase {
     withPropiedades(propiedades: Record<string, any> | undefined) {
 
         if (propiedades) {
-            const obj: Record<string, any> = {}
-            this.builder = this.builder.with({ siblings: obj })
-      
-            for (const [k, v] of Object.entries(propiedades)) {
-              obj[k] = this.build(v);
-            }
-      
-            this.target = obj
+            const builder = this.builder.with({ target: this.target })
+            
+            this.target = new PropiedadesBuilder(propiedades, builder).build()
           }
 
         return this
