@@ -7,6 +7,7 @@ type BuilderOptions = Partial<{
   target: any
   siblings: Record<string, any>
   stopPropiedades: string[]
+  sources: Record<string, any>
 }>
 
 export class ObjectBuilder {
@@ -24,9 +25,16 @@ export class ObjectBuilder {
     return schema == null ? null : (this.options?.target ?? this.source)
   }
 
+  withSource(source: Record<string, any>) {
+    return this.with({ 
+      sources: { ...this.options.sources, ...source }
+    })
+  }
+
   with(options: BuilderOptions) {
-    options = { ...this.options, ...options }
-    return new ObjectBuilder(this.source, options)
+    const newOptions = { ...this.options, ...options }
+    
+    return new ObjectBuilder(this.source, newOptions)
   }
 
   build(schema: Schema | undefined) {
