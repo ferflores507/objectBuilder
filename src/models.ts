@@ -44,6 +44,7 @@ export type Schema = Partial<{
     set: string
     sibling: string
     some: any
+    source: string
     stringify: true
     spread: Schema
     targetPath: string
