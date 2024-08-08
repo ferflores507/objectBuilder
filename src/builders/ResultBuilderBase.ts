@@ -31,7 +31,8 @@ export class ResultBuilderBase {
             stringify,
             parse,
             sibling,
-            source
+            source,
+            includes
         } = schema ?? {}
 
         return this.withConst(value)
@@ -45,6 +46,15 @@ export class ResultBuilderBase {
             .withUnpack(unpack)
             .withStringify(stringify)
             .withParse(parse)
+            .withIncludes(includes)
+    }
+
+    withIncludes(schema: Schema | undefined) {
+        if(schema) {
+            this.target = (this.target as any[]).includes(this.builder.build(schema))
+        }
+
+        return this
     }
 
     withUse(path: string | undefined) {

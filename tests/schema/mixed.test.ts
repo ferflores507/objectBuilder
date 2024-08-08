@@ -3,6 +3,24 @@ import { ObjectBuilder, Schema } from "../.."
 import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 
+test("includes", () => {
+  const schema = {
+    const: [
+      1,
+      2,
+      3
+    ],
+    includes: {
+      targetPath: "id"
+    }
+  }
+
+  const builder = new ObjectBuilder({}).with({ target: { id: 2 }})
+  const resultado = builder.build(schema)
+
+  expect(resultado).toBe(true)
+})
+
 test("stopPropiedades", () => {
   const source = { evaluatedTitle: "evaluated" }
   const schema = {

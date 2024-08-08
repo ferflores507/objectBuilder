@@ -35,6 +35,7 @@ export type Schema = Partial<{
     equals: Schema
     flat: true
     if: Record<string, any>
+    includes: Schema
     path: string
     parse: true
     propiedades: Record<string, Schema>
