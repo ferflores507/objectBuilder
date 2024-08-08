@@ -41,6 +41,7 @@ export type Schema = Partial<{
     reduce: Schema[]
     required: string[]
     schemaFrom: Schema
+    selectTo: string
     set: string
     sibling: string
     some: any
