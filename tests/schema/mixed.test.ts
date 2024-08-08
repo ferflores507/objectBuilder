@@ -3,6 +3,39 @@ import { ObjectBuilder, Schema } from "../.."
 import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 
+test("select", () => {
+
+  const source = {
+    selected: [
+      2,
+      5,
+      7
+    ]
+  }
+
+  const schema = {
+    targetPath: "id",
+    selectTo: "selected"
+  }
+
+  // select new
+
+  let builder = new ObjectBuilder(source).with({ target: { id: 3 }})
+  
+  builder.build(schema)
+  
+  let selected = builder.getSourcePathValue("selected")
+
+  expect(selected).toEqual([2, 5, 7, 3])
+
+  // select existing (deselect)
+  builder = builder.with({ target: { id: 5 }})
+  builder.build(schema)
+  selected = builder.getSourcePathValue("selected")
+
+  expect(selected).toEqual([2, 7, 3])
+})
+
 test("stopPropiedades", () => {
   const source = { evaluatedTitle: "evaluated" }
   const schema = {
