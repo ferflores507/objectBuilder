@@ -31,7 +31,8 @@ export class ResultBuilderBase {
             stringify,
             parse,
             sibling,
-            source
+            source,
+            selectTo
         } = schema ?? {}
 
         return this.withConst(value)
@@ -45,6 +46,29 @@ export class ResultBuilderBase {
             .withUnpack(unpack)
             .withStringify(stringify)
             .withParse(parse)
+            .withSelect(selectTo)
+    }
+
+    withSelect(path: string | undefined) {
+        if(path) {
+            const items = this.builder.getSourcePathValue(path) as any[]
+            const value = this.target
+            const currentIndex = items.indexOf(value)
+
+            const toSplicedArgs = currentIndex === -1
+                ? [items.length, 0, value]
+                : [currentIndex, 1] 
+
+            const newItems = items.toSpliced(...toSplicedArgs)
+            
+            // Por encapsular
+            const paths = path.split(".")
+            const source = this.builder.getSource()
+
+            varios.setUpdateProp(source as {}, paths, newItems)
+        }
+
+        return this
     }
 
     withIncludes(schema: Schema | undefined) {
