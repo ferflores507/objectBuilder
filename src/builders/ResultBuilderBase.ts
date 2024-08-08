@@ -56,10 +56,10 @@ export class ResultBuilderBase {
             const currentIndex = items.indexOf(value)
 
             const toSplicedArgs = currentIndex === -1
-                ? [items.length, 0]
+                ? [items.length, 0, value]
                 : [currentIndex, 1] 
 
-            const newItems = items.toSpliced(...toSplicedArgs, value)
+            const newItems = items.toSpliced(...toSplicedArgs)
             
             // Por encapsular
             const paths = path.split(".")
