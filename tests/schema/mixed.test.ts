@@ -3,7 +3,7 @@ import { ObjectBuilder, Schema } from "../.."
 import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 
-test("includes", () => {
+test("includes", async () => {
   const schema = {
     const: [
       1,
@@ -16,9 +16,9 @@ test("includes", () => {
   }
 
   const builder = new ObjectBuilder({}).with({ target: { id: 2 }})
-  const resultado = builder.build(schema)
+  const resultados = [builder.build(schema), await builder.buildAsync(schema)]
 
-  expect(resultado).toBe(true)
+  expect(resultados).toEqual([true, true])
 })
 
 test("stopPropiedades", () => {

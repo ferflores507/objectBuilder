@@ -31,8 +31,7 @@ export class ResultBuilderBase {
             stringify,
             parse,
             sibling,
-            source,
-            includes
+            source
         } = schema ?? {}
 
         return this.withConst(value)
@@ -46,7 +45,6 @@ export class ResultBuilderBase {
             .withUnpack(unpack)
             .withStringify(stringify)
             .withParse(parse)
-            .withIncludes(includes)
     }
 
     withIncludes(schema: Schema | undefined) {
