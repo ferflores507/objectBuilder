@@ -2,6 +2,13 @@ import { describe, expect, test } from 'vitest'
 import { ObjectBuilder, Schema } from "../.."
 import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
+import { getPathValue } from '../../src/helpers/varios'
+
+test("getPathValue throws on null source", () => {
+  const source = null
+
+  expect(() => getPathValue(source, "test")).toThrow()
+})
 
 test("select", () => {
 
