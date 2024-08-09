@@ -20,6 +20,7 @@ export class ResultBuilder extends ResultBuilderBase {
         } = schema ?? {}
 
         return this.withSchema(schema)
+            .withConditional(schema)
             .withDefinitions(definitions)
             .withPropiedades(propiedades)
             .withSpread(spread)
@@ -27,6 +28,20 @@ export class ResultBuilder extends ResultBuilderBase {
             .withReduce(reduce)
             .withCheckout(checkout)
             .getTarget()
+    }
+
+    withConditional(schema: Schema | undefined) {
+        if(schema) {
+            const condition = schema.if
+
+            const result = typeof(condition) == "string"
+                ? this.builder.getSourcePathValue(condition)
+                : this.build(condition)
+
+            this.target = this.build(result === true ? schema.then : schema.else)
+        }
+
+        return this
     }
 
     withDefinitions(schemas: Schema[] | undefined) {

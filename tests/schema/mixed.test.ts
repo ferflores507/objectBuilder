@@ -4,6 +4,36 @@ import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
+describe("if schema", () => {
+  test.each([1, 2, 3])("if as schema", (expected: number) => {
+    const [ok, invalid] = ["ok", "invalid"]
+    const source = {
+      id: 2,
+      expected
+    }
+
+    const schema = {
+      if: {
+        path: "id",
+        equals: {
+          path: "expected"
+        }
+      },
+      then: {
+        const: ok
+      },
+      else: {
+        const: invalid
+      }
+    }
+
+    const builder = new ObjectBuilder(source)
+    const result = builder.build(schema)
+
+    expect(result).toBe(source.id === source.expected ? ok : invalid)
+  })
+})
+
 test("getPathValue throws on null source", () => {
   const source = null
 
