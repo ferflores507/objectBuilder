@@ -26,11 +26,13 @@ export class ArrayMapBuilder {
         if(join) {
             const target = this.builder.build(join.items)
 
-            this.items = this.items.map(inner => {
-                // this builder is missing the sibling...
-                const group = new ObjectBuilder(inner, { target }).build(join.match)
+            this.items = this.items.map(item => {
+                const group = this.builder
+                    .with({ target })
+                    .withSource({ item })
+                    .build(join.match)
 
-                return { inner, group }
+                return { item, group }
             })
         }
 
