@@ -49,6 +49,16 @@ export class ResultBuilderBase {
             .withSelect(selectTo)
     }
 
+    withEndSchema(schema: Schema | undefined) {
+        const { equals, set, use, includes } = schema ?? {}
+
+        return this.withArraySchema(schema)
+            .withEquals(equals)
+            .withIncludes(includes)
+            .withSet(set)
+            .withUse(use)
+    }
+
     set(path: string, value: any) {
         const source = this.builder.getSource()
 
