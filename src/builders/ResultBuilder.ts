@@ -11,19 +11,21 @@ export class ResultBuilder extends ResultBuilderBase {
 
     build(schema: Schema | undefined) {
 
-        const { propiedades, spread, reduce, definitions, equals, set, checkout, use, includes } = schema ?? {}
+        const { 
+            propiedades, 
+            spread, 
+            reduce, 
+            definitions, 
+            checkout 
+        } = schema ?? {}
 
         return this.withSchema(schema)
             .withDefinitions(definitions)
             .withPropiedades(propiedades)
             .withSpread(spread)
-            .withArraySchema(schema)
-            .withEquals(equals)
+            .withEndSchema(schema)
             .withReduce(reduce)
-            .withIncludes(includes)
-            .withSet(set)
             .withCheckout(checkout)
-            .withUse(use)
             .getTarget()
     }
 
