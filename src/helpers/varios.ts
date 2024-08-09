@@ -15,9 +15,9 @@ export const getValueFromPaths: any = (obj: Record<string, any>, paths: string[]
     return paths?.reduce((p, c) => p?.[c], obj);
 }
 
-export const getPathValue = (obj: {}, path: string | string[] | undefined, separator = ".") => {
+export const getPathValue = (obj: {}, path: string | string[], separator = ".") => {
 
-    const paths = Array.isArray(path) ? path : path?.toString().split(separator)
+    const paths = Array.isArray(path) ? path : path.split(separator)
 
     return getValueFromPaths(obj, paths)
   }
