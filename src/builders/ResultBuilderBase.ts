@@ -49,6 +49,12 @@ export class ResultBuilderBase {
             .withSelect(selectTo)
     }
 
+    set(path: string, value: any) {
+        const source = this.builder.getSource()
+
+        varios.setPathValue(source as {}, path, value)
+    }
+
     withSelect(path: string | undefined) {
         if(path) {
             const items = this.builder.getSourcePathValue(path) as any[]
@@ -61,10 +67,7 @@ export class ResultBuilderBase {
 
             const newItems = items.toSpliced(...toSplicedArgs)
             
-            // Por encapsular
-            const source = this.builder.getSource()
-
-            varios.setPathValue(source as {}, path, newItems)
+            this.set(path, newItems)
         }
 
         return this
@@ -122,9 +125,7 @@ export class ResultBuilderBase {
 
     withSet(path: string | undefined) {
         if(path) {
-            const source = this.builder.getSource()
-
-            varios.setPathValue(source as {}, path, this.target)
+            this.set(path, this.target)
         }
 
         return this
