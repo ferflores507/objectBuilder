@@ -30,11 +30,11 @@ export type Schema = Partial<{
     const: any
     definitions: Schema[]
     delay: number
-    else: Record<string, any>
+    else: Schema
     entries: true
     equals: Schema
     flat: true
-    if: Record<string, any>
+    if: Schema | string
     includes: Schema
     path: string
     parse: true
@@ -50,7 +50,7 @@ export type Schema = Partial<{
     stringify: true
     spread: Schema
     targetPath: string
-    then: Record<string, any>
+    then: Schema
     unpack: string[]
     use: string
 }> & ArraySchema
