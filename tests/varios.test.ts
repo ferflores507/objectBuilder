@@ -133,8 +133,7 @@ describe("varios", () => {
             apellido: "Flores"
         }
 
-        const path = ["detalles", "id"]
-        varios.setPathValue(usuario, path, 1)
+        varios.setPathValue(usuario, "detalles.id", 1)
         const expected = {
             ...usuario,
             detalles: {

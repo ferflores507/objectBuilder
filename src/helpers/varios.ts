@@ -78,7 +78,7 @@ const toArray = (value: any) => Array.isArray(value) ? value : [value]
 
 const toArrayOrNull = (value: any) => value != null ? toArray(value) : null
 
-const setPathValue = (obj: Record<string, any>, path: string[], value: any) => {
+const setPathValueFromPaths = (obj: Record<string, any>, path: string[], value: any) => {
     const first = path[0]
     
     if (path.length === 1) {
@@ -90,8 +90,14 @@ const setPathValue = (obj: Record<string, any>, path: string[], value: any) => {
     else {
         obj[first] = obj[first] ?? {}
 
-        return setPathValue(obj[first], path.slice(1), value);
+        return setPathValueFromPaths(obj[first], path.slice(1), value);
     }
+};
+
+const setPathValue = (obj: Record<string, any>, path: string | string[], value: any, separator = ".") => {
+    const paths = Array.isArray(path) ? path : path.split(separator)
+
+    return setPathValueFromPaths(obj, paths, value)
 };
 
 const removeNullOrUndefined = (source: {}) => {

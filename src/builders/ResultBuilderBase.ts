@@ -62,10 +62,9 @@ export class ResultBuilderBase {
             const newItems = items.toSpliced(...toSplicedArgs)
             
             // Por encapsular
-            const paths = path.split(".")
             const source = this.builder.getSource()
 
-            varios.setPathValue(source as {}, paths, newItems)
+            varios.setPathValue(source as {}, path, newItems)
         }
 
         return this
@@ -123,10 +122,9 @@ export class ResultBuilderBase {
 
     withSet(path: string | undefined) {
         if(path) {
-            const paths = path.split(".")
             const source = this.builder.getSource()
 
-            varios.setPathValue(source as {}, paths, this.target)
+            varios.setPathValue(source as {}, path, this.target)
         }
 
         return this
