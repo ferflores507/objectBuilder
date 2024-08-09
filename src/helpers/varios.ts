@@ -7,7 +7,7 @@ export const getFormData = (source: {}) => {
 
         items.forEach(v => data.append(k, v))
     }
-    
+
     return data
 }
 
@@ -20,7 +20,7 @@ export const getPathValue = (obj: {}, path: string | string[] | undefined, separ
     const paths = Array.isArray(path) ? path : path?.toString().split(separator)
 
     return getValueFromPaths(obj, paths)
-  }
+}
 
 export const spread = (target: any, source: any) => {
     return Array.isArray(target) ? [...target, ...source] : { ...target, ...source }
@@ -31,7 +31,7 @@ export const entries = (source: Record<string, any>) => {
 }
 
 export const comparar = (a: any, b: any, method = "equal") => {
-    
+
     const metodos: Record<string, () => boolean> = {
         equal: () => esIgual(a, b),
         notEqual: () => a !== b,
@@ -42,10 +42,10 @@ export const comparar = (a: any, b: any, method = "equal") => {
     return metodos[method]()
 }
 
-export const ordenar = (objs: any[], orderBy: string) => objs.sort((a,b) => {
+export const ordenar = (objs: any[], orderBy: string) => objs.sort((a, b) => {
     a = getPathValue(a, orderBy)
     b = getPathValue(b, orderBy)
-    
+
     return (a > b) ? 1 : ((b > a) ? -1 : 0)
 })
 
@@ -56,7 +56,7 @@ export const isObject = (value: any) => {
 }
 
 export const flat = (obj: {}) => Object.entries(obj).reduce((p, [k, v]) => {
-    const valor : any = isObject(v) ? v : { [k]: v }
+    const valor: any = isObject(v) ? v : { [k]: v }
     return { ...p, ...valor }
 }, {})
 
@@ -65,11 +65,11 @@ const copy = (obj: {}) => JSON.parse(JSON.stringify(obj))
 export const tryCopy = (obj: {}) => {
     try {
         return copy(obj)
-      }
-      catch(e) {
+    }
+    catch (e) {
         console.log(e)
         console.error(`No se pudo copiar el valor "${obj}"`, { obj })
-      }
+    }
 
     return obj
 }
@@ -80,11 +80,11 @@ export const toArrayOrNull = (value: any) => value != null ? toArray(value) : nu
 
 const setPathValueFromPaths = (obj: Record<string, any>, path: string[], value: any) => {
     const first = path[0]
-    
+
     if (path.length === 1) {
         obj[first] = value;
     }
-    else if (path.length === 0)  {
+    else if (path.length === 0) {
         throw "No hay paths para actualizar el objeto";
     }
     else {
@@ -105,7 +105,7 @@ export const removeNullOrUndefined = (source: {}) => {
 }
 
 export const esIgual = (a: any, b: any) => {
-    if(a === undefined && b === undefined) {
+    if (a === undefined && b === undefined) {
         console.warn("Ambos valores a comparar son undefined")
     }
     return JSON.stringify(a) === JSON.stringify(b)
