@@ -12,7 +12,7 @@ export class ResultBuilderBase {
       }
 
     protected target: unknown
-    protected builder: ObjectBuilder
+    protected readonly builder: ObjectBuilder
     private get options() {
         return this.builder.options
     }

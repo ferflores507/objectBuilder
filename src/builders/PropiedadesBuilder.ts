@@ -7,7 +7,7 @@ export class PropiedadesBuilder {
         this.builder = this.builder.with({ siblings: this.result })
     }
 
-    private result: Record<string, any>
+    private readonly result: Record<string, any>
     private entries = () => {
         const { stopPropiedades } = this.builder.options
         

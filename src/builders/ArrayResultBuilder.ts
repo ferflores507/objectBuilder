@@ -10,7 +10,7 @@ export class ArrayResultBuilder {
     }
 
     target: any
-    builder: ObjectBuilder
+    private readonly builder: ObjectBuilder
 
     build = () => this.target
 

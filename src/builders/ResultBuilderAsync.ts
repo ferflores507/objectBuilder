@@ -12,7 +12,7 @@ export class ResultBuilderAsync extends ResultBuilderBase {
         this.controller = controller
       }
 
-      controller: AbortController
+      private readonly controller: AbortController
 
     clone() {
         return new ResultBuilderAsync(this.target, this.builder, this.controller)
