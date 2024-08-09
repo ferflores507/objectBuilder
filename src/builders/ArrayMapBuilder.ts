@@ -7,7 +7,7 @@ export class ArrayMapBuilder {
         this.builder = builder
     }
 
-    items: any[]
+    private items: any[]
     private readonly builder: ObjectBuilder
 
     build = () => this.items
