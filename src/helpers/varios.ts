@@ -80,11 +80,16 @@ const toArrayOrNull = (value: any) => value != null ? toArray(value) : null
 
 const setUpdateProp = (obj: Record<string, any>, path: string[], value: any) => {
     const first = path[0]
-    if (path.length === 1) obj[first] = value;
-    else if (path.length === 0) throw "No hay paths para actualizar el objeto";
+    
+    if (path.length === 1) {
+        obj[first] = value;
+    }
+    else if (path.length === 0)  {
+        throw "No hay paths para actualizar el objeto";
+    }
     else {
         obj[first] = obj[first] ?? {}
-        
+
         return setUpdateProp(obj[first], path.slice(1), value);
     }
 };
