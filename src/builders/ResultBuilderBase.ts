@@ -65,7 +65,7 @@ export class ResultBuilderBase {
             const paths = path.split(".")
             const source = this.builder.getSource()
 
-            varios.setUpdateProp(source as {}, paths, newItems)
+            varios.setPathValue(source as {}, paths, newItems)
         }
 
         return this
@@ -126,7 +126,7 @@ export class ResultBuilderBase {
             const paths = path.split(".")
             const source = this.builder.getSource()
 
-            varios.setUpdateProp(source as {}, paths, this.target)
+            varios.setPathValue(source as {}, paths, this.target)
         }
 
         return this

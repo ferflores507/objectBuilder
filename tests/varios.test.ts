@@ -127,14 +127,14 @@ describe("spread", () => {
 
 describe("varios", () => {
 
-    test("setUpdateProp", () => {
+    test("setPathValue", () => {
         const usuario = {
             nombre: "Melany",
             apellido: "Flores"
         }
 
         const path = ["detalles", "id"]
-        varios.setUpdateProp(usuario, path, 1)
+        varios.setPathValue(usuario, path, 1)
         const expected = {
             ...usuario,
             detalles: {

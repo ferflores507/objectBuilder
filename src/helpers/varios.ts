@@ -78,7 +78,7 @@ const toArray = (value: any) => Array.isArray(value) ? value : [value]
 
 const toArrayOrNull = (value: any) => value != null ? toArray(value) : null
 
-const setUpdateProp = (obj: Record<string, any>, path: string[], value: any) => {
+const setPathValue = (obj: Record<string, any>, path: string[], value: any) => {
     const first = path[0]
     
     if (path.length === 1) {
@@ -90,7 +90,7 @@ const setUpdateProp = (obj: Record<string, any>, path: string[], value: any) => 
     else {
         obj[first] = obj[first] ?? {}
 
-        return setUpdateProp(obj[first], path.slice(1), value);
+        return setPathValue(obj[first], path.slice(1), value);
     }
 };
 
@@ -105,4 +105,4 @@ const esIgual = (a: any, b: any) => {
     return JSON.stringify(a) === JSON.stringify(b)
 }
 
-export { ordenar, flat, tryCopy, esIgual, removeNullOrUndefined, isObject, setUpdateProp, toArrayOrNull }
+export { ordenar, flat, tryCopy, esIgual, removeNullOrUndefined, isObject, setPathValue, toArrayOrNull }
