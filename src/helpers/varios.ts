@@ -42,27 +42,27 @@ export const comparar = (a: any, b: any, method = "equal") => {
     return metodos[method]()
 }
 
-const ordenar = (objs: any[], orderBy: string) => objs.sort((a,b) => {
+export const ordenar = (objs: any[], orderBy: string) => objs.sort((a,b) => {
     a = getPathValue(a, orderBy)
     b = getPathValue(b, orderBy)
     
     return (a > b) ? 1 : ((b > a) ? -1 : 0)
 })
 
-const isObject = (value: any) => {
+export const isObject = (value: any) => {
     return typeof value === "object"
         && value !== null
         && !Array.isArray(value)
 }
 
-const flat = (obj: {}) => Object.entries(obj).reduce((p, [k, v]) => {
+export const flat = (obj: {}) => Object.entries(obj).reduce((p, [k, v]) => {
     const valor : any = isObject(v) ? v : { [k]: v }
     return { ...p, ...valor }
 }, {})
 
 const copy = (obj: {}) => JSON.parse(JSON.stringify(obj))
 
-const tryCopy = (obj: {}) => {
+export const tryCopy = (obj: {}) => {
     try {
         return copy(obj)
       }
@@ -76,7 +76,7 @@ const tryCopy = (obj: {}) => {
 
 const toArray = (value: any) => Array.isArray(value) ? value : [value]
 
-const toArrayOrNull = (value: any) => value != null ? toArray(value) : null
+export const toArrayOrNull = (value: any) => value != null ? toArray(value) : null
 
 const setPathValueFromPaths = (obj: Record<string, any>, path: string[], value: any) => {
     const first = path[0]
@@ -94,21 +94,19 @@ const setPathValueFromPaths = (obj: Record<string, any>, path: string[], value: 
     }
 };
 
-const setPathValue = (obj: Record<string, any>, path: string | string[], value: any, separator = ".") => {
+export const setPathValue = (obj: Record<string, any>, path: string | string[], value: any, separator = ".") => {
     const paths = Array.isArray(path) ? path : path.split(separator)
 
     return setPathValueFromPaths(obj, paths, value)
 };
 
-const removeNullOrUndefined = (source: {}) => {
+export const removeNullOrUndefined = (source: {}) => {
     return Object.fromEntries(Object.entries(source).filter(([_, v]) => v != null));
 }
 
-const esIgual = (a: any, b: any) => {
+export const esIgual = (a: any, b: any) => {
     if(a === undefined && b === undefined) {
         console.warn("Ambos valores a comparar son undefined")
     }
     return JSON.stringify(a) === JSON.stringify(b)
 }
-
-export { ordenar, flat, tryCopy, esIgual, removeNullOrUndefined, isObject, setPathValue, toArrayOrNull }
