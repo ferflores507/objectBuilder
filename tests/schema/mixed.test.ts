@@ -542,7 +542,7 @@ describe("array", () => {
               find: {
                 targetPath: "nombre",
                 equals: {
-                  path: "nombre"
+                  source: "item.nombre"
                 }
               }
             }
@@ -550,7 +550,7 @@ describe("array", () => {
         },
         expected: [
           {
-            inner: {
+            item: {
               nameId: 1,
               nombre: "nombre",
             },
@@ -560,7 +560,7 @@ describe("array", () => {
             }
           },
           {
-            inner: {
+            item: {
               nameId: 2,
               nombre: "cedula"
             },
