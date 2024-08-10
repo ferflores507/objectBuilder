@@ -5,9 +5,12 @@ import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
 describe("if schema", () => {
+  const [ok, invalid] = ["ok", "invalid"]
+  const cases = [1, 2, 3].map(num => {
+    return [num, num % 2 == 0 ? ok : invalid] as [number, string]
+  })
 
-  test.each([1, 2, 3])("if as string (path)", async (id: number) => {
-    const [ok, invalid] = ["ok", "invalid"]
+  test.each(cases)("if as string (path)", async (id: number, expected: string) => {
     const source = {
       isValid: id % 2 == 0
     }
@@ -24,23 +27,24 @@ describe("if schema", () => {
 
     const builder = new ObjectBuilder(source)
     const results = [builder.build(schema), await builder.buildAsync(schema)]
-    const expected = source.isValid ? ok : invalid
 
     expect(results).toEqual([expected, expected])
   })
 
-  test.each([1, 2, 3])("if as schema", async (id: number) => {
-    const [ok, invalid] = ["ok", "invalid"]
-    const source = {
-      id: 2,
-      expected: id
-    }
+  const modCases = [1, 2, 3].map(num => {
+    const mod = num % 2
+
+    return [mod, mod == 0 ? ok : invalid] as [number, string]
+  })
+
+  test.each(modCases)("if as schema", async (mod: number, expected: string) => {
+    const source = { mod }
 
     const schema = {
       if: {
-        path: "id",
+        path: "mod",
         equals: {
-          path: "expected"
+          const: 0
         }
       },
       then: {
@@ -53,7 +57,6 @@ describe("if schema", () => {
 
     const builder = new ObjectBuilder(source)
     const results = [builder.build(schema), await builder.buildAsync(schema)]
-    const expected = source.id === source.expected ? ok : invalid
 
     expect(results).toEqual([expected, expected])
   })
