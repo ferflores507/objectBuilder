@@ -5,7 +5,7 @@ import { ObjectBuilder } from "./ObjectBuilder"
 import * as varios from "../helpers/varios"
 import { getPathValue } from "../helpers/varios"
 
-export class ResultBuilderBase {
+export abstract class ResultBuilderBase {
     constructor(target: any, builder: ObjectBuilder) {
         this.target = target
         this.builder = builder
@@ -16,6 +16,8 @@ export class ResultBuilderBase {
     private get options() {
         return this.builder.options
     }
+
+    abstract withConditional(schema: Schema | undefined) : this | Promise<this>
 
     getTarget = () => this.target
 

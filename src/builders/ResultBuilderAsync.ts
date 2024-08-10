@@ -30,6 +30,7 @@ export class ResultBuilderAsync extends ResultBuilderBase {
         } = schema ?? {}
 
         this.withSchema(schema)
+        await this.withConditional(schema)
         await this.withDelay(delay)
         await this.withConsultaAsync(consulta)
         await this.withDefinitionsAsync(definitions)
@@ -40,6 +41,20 @@ export class ResultBuilderAsync extends ResultBuilderBase {
         await this.withCheckout(checkout)
         
         return this.getTarget()
+    }
+
+    async withConditional(schema: Schema | undefined) {
+        if(schema) {
+            const condition = schema.if
+
+            const result = typeof(condition) == "string"
+                ? this.builder.getSourcePathValue(condition)
+                : await this.buildAsync(condition)
+
+            this.target = await this.buildAsync(result === true ? schema.then : schema.else)
+        }
+
+        return this
     }
 
     async withConsultaAsync(consulta: Consulta | undefined) {
