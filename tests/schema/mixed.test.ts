@@ -5,6 +5,30 @@ import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
 describe("if schema", () => {
+
+  test.each([1, 2, 3])("if as string (path)", async (id: number) => {
+    const [ok, invalid] = ["ok", "invalid"]
+    const source = {
+      isValid: id % 2 == 0
+    }
+
+    const schema = {
+      if: "isValid",
+      then: {
+        const: ok
+      },
+      else: {
+        const: invalid
+      }
+    }
+
+    const builder = new ObjectBuilder(source)
+    const results = [builder.build(schema), await builder.buildAsync(schema)]
+    const expected = source.isValid ? ok : invalid
+
+    expect(results).toEqual([expected, expected])
+  })
+
   test.each([1, 2, 3])("if as schema", async (id: number) => {
     const [ok, invalid] = ["ok", "invalid"]
     const source = {
