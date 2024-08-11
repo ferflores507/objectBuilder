@@ -8,6 +8,7 @@ type BuilderOptions = Partial<{
   siblings: Record<string, any>
   stopPropiedades: string[]
   sources: Record<string, any>
+  functions: Record<string, Function>
 }>
 
 export class ObjectBuilder {
@@ -23,6 +24,12 @@ export class ObjectBuilder {
   getSourcePathValue = (path: string) => getPathValue(this.getSource(), path)
   getInitialTarget = (schema: Schema | undefined) => {
     return schema == null ? null : (this.options?.target ?? this.source)
+  }
+
+  withFunctions(functions: Record<string, Function>) {
+    return this.with({
+      functions: { ...this.options.functions, ...functions }
+    })
   }
 
   withSource(source: Record<string, any>) {
