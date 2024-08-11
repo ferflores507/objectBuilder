@@ -95,7 +95,8 @@ export abstract class ResultBuilderBase {
 
     withUse(path: string | undefined) {
         if(path) {
-            const func = this.builder.getSourcePathValue(path)
+            const { functions } = this.builder.options
+            const func = functions?.[path] ?? (() => { throw `La función ${path} no está definida.` })()
             this.target = func(this.target, this.builder)
         }
 
