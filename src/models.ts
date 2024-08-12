@@ -7,7 +7,6 @@ export type Join = {
 
 export type AddSchema = {
     value: Schema
-    complete?: Schema,
     max?: number
     maxReached?: Schema
     multiple?: true

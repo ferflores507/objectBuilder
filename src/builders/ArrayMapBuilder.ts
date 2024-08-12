@@ -14,13 +14,10 @@ export class ArrayMapBuilder {
 
     withAdd(addSchema: AddSchema | undefined) {
         if(addSchema) {
-            const { value: valueSchema, complete } = addSchema
+            const { value: valueSchema } = addSchema
             const value = this.builder.build(valueSchema)
-            const items = [...this.items, value]
             
-            this.items = complete 
-                ? this.builder.withSource({ items }).build(complete) as [] 
-                : items
+            this.items = [...this.items, value]
         }
 
         return this
