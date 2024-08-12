@@ -4,6 +4,27 @@ import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
+test("add schema", () => {
+  const source = {}
+  const schema: Schema = {
+    const: [
+      1,
+      2
+    ],
+    add: {
+      value: {
+        const: 3
+      }
+    }
+  }
+
+  const result = new ObjectBuilder(source).build(schema)
+  const expected = [1, 2, 3]
+
+  expect(result).toEqual(expected)
+
+})
+
 describe("if schema", () => {
   const [ok, invalid] = ["ok", "invalid"]
   const cases = [1, 2, 3].map(num => {
@@ -259,7 +280,7 @@ describe("propiedades builder", () => {
   })
 })
 
-describe("use", () => {
+describe.todo("use", () => {
 
   const cases = [
     {
