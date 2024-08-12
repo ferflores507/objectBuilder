@@ -1,4 +1,4 @@
-import { Join, Schema } from "../models"
+import { AddSchema, Join, Schema } from "../models"
 import { ObjectBuilder } from "./ObjectBuilder"
 
 export class ArrayMapBuilder {
@@ -11,6 +11,20 @@ export class ArrayMapBuilder {
     private readonly builder: ObjectBuilder
 
     build = () => this.items
+
+    withAdd(addSchema: AddSchema | undefined) {
+        if(addSchema) {
+            const { value: valueSchema, complete } = addSchema
+            const value = this.builder.build(valueSchema)
+            const items = [...this.items, value]
+            
+            this.items = complete 
+                ? this.builder.withSource({ items }).build(complete) as [] 
+                : items
+        }
+
+        return this
+    }
 
     withMap(schema: Schema | undefined) {
         if(schema) {
