@@ -5,7 +5,16 @@ export type Join = {
     match: Schema
 }
 
+export type AddSchema = {
+    value: Schema
+    complete?: Schema,
+    max?: number
+    maxReached?: Schema
+    multiple?: true
+}
+
 export type ArraySchema = Partial<{
+    add: AddSchema,
     filter: Schema,
     find: Schema,
     items: Schema,
