@@ -14,10 +14,13 @@ export class ArrayMapBuilder {
 
     withAdd(addSchema: AddSchema | undefined) {
         if(addSchema) {
-            const { value: valueSchema } = addSchema
+            const { value: valueSchema, max = Infinity, multiple } = addSchema
             const value = this.builder.build(valueSchema)
+            const newMax = multiple ? max : 1
             
-            this.items = [...this.items, value]
+            this.items = this.items.length < newMax 
+                ? [...this.items, value] 
+                : this.items
         }
 
         return this

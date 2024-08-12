@@ -6,6 +6,51 @@ import { getPathValue } from '../../src/helpers/varios'
 
 describe("add schema", () => {
 
+  test("multiple with max", () => {
+    const source = {}
+    const schema: Schema = {
+      const: [
+        1,
+        2
+      ],
+      add: {
+        multiple: true,
+        max: 2,
+        value: {
+          const: 3
+        }
+      }
+    }
+  
+    const result = new ObjectBuilder(source).build(schema)
+    const expected = [1, 2]
+  
+    expect(result).toEqual(expected)
+  
+  })
+
+  test("multiple with value only", () => {
+    const source = {}
+    const schema: Schema = {
+      const: [
+        1,
+        2
+      ],
+      add: {
+        multiple: true,
+        value: {
+          const: 3
+        }
+      }
+    }
+  
+    const result = new ObjectBuilder(source).build(schema)
+    const expected = [1, 2, 3]
+  
+    expect(result).toEqual(expected)
+  
+  })
+
   test("with reduce", () => {
     const source = {}
     const schema: Schema = {
@@ -26,7 +71,7 @@ describe("add schema", () => {
     }
   
     new ObjectBuilder(source).build(schema)
-    const expected = [1, 2, 3]
+    const expected = [1, 2]
   
     expect(source.items).toEqual(expected)
   
@@ -47,7 +92,7 @@ describe("add schema", () => {
     }
   
     const result = new ObjectBuilder(source).build(schema)
-    const expected = [1, 2, 3]
+    const expected = [1, 2]
   
     expect(result).toEqual(expected)
   
