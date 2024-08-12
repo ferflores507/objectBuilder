@@ -4,24 +4,54 @@ import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
-test("add schema", () => {
-  const source = {}
-  const schema: Schema = {
-    const: [
-      1,
-      2
-    ],
-    add: {
-      value: {
-        const: 3
+describe("add schema", () => {
+
+  test("with reduce", () => {
+    const source = {}
+    const schema: Schema = {
+      const: [
+        1,
+        2
+      ],
+      add: {
+        value: {
+          const: 3
+        }
+      },
+      reduce: [
+        {
+          set: "items"
+        }
+      ]
+    }
+  
+    new ObjectBuilder(source).build(schema)
+    const expected = [1, 2, 3]
+  
+    expect(source.items).toEqual(expected)
+  
+  })
+
+  test("with value only", () => {
+    const source = {}
+    const schema: Schema = {
+      const: [
+        1,
+        2
+      ],
+      add: {
+        value: {
+          const: 3
+        }
       }
     }
-  }
-
-  const result = new ObjectBuilder(source).build(schema)
-  const expected = [1, 2, 3]
-
-  expect(result).toEqual(expected)
+  
+    const result = new ObjectBuilder(source).build(schema)
+    const expected = [1, 2, 3]
+  
+    expect(result).toEqual(expected)
+  
+  })
 
 })
 
