@@ -1,7 +1,8 @@
-import { ArraySchema, Schema } from "../models"
+import { ArraySchema, Schema, SelectSchema } from "../models"
 import { ArrayFilterBuilder } from "./ArrayFilterBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ObjectBuilder } from "./ObjectBuilder"
+import { PropiedadesBuilder } from "./PropiedadesBuilder"
 
 export class ArrayResultBuilder {
     constructor(items: any[], builder: ObjectBuilder) {
@@ -17,6 +18,7 @@ export class ArrayResultBuilder {
     withSchema(schema: ArraySchema | undefined) {
         if(schema) {
             this.target = this.withFilterOptions(schema)
+                .withSelect(schema)
                 .withMapOptions(schema)
                 .withFind(schema.find)
                 .build()
@@ -42,12 +44,27 @@ export class ArrayResultBuilder {
         return this
     }
 
-    private withMapOptions(schema: ArraySchema) {
-        if(Array.isArray(this.target)) {
-            const { map, groupJoin, select } = schema
+    private withSelect(schema: ArraySchema) {
+        const { select } = schema
+        
+        if(select && Array.isArray(this.target)) {
+            
+            const selectSchema = new PropiedadesBuilder(select, this.builder)
+                .build() as SelectSchema
 
             this.target = new ArrayMapBuilder(this.target, this.builder)
-                .withSelect(select)
+                .withSelect(selectSchema)
+                .build()
+        }
+
+        return this
+    }
+
+    private withMapOptions(schema: ArraySchema) {
+        if(Array.isArray(this.target)) {
+            const { map, groupJoin } = schema
+
+            this.target = new ArrayMapBuilder(this.target, this.builder)
                 .withMap(map)
                 .withGroupJoin(groupJoin)
                 .build()

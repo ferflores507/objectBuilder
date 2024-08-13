@@ -14,8 +14,7 @@ export class ArrayMapBuilder {
 
     withSelect(addSchema: SelectSchema | undefined) {
         if(addSchema) {
-            const { value: valueSchema, max = Infinity, multiple } = addSchema
-            const value = this.builder.build(valueSchema)
+            const { value, max = Infinity, multiple } = addSchema
             const valueIndex = this.items.indexOf(value)
             const items = valueIndex > -1
                 ? this.items.toSpliced(valueIndex, 1)

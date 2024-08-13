@@ -6,14 +6,16 @@ export type Join = {
 }
 
 export type SelectSchema = {
-    value: Schema
+    value: unknown
     max?: number
     maxReached?: Schema
     multiple?: true
 }
 
 export type ArraySchema = Partial<{
-    select: SelectSchema,
+    select: {
+        [P in keyof SelectSchema]: Schema;
+    },
     filter: Schema,
     find: Schema,
     items: Schema,
