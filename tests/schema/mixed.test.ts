@@ -14,8 +14,12 @@ describe("add schema", () => {
         2
       ],
       select: {
-        multiple: true,
-        max: 2,
+        multiple: {
+          const: true
+        },
+        max: {
+          const: 2
+        },
         value: {
           const: 3
         }
@@ -37,7 +41,9 @@ describe("add schema", () => {
         2
       ],
       select: {
-        multiple: true,
+        multiple: {
+          const: true
+        },
         value: {
           const: 3
         }
