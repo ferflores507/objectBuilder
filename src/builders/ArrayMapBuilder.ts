@@ -16,10 +16,12 @@ export class ArrayMapBuilder {
         if(addSchema) {
             const { value: valueSchema, max = Infinity, multiple } = addSchema
             const value = this.builder.build(valueSchema)
+            const valueIndex = this.items.indexOf(value)
+            const items = valueIndex > -1
+                ? this.items.toSpliced(valueIndex, 1)
+                : [...this.items, value]
             
-            this.items = multiple 
-                ? [...this.items, value].slice(0, max)
-                : [value]
+            this.items = multiple ? items.slice(0, max) : [value]
         }
 
         return this
