@@ -12,8 +12,8 @@ export class ArrayMapBuilder {
 
     build = () => this.items
 
-    withSelect(addSchema: SelectSchema | undefined) {
-        if(addSchema) {
+    withSelect(selectSchema: SelectSchema | undefined) {
+        if(selectSchema) {
             const getSelected = (items: any[], value: any) => {
                 const index = items.indexOf(value)
 
@@ -22,7 +22,7 @@ export class ArrayMapBuilder {
                     : [...items, value]
             }
 
-            const { value, max = Infinity, multiple } = addSchema
+            const { value, max = Infinity, multiple } = selectSchema
             
             this.items = multiple 
                 ? getSelected(this.items, value).slice(0, max)
