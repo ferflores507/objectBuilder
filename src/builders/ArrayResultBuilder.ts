@@ -44,10 +44,10 @@ export class ArrayResultBuilder {
 
     private withMapOptions(schema: ArraySchema) {
         if(Array.isArray(this.target)) {
-            const { map, groupJoin, add } = schema
+            const { map, groupJoin, select } = schema
 
             this.target = new ArrayMapBuilder(this.target, this.builder)
-                .withAdd(add)
+                .withSelect(select)
                 .withMap(map)
                 .withGroupJoin(groupJoin)
                 .build()

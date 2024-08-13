@@ -1,4 +1,4 @@
-import { AddSchema, Join, Schema } from "../models"
+import { SelectSchema, Join, Schema } from "../models"
 import { ObjectBuilder } from "./ObjectBuilder"
 
 export class ArrayMapBuilder {
@@ -12,7 +12,7 @@ export class ArrayMapBuilder {
 
     build = () => this.items
 
-    withAdd(addSchema: AddSchema | undefined) {
+    withSelect(addSchema: SelectSchema | undefined) {
         if(addSchema) {
             const { value: valueSchema, max = Infinity, multiple } = addSchema
             const value = this.builder.build(valueSchema)

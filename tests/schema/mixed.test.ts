@@ -13,7 +13,7 @@ describe("add schema", () => {
         1,
         2
       ],
-      add: {
+      select: {
         multiple: true,
         max: 2,
         value: {
@@ -36,7 +36,7 @@ describe("add schema", () => {
         1,
         2
       ],
-      add: {
+      select: {
         multiple: true,
         value: {
           const: 3
@@ -55,7 +55,7 @@ describe("add schema", () => {
     const source = {}
     const schema: Schema = {
       const: [4],
-      add: {
+      select: {
         value: {
           const: 3
         }
@@ -78,7 +78,7 @@ describe("add schema", () => {
     const source = {}
     const schema: Schema = {
       const: [],
-      add: {
+      select: {
         value: {
           const: 3
         }
