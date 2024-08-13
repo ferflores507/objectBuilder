@@ -51,13 +51,10 @@ describe("add schema", () => {
   
   })
 
-  test("with reduce", () => {
+  test("with value only, already containing an item and then reduce", () => {
     const source = {}
     const schema: Schema = {
-      const: [
-        1,
-        2
-      ],
+      const: [4],
       add: {
         value: {
           const: 3
@@ -71,7 +68,7 @@ describe("add schema", () => {
     }
   
     new ObjectBuilder(source).build(schema)
-    const expected = [1, 2]
+    const expected = [3]
   
     expect(source.items).toEqual(expected)
   
@@ -80,10 +77,7 @@ describe("add schema", () => {
   test("with value only", () => {
     const source = {}
     const schema: Schema = {
-      const: [
-        1,
-        2
-      ],
+      const: [],
       add: {
         value: {
           const: 3
@@ -92,7 +86,7 @@ describe("add schema", () => {
     }
   
     const result = new ObjectBuilder(source).build(schema)
-    const expected = [1, 2]
+    const expected = [3]
   
     expect(result).toEqual(expected)
   

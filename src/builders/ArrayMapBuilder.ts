@@ -16,11 +16,10 @@ export class ArrayMapBuilder {
         if(addSchema) {
             const { value: valueSchema, max = Infinity, multiple } = addSchema
             const value = this.builder.build(valueSchema)
-            const newMax = multiple ? max : 1
             
-            this.items = this.items.length < newMax 
-                ? [...this.items, value] 
-                : this.items
+            this.items = multiple 
+                ? [...this.items, value].slice(0, max)
+                : [value]
         }
 
         return this
