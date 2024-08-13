@@ -14,13 +14,19 @@ export class ArrayMapBuilder {
 
     withSelect(addSchema: SelectSchema | undefined) {
         if(addSchema) {
+            const getSelected = (items: any[], value: any) => {
+                const index = items.indexOf(value)
+
+                return index > -1 
+                    ? items.toSpliced(index, 1) 
+                    : [...items, value]
+            }
+
             const { value, max = Infinity, multiple } = addSchema
-            const valueIndex = this.items.indexOf(value)
-            const items = valueIndex > -1
-                ? this.items.toSpliced(valueIndex, 1)
-                : [...this.items, value]
             
-            this.items = multiple ? items.slice(0, max) : [value]
+            this.items = multiple 
+                ? getSelected(this.items, value).slice(0, max)
+                : [value]
         }
 
         return this
