@@ -168,9 +168,7 @@ test("select", () => {
 
   const source = {
     selected: [
-      2,
-      5,
-      7
+      2
     ]
   }
 
@@ -187,14 +185,7 @@ test("select", () => {
   
   let selected = builder.getSourcePathValue("selected")
 
-  expect(selected).toEqual([2, 5, 7, 3])
-
-  // select existing (deselect)
-  builder = builder.with({ target: { id: 5 }})
-  builder.build(schema)
-  selected = builder.getSourcePathValue("selected")
-
-  expect(selected).toEqual([2, 7, 3])
+  expect(selected).toEqual([3])
 })
 
 test("includes", async () => {

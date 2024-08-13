@@ -4,6 +4,7 @@ import { ArrayBuilder } from "./ArrayBuilder"
 import { ObjectBuilder } from "./ObjectBuilder"
 import * as varios from "../helpers/varios"
 import { getPathValue } from "../helpers/varios"
+import { ArrayMapBuilder } from "./ArrayMapBuilder"
 
 export abstract class ResultBuilderBase {
     constructor(target: any, builder: ObjectBuilder) {
@@ -70,14 +71,9 @@ export abstract class ResultBuilderBase {
     withSelect(path: string | undefined) {
         if(path) {
             const items = this.builder.getSourcePathValue(path) as any[]
-            const value = this.target
-            const currentIndex = items.indexOf(value)
-
-            const toSplicedArgs = currentIndex === -1
-                ? [items.length, 0, value]
-                : [currentIndex, 1] 
-
-            const newItems = items.toSpliced(...toSplicedArgs)
+            const newItems = new ArrayMapBuilder(items, this.builder)
+                .withSelect({ value: this.target })
+                .build()
             
             this.set(path, newItems)
         }
