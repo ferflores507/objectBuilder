@@ -6,6 +6,27 @@ import { getPathValue } from '../../src/helpers/varios'
 
 describe("not", () => {
 
+  test("every item is opposite boolean", () => {
+    const source = [
+      true,
+      false,
+      false,
+      true
+    ]
+
+    const schema = {
+      map: {
+        not: {}
+      }
+    }
+
+    const builder = new ObjectBuilder(source)
+    const result = builder.build(schema)
+    const expected = source.map(x => !x)
+
+    expect(result).toEqual(expected)
+  })
+
   test("propiedades", () => {
     const source = {}
     const schema = {
