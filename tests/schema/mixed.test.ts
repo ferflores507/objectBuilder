@@ -174,7 +174,7 @@ test("select", () => {
 
   const schema = {
     targetPath: "id",
-    selectTo: "selected"
+    selectSet: "selected"
   }
 
   // select new

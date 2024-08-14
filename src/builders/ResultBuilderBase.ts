@@ -35,7 +35,7 @@ export abstract class ResultBuilderBase {
             parse,
             sibling,
             source,
-            selectTo
+            selectSet
         } = schema ?? {}
 
         return this.withConst(value)
@@ -49,7 +49,7 @@ export abstract class ResultBuilderBase {
             .withUnpack(unpack)
             .withStringify(stringify)
             .withParse(parse)
-            .withSelect(selectTo)
+            .withSelectSet(selectSet)
     }
 
     withEndSchema(schema: Schema | undefined) {
@@ -68,7 +68,7 @@ export abstract class ResultBuilderBase {
         varios.setPathValue(source as {}, path, value)
     }
 
-    withSelect(path: string | undefined) {
+    withSelectSet(path: string | undefined) {
         if(path) {
             const items = this.builder.getSourcePathValue(path) as any[]
             const newItems = new ArrayMapBuilder(items, this.builder)
