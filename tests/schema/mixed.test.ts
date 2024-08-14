@@ -6,7 +6,7 @@ import { getPathValue } from '../../src/helpers/varios'
 
 describe("not", () => {
 
-  test("every item is opposite boolean", () => {
+  test("every item is opposite boolean", async () => {
     const source = [
       true,
       false,
@@ -21,13 +21,13 @@ describe("not", () => {
     }
 
     const builder = new ObjectBuilder(source)
-    const result = builder.build(schema)
+    const results = [builder.build(schema), await builder.buildAsync(schema)]
     const expected = source.map(x => !x)
 
-    expect(result).toEqual(expected)
+    expect(results).toEqual([expected, expected])
   })
 
-  test("propiedades", () => {
+  test("propiedades", async () => {
     const source = {}
     const schema = {
       propiedades: {
@@ -42,12 +42,12 @@ describe("not", () => {
     const builder = new ObjectBuilder(source)
       .withSource({ activated: false })
 
-    const result = builder.build(schema)
+    const results = [builder.build(schema), await builder.buildAsync(schema)]
     const expected = {
       activated: true
     }
 
-    expect(result).toEqual(expected)
+    expect(results).toEqual([expected, expected])
   })
 
   describe("simple not", () => {
@@ -62,10 +62,12 @@ describe("not", () => {
       }
     ]
 
-    test.each(schemas)("schema: $schema", (schema: Schema) => {
+    test.each(schemas)("schema: $schema", async (schema: Schema) => {
       const results = [
         !builder.build(schema),
-        builder.build({ not: schema })
+        builder.build({ not: schema }),
+        !(await builder.buildAsync(schema)),
+        await builder.buildAsync({ not: schema })
       ]
 
       expect(new Set(results).size).toBe(1)
