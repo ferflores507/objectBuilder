@@ -35,7 +35,8 @@ export abstract class ResultBuilderBase {
             parse,
             sibling,
             source,
-            selectSet
+            selectSet,
+            not
         } = schema ?? {}
 
         return this.withConst(value)
@@ -50,6 +51,15 @@ export abstract class ResultBuilderBase {
             .withStringify(stringify)
             .withParse(parse)
             .withSelectSet(selectSet)
+            .withNot(not)
+    }
+
+    withNot(schema: Schema | undefined) {
+        if(schema) {
+            this.target = ! this.builder.build(schema)
+        }
+
+        return this
     }
 
     withEndSchema(schema: Schema | undefined) {
