@@ -6,6 +6,29 @@ import { getPathValue } from '../../src/helpers/varios'
 
 describe("not", () => {
 
+  test("propiedades", () => {
+    const source = {}
+    const schema = {
+      propiedades: {
+        activated: {
+          not: {
+            source: "activated"
+          }
+        }
+      }
+    }
+
+    const builder = new ObjectBuilder(source)
+      .withSource({ activated: false })
+
+    const result = builder.build(schema)
+    const expected = {
+      activated: true
+    }
+
+    expect(result).toEqual(expected)
+  })
+
   describe("simple not", () => {
     const source = { activated: false }
     const builder = new ObjectBuilder(source)
