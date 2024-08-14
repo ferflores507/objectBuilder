@@ -4,6 +4,31 @@ import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
+describe("not", () => {
+
+  describe("simple not", () => {
+    const source = { activated: false }
+    const builder = new ObjectBuilder(source)
+    const schemas: Schema[] = [
+      {
+        const: false
+      },
+      {
+        path: "activated"
+      }
+    ]
+
+    test.each(schemas)("schema: $schema", (schema: Schema) => {
+      const results = [
+        !builder.build(schema),
+        builder.build({ not: schema })
+      ]
+
+      expect(new Set(results).size).toBe(1)
+    })
+  })
+})
+
 describe("add schema", () => {
 
   test("multiple with max", () => {
