@@ -23,10 +23,10 @@ export class ArrayMapBuilder {
             }
 
             const { value, max = Infinity, multiple } = selectSchema
-            
-            this.items = multiple 
-                ? getSelected(this.items, value).slice(0, max)
-                : [value]
+            this.items = getSelected(this.items, value)
+                .slice(...multiple ? [0, max] : [-1])
+
+            // this.items = (mandatory && tems.length) ? this.items : [value]
         }
 
         return this
