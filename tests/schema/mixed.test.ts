@@ -346,7 +346,7 @@ describe("propiedades builder", () => {
   })
 })
 
-describe.todo("use", () => {
+describe("use", () => {
 
   const cases = [
     {
@@ -361,9 +361,7 @@ describe.todo("use", () => {
 
   test.each(cases)("use %s", async ({ use, expected }) => {
     const source = {
-      items: ["a", "b", "c"],
-      first: (array: any[]) => array[0],
-      last: (array: any[]) => array[array.length - 1]
+      items: ["a", "b", "c"]
     }
 
     const schema = {
@@ -371,7 +369,10 @@ describe.todo("use", () => {
       use
     }
 
-    const builder = new ObjectBuilder(source)
+    const builder = new ObjectBuilder(source).withFunctions({
+      first: (array: any[]) => array[0],
+      last: (array: any[]) => array[array.length - 1]
+    })
     const results = await buildResultsAsync(builder, schema)
 
     expect(results).toEqual([expected, expected])
