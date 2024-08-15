@@ -2,18 +2,18 @@ import { Schema } from "../..";
 import { ObjectBuilder } from "./ObjectBuilder";
 
 export class PropiedadesBuilder {
-    constructor(private propiedades: Record<string, Schema>, private builder: ObjectBuilder) {
-        this.result = { ...this.propiedades }
+    constructor(propiedades: Record<string, Schema>, private builder: ObjectBuilder) {
+        this.result = { ...propiedades }
         this.builder = this.builder.with({ siblings: this.result })
+
+        const { stopPropiedades } = this.builder.options
+        
+        this.entries = Object.entries(propiedades)
+            .filter(([k]) => !stopPropiedades?.includes(k))
     }
 
     private readonly result: Record<string, any>
-    private entries = () => {
-        const { stopPropiedades } = this.builder.options
-        
-        return Object.entries(this.propiedades)
-            .filter(([k]) => !stopPropiedades?.includes(k))
-    }
+    private entries: [string, Schema][]
 
     getResult() {
         return this.result
@@ -36,7 +36,7 @@ export class PropiedadesBuilder {
     }
  
     build() {
-        for (const [k, v] of this.entries()) {
+        for (const [k, v] of this.entries) {
             if(this.trySetComputed(k, v) === false) {
                 this.result[k] = this.builder.build(v)
             }
@@ -46,7 +46,7 @@ export class PropiedadesBuilder {
     }
 
     async buildAsync() {        
-        for (const [k, v] of this.entries()) {
+        for (const [k, v] of this.entries) {
             if(this.trySetComputed(k, v) === false) {
                 this.result[k] = await this.builder.buildAsync(v)
             }
