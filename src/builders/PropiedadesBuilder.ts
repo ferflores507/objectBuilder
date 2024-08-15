@@ -11,7 +11,8 @@ export class PropiedadesBuilder {
         const initialEntries = Object.entries(propiedades)
             .filter(([k]) => !stopPropiedades?.includes(k))
 
-        const [entries, computedEntries] = this.partition(initialEntries)
+        const passPredicate = ([k, v]: [string, Schema]) => v.isComputed
+        const [computedEntries, entries] = this.partition(initialEntries, passPredicate)
 
         this.entries = entries
     }
@@ -19,14 +20,18 @@ export class PropiedadesBuilder {
     private readonly result: Record<string, any>
     private entries: [string, Schema][]
 
-    partition(entries: [string, Schema][]) {
+    partition<T>(items: T[], pass: (item: T) => boolean | undefined) {
 
-        const passedEntries = entries
-        const failedEntries: any[] = []
+        const passed: T[] = []
+        const failed: T[] = []
+        
+        for(const item of items) {
+            (pass(item) ? passed : failed).push(item)
+        }
 
         return [
-            passedEntries,
-            failedEntries
+            passed,
+            failed
         ]
     }
 
