@@ -6,7 +6,12 @@ export class PropiedadesBuilder {
         this.result = { ...propiedades }
         this.builder = this.builder.with({ siblings: this.result })
 
-        const [entries, computedEntries] = this.partition(propiedades)
+        const { stopPropiedades } = this.builder.options
+
+        const initialEntries = Object.entries(propiedades)
+            .filter(([k]) => !stopPropiedades?.includes(k))
+
+        const [entries, computedEntries] = this.partition(initialEntries)
 
         this.entries = entries
     }
@@ -14,17 +19,14 @@ export class PropiedadesBuilder {
     private readonly result: Record<string, any>
     private entries: [string, Schema][]
 
-    partition(propiedades: Record<string, Schema>) {
-        const { stopPropiedades } = this.builder.options
+    partition(entries: [string, Schema][]) {
 
-        const validEntries = Object.entries(propiedades)
-            .filter(([k]) => !stopPropiedades?.includes(k))
-
-        const computedEntries: any[] = []
+        const passedEntries = entries
+        const failedEntries: any[] = []
 
         return [
-            validEntries,
-            computedEntries
+            passedEntries,
+            failedEntries
         ]
     }
 
