@@ -6,14 +6,27 @@ export class PropiedadesBuilder {
         this.result = { ...propiedades }
         this.builder = this.builder.with({ siblings: this.result })
 
-        const { stopPropiedades } = this.builder.options
-        
-        this.entries = Object.entries(propiedades)
-            .filter(([k]) => !stopPropiedades?.includes(k))
+        const [entries, computedEntries] = this.partition(propiedades)
+
+        this.entries = entries
     }
 
     private readonly result: Record<string, any>
     private entries: [string, Schema][]
+
+    partition(propiedades: Record<string, Schema>) {
+        const { stopPropiedades } = this.builder.options
+
+        const validEntries = Object.entries(propiedades)
+            .filter(([k]) => !stopPropiedades?.includes(k))
+
+        const computedEntries: any[] = []
+
+        return [
+            validEntries,
+            computedEntries
+        ]
+    }
 
     getResult() {
         return this.result
