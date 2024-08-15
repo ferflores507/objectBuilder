@@ -1,9 +1,10 @@
 import { Schema } from "../..";
+import { partition } from "../helpers/varios";
 import { BuilderOptions, ObjectBuilder } from "./ObjectBuilder";
 
 export class PropiedadesBuilder {
     constructor(propiedades: Record<string, Schema>, builder: ObjectBuilder) {
-        const [computedEntries, entries] = this.getEntries(propiedades, builder.options)
+        const [computedEntries, entries] = this.filterEntries(propiedades, builder.options)
         
         this.entries = entries
         this.result = { ...propiedades }
@@ -15,13 +16,13 @@ export class PropiedadesBuilder {
     private readonly entries: [string, Schema][]
     private readonly builder: ObjectBuilder
 
-    getEntries(propiedades: Record<string, Schema>, options: BuilderOptions) {
+    filterEntries(propiedades: Record<string, Schema>, options: BuilderOptions) {
         const initialEntries = Object.entries(propiedades)
             .filter(([k]) => !options.stopPropiedades?.includes(k))
 
         const passPredicate = ([k, v]: [string, Schema]) => v.isComputed
         
-        return this.partition(initialEntries, passPredicate)
+        return partition(initialEntries, passPredicate)
     }
 
     setComputed(obj: {}, entries: [string, Schema][]) {
@@ -34,21 +35,6 @@ export class PropiedadesBuilder {
                 }
             })
         }, obj)
-    }
-
-    partition<T>(items: T[], pass: (item: T) => boolean | undefined) {
-
-        const passed: T[] = []
-        const failed: T[] = []
-        
-        for(const item of items) {
-            (pass(item) ? passed : failed).push(item)
-        }
-
-        return [
-            passed,
-            failed
-        ]
     }
 
     getResult() {

@@ -1,3 +1,18 @@
+export function partition<T>(items: T[], pass: (item: T) => boolean | undefined) {
+
+    const passed: T[] = []
+    const failed: T[] = []
+
+    for (const item of items) {
+        (pass(item) ? passed : failed).push(item)
+    }
+
+    return [
+        passed,
+        failed
+    ]
+}
+
 export const getFormData = (source: {}) => {
 
     const data = new FormData()
