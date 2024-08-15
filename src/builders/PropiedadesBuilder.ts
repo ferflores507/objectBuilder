@@ -18,6 +18,22 @@ export class PropiedadesBuilder {
     getResult() {
         return this.result
     }
+    
+    trySetComputed(key: string, schema: Schema | undefined) {
+        const { isComputed = false } = schema ?? {}
+
+        if(isComputed) {
+            const builder = this.builder
+            
+            Object.defineProperty(this.result, key, {
+                get() {
+                    return builder.build(schema)
+                }
+            })
+        }
+
+        return isComputed
+    }
  
     build() {
         for (const [k, v] of this.entries()) {
