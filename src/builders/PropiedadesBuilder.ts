@@ -37,15 +37,19 @@ export class PropiedadesBuilder {
  
     build() {
         for (const [k, v] of this.entries()) {
-            this.result[k] = this.builder.build(v)
+            if(this.trySetComputed(k, v) === false) {
+                this.result[k] = this.builder.build(v)
+            }
         }
 
         return this.getResult()
     }
 
-    async buildAsync() {
+    async buildAsync() {        
         for (const [k, v] of this.entries()) {
-            this.result[k] = await this.builder.buildAsync(v)
+            if(this.trySetComputed(k, v) === false) {
+                this.result[k] = await this.builder.buildAsync(v)
+            }
         }
 
         return this.getResult()
