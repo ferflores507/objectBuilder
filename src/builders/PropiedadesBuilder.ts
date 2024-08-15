@@ -12,8 +12,8 @@ export class PropiedadesBuilder {
     }
 
     private readonly result: Record<string, any>
-    private entries: [string, Schema][]
-    private builder: ObjectBuilder
+    private readonly entries: [string, Schema][]
+    private readonly builder: ObjectBuilder
 
     getEntries(propiedades: Record<string, Schema>, options: BuilderOptions) {
         const initialEntries = Object.entries(propiedades)
@@ -28,13 +28,11 @@ export class PropiedadesBuilder {
         const builder = this.builder
         
         return entries.reduce((obj, [key, schema]) => {
-            Object.defineProperty(obj, key, {
+            return Object.defineProperty(obj, key, {
                 get() {
                     return builder.build(schema)
                 }
             })
-
-            return obj
         }, obj)
     }
 
