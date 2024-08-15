@@ -44,14 +44,14 @@ export class ResultBuilderAsync extends ResultBuilderBase {
     }
 
     async withConditional(schema: Schema | undefined) {
-        if(schema) {
+        if(schema?.if) {
             const condition = schema.if
 
             const result = typeof(condition) == "string"
                 ? this.builder.getSourcePathValue(condition)
-                : await this.buildAsync(condition)
+                : await this.builder.buildAsync(condition)
 
-            this.target = await this.buildAsync(result === true ? schema.then : schema.else)
+            this.target = await this.builder.buildAsync(result === true ? schema.then : schema.else)
         }
 
         return this

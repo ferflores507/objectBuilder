@@ -31,14 +31,14 @@ export class ResultBuilder extends ResultBuilderBase {
     }
 
     withConditional(schema: Schema | undefined) {
-        if(schema) {
+        if(schema?.if) {
             const condition = schema.if
 
             const result = typeof(condition) == "string"
                 ? this.builder.getSourcePathValue(condition)
-                : this.build(condition)
+                : this.builder.build(condition)
 
-            this.target = this.build(result === true ? schema.then : schema.else)
+            this.target = this.builder.build(result === true ? schema.then : schema.else)
         }
 
         return this
