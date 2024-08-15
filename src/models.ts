@@ -45,6 +45,7 @@ export type Schema = Partial<{
     equals: Schema
     flat: true
     if: Schema | string
+    isComputed: true
     includes: Schema
     not: Schema
     path: string
