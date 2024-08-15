@@ -4,6 +4,77 @@ import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
+describe("not", () => {
+
+  test("every item is opposite boolean", async () => {
+    const source = [
+      true,
+      false,
+      false,
+      true
+    ]
+
+    const schema = {
+      map: {
+        not: {}
+      }
+    }
+
+    const builder = new ObjectBuilder(source)
+    const results = [builder.build(schema), await builder.buildAsync(schema)]
+    const expected = source.map(x => !x)
+
+    expect(results).toEqual([expected, expected])
+  })
+
+  test("propiedades", async () => {
+    const source = {}
+    const schema = {
+      propiedades: {
+        activated: {
+          not: {
+            source: "activated"
+          }
+        }
+      }
+    }
+
+    const builder = new ObjectBuilder(source)
+      .withSource({ activated: false })
+
+    const results = [builder.build(schema), await builder.buildAsync(schema)]
+    const expected = {
+      activated: true
+    }
+
+    expect(results).toEqual([expected, expected])
+  })
+
+  describe("simple not", () => {
+    const source = { activated: false }
+    const builder = new ObjectBuilder(source)
+    const schemas: Schema[] = [
+      {
+        const: false
+      },
+      {
+        path: "activated"
+      }
+    ]
+
+    test.each(schemas)("schema: $schema", async (schema: Schema) => {
+      const results = [
+        !builder.build(schema),
+        builder.build({ not: schema }),
+        !(await builder.buildAsync(schema)),
+        await builder.buildAsync({ not: schema })
+      ]
+
+      expect(new Set(results).size).toBe(1)
+    })
+  })
+})
+
 describe("add schema", () => {
 
   test("multiple with max", () => {
