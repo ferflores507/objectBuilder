@@ -3,7 +3,7 @@ import type { Schema } from "../models"
 import { ResultBuilder } from "./ResultBuilder"
 import { ResultBuilderAsync } from "./ResultBuilderAsync"
 
-type BuilderOptions = Partial<{
+export type BuilderOptions = Partial<{
   target: any
   siblings: Record<string, any>
   stopPropiedades: string[]
