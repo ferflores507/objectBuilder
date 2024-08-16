@@ -51,7 +51,7 @@ export class ResultBuilderAsync extends ResultBuilderBase {
                 ? this.builder.getSourcePathValue(condition)
                 : await this.builder.buildAsync(condition)
 
-            this.target = await this.builder.buildAsync(result != null ? schema.then : schema.else)
+            this.target = await this.builder.buildAsync(result === true ? schema.then : schema.else)
         }
 
         return this
