@@ -38,7 +38,7 @@ export class ResultBuilder extends ResultBuilderBase {
                 ? this.builder.getSourcePathValue(condition)
                 : this.builder.build(condition)
 
-            this.target = this.builder.build(result === true ? schema.then : schema.else)
+            this.target = this.builder.build(result ? schema.then : schema.else)
         }
 
         return this
