@@ -136,7 +136,7 @@ export abstract class ResultBuilderBase {
     withSchemaFrom(source: Schema | undefined) {
         if(source) {
             const schema = this.builder.build(source) as Schema
-            this.target = this.builder.build(schema)
+            this.target = this.builder.with({ target: this.target }).build(schema)
         }
 
         return this
