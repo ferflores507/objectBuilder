@@ -54,6 +54,22 @@ export abstract class ResultBuilderBase {
             .withNot(not)
     }
 
+    withIsNullOrWhiteSpace(isNullOrWhiteSpace: true | undefined) {
+        if(isNullOrWhiteSpace) {
+            this.target = ((this.target ?? "") as string).trim() === ""
+        }
+
+        return this
+    }
+
+    withTrim(trim: true | undefined) {
+        if(trim) {
+            this.target = (this.target as string).trim()
+        }
+
+        return this
+    }
+
     withNot(schema: Schema | undefined) {
         if(schema) {
             this.target = ! this.builder.build(schema)
