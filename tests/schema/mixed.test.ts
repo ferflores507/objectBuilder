@@ -4,6 +4,27 @@ import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
+describe("trim", () => {
+  const cases = [
+    "  hello   ", 
+    "  this is a test", 
+    "", 
+    "   "
+  ].map(val => [val, val.trim()])
+
+  test.each(cases)("(%s).trim equals: (%s)", async (value, expected) => {
+    const source = { value }
+    const schema: Schema = {
+      path: "value",
+      trim: true
+    }
+    const builder = new ObjectBuilder(source)
+    const results = [builder.build(schema), await builder.build(schema)]
+
+    expect(results).toEqual([expected, expected])
+  })
+})
+
 describe("isNullOrWhiteSpace (value)?", () => {
 
   const falseValues: [any, false][] = ["hello", 1, false, true].map(val => [val, false])
