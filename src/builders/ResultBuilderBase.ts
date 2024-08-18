@@ -60,7 +60,7 @@ export abstract class ResultBuilderBase {
 
     withIsNullOrWhiteSpace(isNullOrWhiteSpace: true | undefined) {
         if(isNullOrWhiteSpace) {
-            this.target = ((this.target ?? "") as string).trim() === ""
+            this.target = ((this.target ?? "").toString()).trim() === ""
         }
 
         return this
