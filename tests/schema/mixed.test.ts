@@ -4,6 +4,30 @@ import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
+describe("isNullOrWhiteSpace (value)?", () => {
+
+  const falseValues: [any, false][] = ["hello", 1, false, true].map(val => [val, false])
+  const trueValues: [any, true][] = ["", "   ", null, undefined].map(val => [val, true])
+
+  const cases = [
+    ...falseValues,
+    ...trueValues
+  ]
+
+  test.each(cases)("(%s): %s", async (value, expected) => {
+    const source = { value }
+    const schema: Schema = {
+      path: "value",
+      isNullOrWhiteSpace: true
+    }
+
+    const builder = new ObjectBuilder(source)
+    const resultados = [builder.build(schema), await builder.buildAsync(schema)]
+
+    expect(resultados).toEqual([expected, expected])
+  })
+})
+
 describe("not", () => {
 
   test("every item is opposite boolean", async () => {
