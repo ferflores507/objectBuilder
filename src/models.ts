@@ -46,6 +46,7 @@ export type Schema = Partial<{
     flat: true
     if: Schema | string
     isComputed: true
+    isNullOrWhiteSpace: true
     includes: Schema
     not: Schema
     path: string
@@ -63,6 +64,7 @@ export type Schema = Partial<{
     spread: Schema
     targetPath: string
     then: Schema
+    trim: true
     unpack: string[]
     use: string
 }> & ArraySchema
