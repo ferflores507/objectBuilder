@@ -36,7 +36,9 @@ export abstract class ResultBuilderBase {
             sibling,
             source,
             selectSet,
-            not
+            not,
+            isNullOrWhiteSpace,
+            trim
         } = schema ?? {}
 
         return this.withConst(value)
@@ -52,6 +54,8 @@ export abstract class ResultBuilderBase {
             .withParse(parse)
             .withSelectSet(selectSet)
             .withNot(not)
+            .withIsNullOrWhiteSpace(isNullOrWhiteSpace)
+            .withTrim(trim)
     }
 
     withIsNullOrWhiteSpace(isNullOrWhiteSpace: true | undefined) {
