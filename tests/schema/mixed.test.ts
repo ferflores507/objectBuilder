@@ -4,6 +4,23 @@ import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
+test("increment", async () => {
+  const source = { total: 7 }
+  const schema: Schema = {
+    increment: "total",
+    reduce: [
+      {
+        path: "total"
+      }
+    ]
+  }
+  const builder = new ObjectBuilder(source)
+  const expected = source.total + 1
+  const resultados = [builder.build(schema), await builder.buildAsync(schema)]
+  
+  expect(resultados).toEqual([expected, expected + 1])
+})
+
 describe("trim", () => {
   const cases = [
     "  hello   ", 
