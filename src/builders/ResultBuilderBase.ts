@@ -38,7 +38,8 @@ export abstract class ResultBuilderBase {
             selectSet,
             not,
             isNullOrWhiteSpace,
-            trim
+            trim,
+            increment
         } = schema ?? {}
 
         return this.withConst(value)
@@ -56,6 +57,19 @@ export abstract class ResultBuilderBase {
             .withNot(not)
             .withIsNullOrWhiteSpace(isNullOrWhiteSpace)
             .withTrim(trim)
+            .withIncrement(increment)
+    }
+
+    withIncrement(path: string | undefined) {
+        if(path) {
+            const value = this.builder.getSourcePathValue(path) + 1
+
+            this.set(path, value) // this method should assign value to this.target
+
+            this.target = value
+        }
+
+        return this
     }
 
     withIsNullOrWhiteSpace(isNullOrWhiteSpace: true | undefined) {
