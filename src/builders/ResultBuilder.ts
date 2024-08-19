@@ -1,29 +1,52 @@
 import type { Schema } from "../models"
 import { ResultBuilderBase } from "./ResultBuilderBase"
 import * as varios from "../helpers/varios"
+import { PropiedadesBuilder } from "./PropiedadesBuilder"
 
 export class ResultBuilder extends ResultBuilderBase {
 
+    clone() {
+        return new ResultBuilder(this.target, this.builder)
+    }
+
     build(schema: Schema | undefined) {
 
-        const { propiedades, spread, reduce, definitions, equals, set, checkout, use } = schema ?? {}
+        const { 
+            propiedades, 
+            spread, 
+            reduce, 
+            definitions, 
+            checkout 
+        } = schema ?? {}
 
         return this.withSchema(schema)
+            .withConditional(schema)
             .withDefinitions(definitions)
             .withPropiedades(propiedades)
             .withSpread(spread)
-            .withArraySchema(schema)
-            .withEquals(equals)
+            .withEndSchema(schema)
             .withReduce(reduce)
-            .withSet(set)
             .withCheckout(checkout)
-            .withUse(use)
             .getTarget()
+    }
+
+    withConditional(schema: Schema | undefined) {
+        if(schema?.if) {
+            const condition = schema.if
+
+            const result = typeof(condition) == "string"
+                ? this.builder.getSourcePathValue(condition)
+                : this.builder.build(condition)
+
+            this.target = this.builder.build(result ? schema.then : schema.else)
+        }
+
+        return this
     }
 
     withDefinitions(schemas: Schema[] | undefined) {
         if(schemas) {
-            this.target = schemas?.map(schema => this.builder.build(schema))
+            this.target = schemas?.map(schema => this.clone().build(schema))
         }
 
         return this
@@ -42,13 +65,9 @@ export class ResultBuilder extends ResultBuilderBase {
     withPropiedades(propiedades: Record<string, any> | undefined) {
 
         if (propiedades) {
-            const obj: Record<string, any> = {}
-      
-            for (const [k, v] of Object.entries(propiedades)) {
-              obj[k] = this.builder.withTarget(obj).build(v);
-            }
-      
-            this.target = obj
+            const builder = this.builder.with({ target: this.target })
+            
+            this.target = new PropiedadesBuilder(propiedades, builder).build()
           }
 
         return this

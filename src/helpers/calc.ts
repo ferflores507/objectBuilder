@@ -4,7 +4,7 @@ export class Calc {
         this.numbers = numbers
     }
 
-    numbers: number[]
+    private readonly numbers: number[]
 
     sumar = () => this.numbers.reduce((a, b) => a + b)
     restar = () => this.numbers.reduce((a, b) => a - b)

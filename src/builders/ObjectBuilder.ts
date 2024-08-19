@@ -1,23 +1,47 @@
-import { getObjPath } from "../helpers/varios"
+import { getPathValue } from "../helpers/varios"
 import type { Schema } from "../models"
 import { ResultBuilder } from "./ResultBuilder"
 import { ResultBuilderAsync } from "./ResultBuilderAsync"
 
+export type BuilderOptions = Partial<{
+  target: any
+  siblings: Record<string, any>
+  stopPropiedades: string[]
+  sources: Record<string, any>
+  functions: Record<string, Function>
+}>
+
 export class ObjectBuilder {
-  constructor(source: Record<string, any>, target?: any) {
+  constructor(source: Record<string, any>, options: BuilderOptions = {}) {
     this.source = source
-    this.target = target
+    this.options = options
   }
 
   private readonly source: Record<string, any>
-  private readonly target: any
+  readonly options: BuilderOptions
   
   getSource = () => this.source
-  getSourcePathValue = (path: string) => getObjPath(this.getSource(), path)
-  getInitialTarget = (schema: Schema | undefined) => schema == null ? null : (this.target ?? this.source)
+  getSourcePathValue = (path: string) => getPathValue(this.getSource(), path)
+  getInitialTarget = (schema: Schema | undefined) => {
+    return schema == null ? null : (this.options?.target ?? this.source)
+  }
 
-  withTarget(value: any) {
-    return new ObjectBuilder(this.source, value)
+  withFunctions(functions: Record<string, Function>) {
+    return this.with({
+      functions: { ...this.options.functions, ...functions }
+    })
+  }
+
+  withSource(source: Record<string, any>) {
+    return this.with({ 
+      sources: { ...this.options.sources, ...source }
+    })
+  }
+
+  with(options: BuilderOptions) {
+    const newOptions = { ...this.options, ...options }
+    
+    return new ObjectBuilder(this.source, newOptions)
   }
 
   build(schema: Schema | undefined) {
@@ -52,11 +76,5 @@ export class ObjectBuilder {
       response: this.buildAsync(schema, controller),
       cancel: () => controller.abort("cancel")
     }
-  }
-
-  buildWithOuter(inner: any, schema: Schema | undefined) {
-    const source = { inner, outer: this.getSource() }
-
-    return new ObjectBuilder(source).build(schema)
   }
 }

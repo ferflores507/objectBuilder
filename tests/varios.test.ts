@@ -24,7 +24,7 @@ describe("getObjPath works with custom separator or default: '.'", () => {
             }
         }
 
-        const value = varios.getObjPath(source, path, separator)
+        const value = varios.getPathValue(source, path, separator)
 
         expect(value).toBe(country)
     })
@@ -127,14 +127,13 @@ describe("spread", () => {
 
 describe("varios", () => {
 
-    test("setUpdateProp", () => {
+    test("setPathValue", () => {
         const usuario = {
             nombre: "Melany",
             apellido: "Flores"
         }
 
-        const path = ["detalles", "id"]
-        varios.setUpdateProp(usuario, path, 1)
+        varios.setPathValue(usuario, "detalles.id", 1)
         const expected = {
             ...usuario,
             detalles: {

@@ -5,7 +5,17 @@ export type Join = {
     match: Schema
 }
 
+export type SelectSchema = {
+    value: unknown
+    max?: number
+    maxReached?: Schema
+    multiple?: true
+}
+
 export type ArraySchema = Partial<{
+    select: {
+        [P in keyof SelectSchema]: Schema;
+    },
     filter: Schema,
     find: Schema,
     items: Schema,
@@ -30,23 +40,32 @@ export type Schema = Partial<{
     const: any
     definitions: Schema[]
     delay: number
-    else: Record<string, any>
+    else: Schema
     entries: true
     equals: Schema
     flat: true
-    if: Record<string, any>
+    if: Schema | string
+    isComputed: true
+    isNullOrWhiteSpace: true
+    includes: Schema
+    increment: string
+    not: Schema
     path: string
     parse: true
     propiedades: Record<string, Schema>
     reduce: Schema[]
     required: string[]
     schemaFrom: Schema
+    selectSet: string
     set: string
+    sibling: string
     some: any
+    source: string
     stringify: true
     spread: Schema
     targetPath: string
-    then: Record<string, any>
+    then: Schema
+    trim: true
     unpack: string[]
     use: string
 }> & ArraySchema

@@ -3,6 +3,7 @@ import { ObjectBuilder } from "./ObjectBuilder"
 import { ResultBuilderBase } from "./ResultBuilderBase"
 import * as varios from "../helpers/varios"
 import useConsulta from "../helpers/useConsulta"
+import { PropiedadesBuilder } from "./PropiedadesBuilder"
 
 export class ResultBuilderAsync extends ResultBuilderBase {
 
@@ -11,25 +12,49 @@ export class ResultBuilderAsync extends ResultBuilderBase {
         this.controller = controller
       }
 
-      controller: AbortController
+      private readonly controller: AbortController
+
+    clone() {
+        return new ResultBuilderAsync(this.target, this.builder, this.controller)
+    }
 
     async buildAsync(schema: Schema | undefined) {
-        const { propiedades, spread, definitions, reduce, equals, set, delay, consulta, checkout, use } = schema ?? {}
+        const { 
+            propiedades, 
+            spread, 
+            definitions, 
+            reduce, 
+            delay, 
+            consulta, 
+            checkout 
+        } = schema ?? {}
 
         this.withSchema(schema)
+        await this.withConditional(schema)
         await this.withDelay(delay)
         await this.withConsultaAsync(consulta)
         await this.withDefinitionsAsync(definitions)
         await this.withPropiedadesAsync(propiedades)
         await this.withSpreadAsync(spread)
-        await this.withArraySchema(schema) // await solo para alinear 
-        await this.withEquals(equals) // await solo para alinear
+        await this.withEndSchema(schema) // await solo para alinear 
         await this.withReduceAsync(reduce)
-        await this.withSet(set)
         await this.withCheckout(checkout)
-        await this.withUse(use)
-
+        
         return this.getTarget()
+    }
+
+    async withConditional(schema: Schema | undefined) {
+        if(schema?.if) {
+            const condition = schema.if
+
+            const result = typeof(condition) == "string"
+                ? this.builder.getSourcePathValue(condition)
+                : await this.builder.buildAsync(condition)
+
+            this.target = await this.builder.buildAsync(result ? schema.then : schema.else)
+        }
+
+        return this
     }
 
     async withConsultaAsync(consulta: Consulta | undefined) {
@@ -43,7 +68,7 @@ export class ResultBuilderAsync extends ResultBuilderBase {
 
     async withDelay(ms: number | undefined) {
 
-        const delay = (ms: number) => new Promise((resolve, reject) => {
+        const delay = (ms: number) => new Promise<void>((resolve, reject) => {
 
             const timeoutID = setTimeout(() => {
                 console.log("delay resolved")
@@ -64,7 +89,8 @@ export class ResultBuilderAsync extends ResultBuilderBase {
 
     async withDefinitionsAsync(schemas: Schema[] | undefined) {
         if(schemas) {
-            const promises = schemas.map(schema => this.builder.buildAsync(schema, this.controller))
+            const promises = schemas.map(schema => this.clone().buildAsync(schema))
+                
             this.target = await Promise.all(promises)
         }
     }
@@ -80,13 +106,9 @@ export class ResultBuilderAsync extends ResultBuilderBase {
     async withPropiedadesAsync(propiedades: Record<string, any> | undefined) {
 
         if (propiedades) {
-            const obj: Record<string, any> = {}
+            const builder = this.builder.with({ target: this.target })
       
-            for (const [k, v] of Object.entries(propiedades)) {
-              obj[k] = await this.builder.withTarget(obj).buildAsync(v, this.controller);
-            }
-      
-            this.target = obj
+            this.target = await new PropiedadesBuilder(propiedades, builder).buildAsync()
           }
 
         return this
