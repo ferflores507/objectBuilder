@@ -62,7 +62,7 @@ export abstract class ResultBuilderBase {
 
     withIncrement(path: string | undefined) {
         if(path) {
-            const value = this.builder.getSourcePathValue(path) + 1
+            const value = (this.builder.getSourcePathValue(path) ?? 0) + 1
 
             this.set(path, value) // this method should assign value to this.target
 
