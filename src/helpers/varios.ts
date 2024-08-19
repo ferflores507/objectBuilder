@@ -1,3 +1,12 @@
+export function toShift<T> (items: T[]) : [T, T[]] {
+    return [
+        items[0],
+        items.slice(1)
+    ]
+}
+
+export const toTitleCase = (value: string) => value[0].toUpperCase() + value.slice(1)
+
 export function partition<T>(items: T[], pass: (item: T) => boolean | undefined) {
 
     const passed: T[] = []
