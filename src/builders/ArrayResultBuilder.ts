@@ -49,27 +49,12 @@ export class ArrayResultBuilder {
 
     withSchema(schema: ArraySchema | undefined) {
         if(schema) {
-            this.target = this.withFilterOptions(schema)
-                .withSelect(schema)
+            if(Array.isArray(this.target)) {
+                this.target = new ArrayFilterResultBuilder(this.target, this.builder).build(schema)
+            }
+                
+            this.target = this.withSelect(schema)
                 .withMapOptions(schema)
-                .withFind(schema.find)
-                .build()
-        }
-
-        return this
-    }
-
-    private withFilterOptions(schema: ArraySchema) {
-        if(Array.isArray(this.target)) {
-            const { filter, find, items, contains } = schema
-        
-            this.target = new ArrayFilterBuilder(this.target, this.builder)
-                .withValidation(items)
-                .withContains(contains)
-                .withFilter(filter)
-                .withFind(find)
-                // .withMin(minMatches)
-                // .withMax(maxMatches)
                 .build()
         }
 
@@ -79,8 +64,7 @@ export class ArrayResultBuilder {
     private withSelect(schema: ArraySchema) {
         const { select } = schema
         
-        if(select && Array.isArray(this.target)) {
-            
+        if(select) {
             const selectSchema = new PropiedadesBuilder(select, this.builder)
                 .build() as SelectSchema
 
@@ -93,23 +77,12 @@ export class ArrayResultBuilder {
     }
 
     private withMapOptions(schema: ArraySchema) {
-        if(Array.isArray(this.target)) {
-            const { map, groupJoin } = schema
+        const { map, groupJoin } = schema
 
-            this.target = new ArrayMapBuilder(this.target, this.builder)
-                .withMap(map)
-                .withGroupJoin(groupJoin)
-                .build()
-        }
-
-        return this
-    }
-
-    private withFind(schema: Schema | undefined) {
-
-        if(schema) {
-            this.target = this.target[0]
-        }
+        this.target = new ArrayMapBuilder(this.target, this.builder)
+            .withMap(map)
+            .withGroupJoin(groupJoin)
+            .build()
 
         return this
     }
