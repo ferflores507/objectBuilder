@@ -1,6 +1,6 @@
 import type { ArraySchema } from "../models";
 import { ArrayBuilderBase } from "./ArrayBuilderBase";
-import { ArrayResultBuilder } from "./ArrayResultBuilder";
+import { ArrayFilterResultBuilder, ArrayResultBuilder } from "./ArrayResultBuilder";
 
 export class ArrayBuilder extends ArrayBuilderBase {
 
@@ -18,8 +18,23 @@ export class ArrayBuilder extends ArrayBuilderBase {
             throw "El elemento debe ser de tipo arreglo."
         }
 
-        return new ArrayResultBuilder(this.items, this.builder)
+        this.withFilterResult(schema)
+            .withArrayResult(schema)
+
+        return this.items
+    }
+
+    withFilterResult(schema: ArraySchema | undefined) {
+        this.items = new ArrayFilterResultBuilder(this.items, this.builder).build(schema)
+
+        return this
+    }
+
+    withArrayResult(schema: ArraySchema | undefined) {
+        this.items = new ArrayResultBuilder(this.items, this.builder)
             .withSchema(schema)
             .build()
+
+        return this
     }
 }

@@ -22,7 +22,7 @@ export class ArrayFilterResultBuilder extends ArrayBuilderBase {
         }
 
         const { find } = schema ?? {}
-        const result = this.filter(schema)
+        const result = Array.isArray(this.items) ? this.filter(schema) : this.items
 
         return find ? (result as any[])[0] : result
     }
@@ -47,11 +47,7 @@ export class ArrayResultBuilder extends ArrayBuilderBase {
     build = () => this.items
 
     withSchema(schema: ArraySchema | undefined) {
-        if(schema) {
-            if(Array.isArray(this.items)) {
-                this.items = new ArrayFilterResultBuilder(this.items, this.builder).build(schema)
-            }
-                
+        if(schema) {                
             this.items = this.withSelect(schema)
                 .withMapOptions(schema)
                 .build()
