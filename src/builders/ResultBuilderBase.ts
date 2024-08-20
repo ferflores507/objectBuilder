@@ -39,7 +39,8 @@ export abstract class ResultBuilderBase {
             not,
             isNullOrWhiteSpace,
             trim,
-            increment
+            increment,
+            UUID
         } = schema ?? {}
 
         return this.withConst(value)
@@ -58,6 +59,15 @@ export abstract class ResultBuilderBase {
             .withIsNullOrWhiteSpace(isNullOrWhiteSpace)
             .withTrim(trim)
             .withIncrement(increment)
+            .withUUID(UUID)
+    }
+
+    withUUID(uuid: true | undefined) {
+        if(uuid) {
+            this.target = crypto.randomUUID()
+        }
+
+        return this
     }
 
     withIncrement(path: string | undefined) {
