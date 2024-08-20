@@ -38,22 +38,22 @@ export class ArrayFilterResultBuilder {
 
 export class ArrayResultBuilder {
     constructor(items: any[], builder: ObjectBuilder) {
-        this.target = items
+        this.items = items
         this.builder = builder
     }
 
-    private target: any
+    private items: any[]
     private readonly builder: ObjectBuilder
 
-    build = () => this.target
+    build = () => this.items
 
     withSchema(schema: ArraySchema | undefined) {
         if(schema) {
-            if(Array.isArray(this.target)) {
-                this.target = new ArrayFilterResultBuilder(this.target, this.builder).build(schema)
+            if(Array.isArray(this.items)) {
+                this.items = new ArrayFilterResultBuilder(this.items, this.builder).build(schema)
             }
                 
-            this.target = this.withSelect(schema)
+            this.items = this.withSelect(schema)
                 .withMapOptions(schema)
                 .build()
         }
@@ -68,7 +68,7 @@ export class ArrayResultBuilder {
             const selectSchema = new PropiedadesBuilder(select, this.builder)
                 .build() as SelectSchema
 
-            this.target = new ArrayMapBuilder(this.target, this.builder)
+            this.items = new ArrayMapBuilder(this.items, this.builder)
                 .withSelect(selectSchema)
                 .build()
         }
@@ -79,7 +79,7 @@ export class ArrayResultBuilder {
     private withMapOptions(schema: ArraySchema) {
         const { map, groupJoin } = schema
 
-        this.target = new ArrayMapBuilder(this.target, this.builder)
+        this.items = new ArrayMapBuilder(this.items, this.builder)
             .withMap(map)
             .withGroupJoin(groupJoin)
             .build()
