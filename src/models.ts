@@ -68,4 +68,5 @@ export type Schema = Partial<{
     trim: true
     unpack: string[]
     use: string
+    UUID: true
 }> & ArraySchema
