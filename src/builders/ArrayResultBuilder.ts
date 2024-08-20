@@ -7,7 +7,20 @@ import { PropiedadesBuilder } from "./PropiedadesBuilder"
 
 export class ArrayFilterResultBuilder extends ArrayBuilderBase {
 
+    validar(schema: ArraySchema | undefined) {
+        const { filter, find, items, contains } = schema ?? {}
+
+        const isEmpty = [filter, find, items, contains].every(x => x == null)
+        const isArray = Array.isArray(this.items)
+
+        return isArray || isEmpty
+    }
+
     build(schema: ArraySchema | undefined) {
+        if(this.validar(schema) == false) {
+            throw "El elemento debe ser de tipo arreglo o contener algun filtro"
+        }
+
         const { find } = schema ?? {}
         const result = this.filter(schema)
 
