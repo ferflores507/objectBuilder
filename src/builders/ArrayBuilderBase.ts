@@ -6,6 +6,6 @@ export class ArrayBuilderBase {
         this.builder = builder
     }
 
-    readonly items: any[]
+    items: any[]
     readonly builder: ObjectBuilder
 }
