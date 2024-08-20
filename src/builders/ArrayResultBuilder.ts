@@ -1,18 +1,11 @@
 import { ArraySchema, Schema, SelectSchema } from "../models"
+import { ArrayBuilderBase } from "./ArrayBuilderBase"
 import { ArrayFilterBuilder } from "./ArrayFilterBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ObjectBuilder } from "./ObjectBuilder"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
 
-export class ArrayFilterResultBuilder {
-
-    constructor(items: any[], builder: ObjectBuilder) {
-        this.items = items
-        this.builder = builder
-    }
-
-    private items: any[]
-    private readonly builder: ObjectBuilder
+export class ArrayFilterResultBuilder extends ArrayBuilderBase {
 
     build(schema: ArraySchema | undefined) {
         const { find } = schema ?? {}
@@ -36,14 +29,7 @@ export class ArrayFilterResultBuilder {
 
 }
 
-export class ArrayResultBuilder {
-    constructor(items: any[], builder: ObjectBuilder) {
-        this.items = items
-        this.builder = builder
-    }
-
-    private items: any[]
-    private readonly builder: ObjectBuilder
+export class ArrayResultBuilder extends ArrayBuilderBase {
 
     build = () => this.items
 
