@@ -1,4 +1,4 @@
-import type { ArraySchema } from "../models";
+import type { ArraySchema, Schema } from "../models";
 import { ArrayBuilderBase } from "./ArrayBuilderBase";
 import { ArrayFilterResultBuilder, ArrayResultBuilder } from "./ArrayResultBuilder";
 
@@ -18,10 +18,22 @@ export class ArrayBuilder extends ArrayBuilderBase {
             throw "El elemento debe ser de tipo arreglo."
         }
 
-        this.withFilterResult(schema)
+        const { add } = schema ?? {}
+
+        this.withAdd(add)
+            .withFilterResult(schema)
             .withArrayResult(schema)
 
         return this.items
+    }
+
+    withAdd(schema: Schema | undefined) {
+        if(schema) {
+            const item = this.builder.build(schema)
+            this.items = [...this.items, item]
+        }
+
+        return this
     }
 
     withFilterResult(schema: ArraySchema | undefined) {
