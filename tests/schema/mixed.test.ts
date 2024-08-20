@@ -4,6 +4,16 @@ import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
+test("UUID", async () => {
+  const source = {}
+  const schema: Schema = {
+    UUID: true
+  }
+  const builder = new ObjectBuilder(source)
+  
+  expect(() => builder.build(schema)).not.toThrow()
+})
+
 test("increment", async () => {
   const source = { total: 7 }
   const schema: Schema = {
