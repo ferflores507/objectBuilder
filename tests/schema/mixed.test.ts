@@ -4,6 +4,23 @@ import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
+test("add", async () => {
+  const source = {}
+  const schema: Schema = {
+    const: [
+      1, 2, 3
+    ],
+    add: {
+      const: 4
+    }
+  }
+  const builder = new ObjectBuilder(source)
+  const expected = [1, 2, 3, 4]
+  const results = [builder.build(schema), await builder.buildAsync(schema)]
+  
+  expect(results).toEqual([expected, expected])
+})
+
 test("UUID", async () => {
   const source = {}
   const schema: Schema = {
