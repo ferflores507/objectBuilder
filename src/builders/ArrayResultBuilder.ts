@@ -4,6 +4,38 @@ import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ObjectBuilder } from "./ObjectBuilder"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
 
+export class ArrayFilterResultBuilder {
+
+    constructor(items: any[], builder: ObjectBuilder) {
+        this.items = items
+        this.builder = builder
+    }
+
+    private items: any[]
+    private readonly builder: ObjectBuilder
+
+    build(schema: ArraySchema | undefined) {
+        const { find } = schema ?? {}
+        const result = this.filter(schema)
+
+        return find ? (result as any[])[0] : result
+    }
+
+    filter(schema: ArraySchema | undefined) {
+        const { filter, find, items, contains } = schema ?? {}
+
+        return new ArrayFilterBuilder(this.items, this.builder)
+            .withValidation(items)
+            .withContains(contains)
+            .withFilter(filter)
+            .withFind(find)
+            // .withMin(minMatches)
+            // .withMax(maxMatches)
+            .build()
+    }
+
+}
+
 export class ArrayResultBuilder {
     constructor(items: any[], builder: ObjectBuilder) {
         this.target = items
