@@ -40,7 +40,8 @@ export abstract class ResultBuilderBase {
             isNullOrWhiteSpace,
             trim,
             increment,
-            UUID
+            UUID,
+            schema: schemaAsValue
         } = schema ?? {}
 
         return this.withConst(value)
@@ -60,6 +61,15 @@ export abstract class ResultBuilderBase {
             .withTrim(trim)
             .withIncrement(increment)
             .withUUID(UUID)
+            .withSchemaAsValue(schemaAsValue)
+    }
+
+    withSchemaAsValue(schema: Schema | undefined) {
+        if(schema) {
+            this.target = schema
+        }
+
+        return this
     }
 
     withUUID(uuid: true | undefined) {

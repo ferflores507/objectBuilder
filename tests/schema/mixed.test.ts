@@ -4,6 +4,27 @@ import { buildResultsAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
+test("schema as value", async () => {
+  const source = {}
+  const schema: Schema = {
+    schema: {
+      propiedades: {
+        value: {
+          path: "id"
+        },
+        nombre: {
+          const: "Melany"
+        }
+      }
+    }
+  }
+  const builder = new ObjectBuilder(source)
+  const expected = schema.schema
+  const results = [builder.build(schema), await builder.buildAsync(schema)]
+  
+  expect(results).toEqual([expected, expected])
+})
+
 test("add", async () => {
   const source = {}
   const schema: Schema = {

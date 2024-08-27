@@ -59,6 +59,7 @@ export type Schema = Partial<{
     schemaFrom: Schema
     selectSet: string
     set: string
+    schema: Schema
     sibling: string
     some: any
     source: string
