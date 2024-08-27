@@ -56,11 +56,9 @@ test("increment", async () => {
   const source = { total: 7 }
   const schema: Schema = {
     increment: "total",
-    reduce: [
-      {
-        path: "total"
-      }
-    ]
+    reduce: {
+      path: "total"
+    }
   }
   const builder = new ObjectBuilder(source)
   const expected = source.total + 1
@@ -247,11 +245,9 @@ describe("add schema", () => {
           const: 3
         }
       },
-      reduce: [
-        {
-          set: "items"
-        }
-      ]
+      reduce: {
+        set: "items"
+      }
     }
   
     new ObjectBuilder(source).build(schema)
@@ -660,7 +656,7 @@ describe("spread", () => {
     {
       tipo: "con reduce",
       schema: {
-        reduce: [
+        reduceMany: [
           {
             spread: {
               path: "dos"
@@ -1157,15 +1153,13 @@ describe("array", () => {
           const: "Melany"
         }
       },
-      reduce: [
-        {
-          propiedades: {
-            total: {
-              targetPath: "length"
-            }
+      reduce: {
+        propiedades: {
+          total: {
+            targetPath: "length"
           }
         }
-      ]
+      }
     }
 
     const builder = new ObjectBuilder(source)
@@ -1205,7 +1199,7 @@ describe("mixed", () => {
 
     const schema: Schema = {
       const: [3, 10, 2, 4, 1].map(id => ({ id, nombre: [4, 10].includes(id) ? "Melany" : "Fernando" })),
-      reduce: [
+      reduceMany: [
         {
           // array: {
           //   orderBy: "id"
@@ -1319,11 +1313,9 @@ describe("mixed", () => {
               const: 7
             }
           },
-          reduce: [
-            {
-              unpack: ["nombre", "id"],
-            }
-          ]
+          reduce: {
+            unpack: ["nombre", "id"],
+          }
         },
         expected: { nombre: "Melany", id: 7 }
       },
