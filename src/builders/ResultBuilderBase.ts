@@ -84,9 +84,7 @@ export abstract class ResultBuilderBase {
         if(path) {
             const value = (this.builder.getSourcePathValue(path) ?? 0) + 1
 
-            this.set(path, value) // this method should assign value to this.target
-
-            this.target = value
+            this.target = this.set(path, value)
         }
 
         return this
@@ -130,6 +128,8 @@ export abstract class ResultBuilderBase {
         const source = this.builder.getSource()
 
         varios.setPathValue(source as {}, path, value)
+
+        return value
     }
 
     withSelectSet(path: string | undefined) {
