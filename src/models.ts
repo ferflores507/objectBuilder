@@ -54,7 +54,8 @@ export type Schema = Partial<{
     path: string
     parse: true
     propiedades: Record<string, Schema>
-    reduce: Schema[]
+    reduce: Schema
+    reduceMany: Schema[]
     required: string[]
     schemaFrom: Schema
     selectSet: string
