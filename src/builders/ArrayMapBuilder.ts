@@ -1,14 +1,7 @@
 import { SelectSchema, Join, Schema } from "../models"
-import { ObjectBuilder } from "./ObjectBuilder"
+import { ArrayBuilderBase } from "./ArrayBuilderBase"
 
-export class ArrayMapBuilder {
-    constructor(items: any[], builder: ObjectBuilder) {
-        this.items = items
-        this.builder = builder
-    }
-
-    private items: any[]
-    private readonly builder: ObjectBuilder
+export class ArrayMapBuilder extends ArrayBuilderBase {
 
     build = () => this.items
 
