@@ -1,8 +1,7 @@
-import { ArraySchema, Schema, SelectSchema } from "../models"
+import { ArraySchema, SelectSchema } from "../models"
 import { ArrayBuilderBase } from "./ArrayBuilderBase"
 import { ArrayFilterBuilder } from "./ArrayFilterBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
-import { ObjectBuilder } from "./ObjectBuilder"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
 
 export class ArrayFilterResultBuilder extends ArrayBuilderBase {

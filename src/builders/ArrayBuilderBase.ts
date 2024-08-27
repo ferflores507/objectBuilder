@@ -1,11 +1,6 @@
 import { ObjectBuilder } from "./ObjectBuilder"
 
 export class ArrayBuilderBase {
-    constructor(items: any[], builder: ObjectBuilder) {
-        this.items = items
-        this.builder = builder
+    constructor(protected items: any[], readonly builder: ObjectBuilder) {
     }
-
-    items: any[]
-    readonly builder: ObjectBuilder
 }

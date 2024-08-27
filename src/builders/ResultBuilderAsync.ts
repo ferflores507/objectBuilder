@@ -23,7 +23,8 @@ export class ResultBuilderAsync extends ResultBuilderBase {
             propiedades, 
             spread, 
             definitions, 
-            reduce, 
+            reduce,
+            reduceMany,
             delay, 
             consulta, 
             checkout 
@@ -38,6 +39,7 @@ export class ResultBuilderAsync extends ResultBuilderBase {
         await this.withSpreadAsync(spread)
         await this.withEndSchema(schema) // await solo para alinear 
         await this.withReduceAsync(reduce)
+        await this.withReduceManyAsync(reduceMany)
         await this.withCheckout(checkout)
         
         return this.getTarget()
@@ -95,7 +97,13 @@ export class ResultBuilderAsync extends ResultBuilderBase {
         }
     }
 
-    async withReduceAsync(schemas: Schema[] | undefined) {
+    async withReduceAsync(schema: Schema | undefined) {
+        if(schema) {
+            this.target = await this.buildAsync(schema)
+        }
+    }
+
+    async withReduceManyAsync(schemas: Schema[] | undefined) {
         if(schemas) {
             for (const schema of schemas) {
                 this.target = await this.buildAsync(schema)
