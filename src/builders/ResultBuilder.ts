@@ -52,7 +52,15 @@ export class ResultBuilder extends ResultBuilderBase {
         return this
     }
 
-    withReduce(schemas: Schema[] | undefined) {
+    withReduce(schema: Schema | undefined) {
+        if(schema) {
+            this.target = this.build(schema)
+        }
+
+        return this
+    }
+
+    withReduceMany(schemas: Schema[] | undefined) {
         if(schemas) {
             for (const schema of schemas) {
                 this.target = this.build(schema)

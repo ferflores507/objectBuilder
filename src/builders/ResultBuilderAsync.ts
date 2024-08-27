@@ -95,7 +95,13 @@ export class ResultBuilderAsync extends ResultBuilderBase {
         }
     }
 
-    async withReduceAsync(schemas: Schema[] | undefined) {
+    async withReduceAsync(schema: Schema | undefined) {
+        if(schema) {
+            this.target = await this.buildAsync(schema)
+        }
+    }
+
+    async withReduceManyAsync(schemas: Schema[] | undefined) {
         if(schemas) {
             for (const schema of schemas) {
                 this.target = await this.buildAsync(schema)
