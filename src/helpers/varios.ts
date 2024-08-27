@@ -128,7 +128,11 @@ export const setPathValue = (obj: Record<string, any>, path: string | string[], 
 };
 
 export const removeNullOrUndefined = (source: {}) => {
-    return Object.fromEntries(Object.entries(source).filter(([_, v]) => v != null));
+    return Object.fromEntries(entriesWithValues(source));
+}
+
+export const entriesWithValues = (source: { [k: string]: any }) => {
+    return Object.entries(source).filter(([k, v]) => v != null)
 }
 
 export const esIgual = (a: any, b: any) => {
