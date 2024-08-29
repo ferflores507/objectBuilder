@@ -136,26 +136,26 @@ describe("not", () => {
   })
 
   test("propiedades", async () => {
-    const source = {}
-    const schema = {
-      propiedades: {
-        activated: {
-          not: {
-            source: "activated"
+    await expectToEqualAsync({
+      source: {},
+      schema: {
+        propiedades: {
+          activated: {
+            not: {
+              source: "activated"
+            }
           }
         }
+      },
+      expected: {
+        activated: true
+      },
+      options: {
+        sources: {
+          activated: false
+        }
       }
-    }
-
-    const builder = new ObjectBuilder(source)
-      .withSource({ activated: false })
-
-    const results = [builder.build(schema), await builder.buildAsync(schema)]
-    const expected = {
-      activated: true
-    }
-
-    expect(results).toEqual([expected, expected])
+    })
   })
 
   describe("simple not", () => {
@@ -352,21 +352,25 @@ test("select", () => {
 })
 
 test("includes", async () => {
-  const schema = {
-    const: [
-      1,
-      2,
-      3
-    ],
-    includes: {
-      targetPath: "id"
+  await expectToEqualAsync({
+    source: {},
+    schema: {
+      const: [
+        1,
+        2,
+        3
+      ],
+      includes: {
+        targetPath: "id"
+      }
+    },
+    expected: true,
+    options: {
+      target: {
+        id: 2
+      }
     }
-  }
-
-  const builder = new ObjectBuilder({}).with({ target: { id: 2 }})
-  const resultados = [builder.build(schema), await builder.buildAsync(schema)]
-
-  expect(resultados).toEqual([true, true])
+  })
 })
 
 test("stopPropiedades", () => {
@@ -522,23 +526,23 @@ describe("use", () => {
     }
   ]
 
-  test.each(cases)("use %s", async ({ use, expected }) => {
-    const source = {
-      items: ["a", "b", "c"]
-    }
-
-    const schema = {
-      path: "items",
-      use
-    }
-
-    const builder = new ObjectBuilder(source).withFunctions({
-      first: (array: any[]) => array[0],
-      last: (array: any[]) => array[array.length - 1]
+  test.each(cases)("use %s", async ({ use, expected }) => {  
+    await expectToEqualAsync({
+      source: {
+        items: ["a", "b", "c"]
+      },
+      schema: {
+        path: "items",
+        use
+      },
+      expected,
+      options: {
+        functions: {
+          first: (array: any[]) => array[0],
+          last: (array: any[]) => array[array.length - 1]
+        }
+      }
     })
-    const results = await buildResultsAsync(builder, schema)
-
-    expect(results).toEqual([expected, expected])
   })
 
 })
@@ -658,24 +662,23 @@ describe("spread", () => {
   ]
 
   test.each(cases)("spread $tipo", async ({ schema, expected }) => {
-
-    const source = {
-      dos: {
-        subDos: 2
+    await expectToEqualAsync({
+      source: {
+        dos: {
+          subDos: 2
+        },
+        tres: {
+          subTres: 3
+        }
       },
-      tres: {
-        subTres: 3
+      schema,
+      expected,
+      options: {
+        target: {
+          subUno: 1
+        }
       }
-    }
-
-    const initialTarget = {
-      subUno: 1
-    }
-
-    const builder = new ObjectBuilder(source, { target: initialTarget })
-    const results = await buildResultsAsync(builder, schema)
-
-    expect(results).toEqual([expected, expected])
+    })
   })
 })
 
