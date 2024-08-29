@@ -20,18 +20,7 @@ test("schema as value", async () => {
   
   await expectToEqualAsync({
     source: {},
-    schema: {
-      schema: {
-        propiedades: {
-          value: {
-            path: "id"
-          },
-          nombre: {
-            const: "Melany"
-          }
-        }
-      }
-    },
+    schema,
     expected: schema.schema
   })
 })
