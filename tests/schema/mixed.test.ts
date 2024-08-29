@@ -370,11 +370,11 @@ test("select", () => {
 
   // select new
 
-  let builder = new ObjectBuilder(source).with({ target: { id: 3 }})
+  const builder = new ObjectBuilder(source).with({ target: { id: 3 }})
   
   builder.build(schema)
   
-  let selected = builder.getSourcePathValue("selected")
+  const selected = builder.getSourcePathValue("selected")
 
   expect(selected).toEqual([3])
 })
