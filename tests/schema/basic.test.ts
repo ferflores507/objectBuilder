@@ -224,27 +224,27 @@ describe("basico", () => {
 describe("basico old", () => {
   
     test("set", async () => {
-      const source = {
-        nombre: "Melany",
-        apellido: "Flores"
+      const caseArg = {
+        source: {
+          nombre: "Melany",
+          apellido: "Flores"
+        },
+        schema: {
+          const: 1,
+          set: "detalles.id"
+        }
       }
-  
-      const schema = {
-        const: 1,
-        set: "detalles.id"
-      }
-      const builder = new ObjectBuilder(source)
       
-      await buildResultsAsync(builder, schema)
+      await buildResultsAsync(caseArg)
   
       const expected = {
-        ...source,
+        ...caseArg.source,
         detalles: {
           id: 1
         }
       }
   
-      expect(source).toEqual(expected)
+      expect(caseArg.source).toEqual(expected)
     })
   
     describe("equals", () => {
