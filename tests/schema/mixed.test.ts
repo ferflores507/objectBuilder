@@ -373,28 +373,39 @@ test("includes", async () => {
   })
 })
 
-test("stopPropiedades", () => {
-  const source = { evaluatedTitle: "evaluated" }
-  const schema = {
-    propiedades: {
-      uno: {
-        const: 1
-      },
-      dos: {
-        path: "not evaluated",
-      },
-      tres: {
-        propiedades: {
-          title: {
-            path: "evaluatedTitle"
-          },
-          dos: {
-            const: "not evaluated"
-          },
-        }
-      },
+test("stopPropiedades", async () => {
+  const caseArg = {
+    source: { 
+      evaluatedTitle: "evaluated" 
+    },
+    schema: {
+      propiedades: {
+        uno: {
+          const: 1
+        },
+        dos: {
+          path: "not evaluated",
+        },
+        tres: {
+          propiedades: {
+            title: {
+              path: "evaluatedTitle"
+            },
+            dos: {
+              const: "not evaluated"
+            },
+          }
+        },
+      }
     }
   }
+  const [result] = await buildResultsAsync(caseArg)
+  const [resultWithStop] = await buildResultsAsync({
+    ...caseArg,
+    options: {
+      stopPropiedades: ["dos"]
+    }
+  })
 
   const expected = {
     uno: 1,
@@ -409,12 +420,8 @@ test("stopPropiedades", () => {
     }
   }
 
-  const builder = new ObjectBuilder(source)
-  const result = builder.build(schema)
-  const resultWithStopDos = builder.with({ stopPropiedades: ["dos"] }).build(schema)
-
   expect(result).not.toEqual(expected)
-  expect(resultWithStopDos).toEqual(expected)
+  expect(resultWithStop).toEqual(expected)
 })
 
 describe("propiedades builder", () => {
