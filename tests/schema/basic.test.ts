@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { ObjectBuilder, Schema } from "../.."
-import { buildResultsAsync } from "./buildResultsASync"
+import { buildResultsAsync, expectToEqualAsync } from "./buildResultsASync"
 
 type Case = {
   name: string,
@@ -215,12 +215,8 @@ const cases: Case[] = [
 
 describe("basico", () => {
 
-  test.each(cases)("$name", async ({ name, source, schema, expected }) => {
-
-    const builder = new ObjectBuilder(source)
-    const results = await buildResultsAsync(builder, schema)
-  
-    expect(results).toEqual([expected, expected]) // until an everyIsEqual or toEqualAll is implemented
+  test.each(cases)("$name", async (caseArg) => {  
+    await expectToEqualAsync(caseArg)
   })
 
 })
@@ -283,10 +279,11 @@ describe("basico old", () => {
       ]
   
       test.each(cases)("case", async (schema) => {
-        const builder = new ObjectBuilder({})
-        const results = await buildResultsAsync(builder, schema)
-
-        expect(results.every(r => r === true)).toBe(true)
+        await expectToEqualAsync({
+          source: {},
+          schema,
+          expected: true
+        })
       })
     })
       

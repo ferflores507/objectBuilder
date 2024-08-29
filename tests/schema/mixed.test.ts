@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { ObjectBuilder, Schema } from "../.."
-import { buildResultsAsync } from './buildResultsASync'
+import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
@@ -18,11 +18,12 @@ test("schema as value", async () => {
       }
     }
   }
-  const builder = new ObjectBuilder(source)
-  const expected = schema.schema
-  const results = [builder.build(schema), await builder.buildAsync(schema)]
   
-  expect(results).toEqual([expected, expected])
+  await expectToEqualAsync({
+    source,
+    schema,
+    expected: schema.schema
+  })
 })
 
 test("add", async () => {
@@ -35,11 +36,12 @@ test("add", async () => {
       const: 4
     }
   }
-  const builder = new ObjectBuilder(source)
-  const expected = [1, 2, 3, 4]
-  const results = [builder.build(schema), await builder.buildAsync(schema)]
-  
-  expect(results).toEqual([expected, expected])
+
+  await expectToEqualAsync({
+    source,
+    schema,
+    expected: [1, 2, 3, 4]
+  })
 })
 
 test("UUID", async () => {
@@ -81,10 +83,12 @@ describe("trim", () => {
       path: "value",
       trim: true
     }
-    const builder = new ObjectBuilder(source)
-    const results = [builder.build(schema), await builder.build(schema)]
 
-    expect(results).toEqual([expected, expected])
+    await expectToEqualAsync({
+      source,
+      schema,
+      expected
+    })
   })
 })
 
@@ -105,10 +109,11 @@ describe("isNullOrWhiteSpace (value)?", () => {
       isNullOrWhiteSpace: true
     }
 
-    const builder = new ObjectBuilder(source)
-    const resultados = [builder.build(schema), await builder.buildAsync(schema)]
-
-    expect(resultados).toEqual([expected, expected])
+    await expectToEqualAsync({
+      source,
+      schema,
+      expected
+    })
   })
 })
 
@@ -128,11 +133,11 @@ describe("not", () => {
       }
     }
 
-    const builder = new ObjectBuilder(source)
-    const results = [builder.build(schema), await builder.buildAsync(schema)]
-    const expected = source.map(x => !x)
-
-    expect(results).toEqual([expected, expected])
+    await expectToEqualAsync({
+      source,
+      schema,
+      expected: source.map(x => !x)
+    })
   })
 
   test("propiedades", async () => {
@@ -185,7 +190,7 @@ describe("not", () => {
 
 describe("add schema", () => {
 
-  test("multiple with max", () => {
+  test("multiple with max", async () => {
     const source = {}
     const schema: Schema = {
       const: [
@@ -205,14 +210,16 @@ describe("add schema", () => {
       }
     }
   
-    const result = new ObjectBuilder(source).build(schema)
     const expected = [1, 2]
-  
-    expect(result).toEqual(expected)
-  
+
+    await expectToEqualAsync({
+      source,
+      schema,
+      expected
+    })
   })
 
-  test("multiple with value only", () => {
+  test("multiple with value only", async () => {
     const source = {}
     const schema: Schema = {
       const: [
@@ -229,10 +236,13 @@ describe("add schema", () => {
       }
     }
   
-    const result = new ObjectBuilder(source).build(schema)
     const expected = [1, 2, 3]
-  
-    expect(result).toEqual(expected)
+
+    await expectToEqualAsync({
+      source,
+      schema,
+      expected
+    })
   
   })
 
@@ -257,7 +267,7 @@ describe("add schema", () => {
   
   })
 
-  test("with value only", () => {
+  test("with value only", async () => {
     const source = {}
     const schema: Schema = {
       const: [],
@@ -268,11 +278,13 @@ describe("add schema", () => {
       }
     }
   
-    const result = new ObjectBuilder(source).build(schema)
     const expected = [3]
-  
-    expect(result).toEqual(expected)
-  
+
+    await expectToEqualAsync({
+      source,
+      schema,
+      expected
+    })
   })
 
 })
@@ -298,10 +310,11 @@ describe("if schema", () => {
       }
     }
 
-    const builder = new ObjectBuilder(source)
-    const results = [builder.build(schema), await builder.buildAsync(schema)]
-
-    expect(results).toEqual([expected, expected])
+    await expectToEqualAsync({
+      source,
+      schema,
+      expected
+    })
   })
 
   const modCases = [1, 2, 3].map(num => {
@@ -328,10 +341,11 @@ describe("if schema", () => {
       }
     }
 
-    const builder = new ObjectBuilder(source)
-    const results = [builder.build(schema), await builder.buildAsync(schema)]
-
-    expect(results).toEqual([expected, expected])
+    await expectToEqualAsync({
+      source,
+      schema,
+      expected
+    })
   })
 })
 
@@ -557,7 +571,7 @@ describe("use", () => {
 
 })
 
-test("sibling nested", () => {
+test("sibling nested", async () => {
   const source = {}
   const idCopy = {
     sibling: "id"
@@ -588,8 +602,6 @@ test("sibling nested", () => {
     }
   }
 
-  const builder = new ObjectBuilder({})
-  const result = builder.build(schema)
   const expected = {
     id: 1,
     idCopy: 1,
@@ -603,7 +615,11 @@ test("sibling nested", () => {
     }
   }
 
-  expect(result).toEqual(expected)
+  await expectToEqualAsync({
+    source,
+    schema,
+    expected
+  })
 })
 
 describe("sibling", () => {
@@ -625,15 +641,17 @@ describe("sibling", () => {
       }
     }
 
-    const builder = new ObjectBuilder(source)
-    const results = await buildResultsAsync(builder, schema)
     const expected = {
       title: "One",
       value: 1,
       titleCopy: "One"
     }
 
-    expect(results).toEqual([expected, expected])
+    await expectToEqualAsync({
+      source,
+      schema,
+      expected
+    })
   })
 
 })
@@ -711,9 +729,6 @@ describe("entries", () => {
       entries: true
     }
 
-    const builder = new ObjectBuilder(source)
-    const results = await buildResultsAsync(builder, schema)
-
     const expected = [
       {
         key: "nombre",
@@ -729,7 +744,11 @@ describe("entries", () => {
       }
     ]
     
-    expect(results).toEqual([expected, expected])
+    await expectToEqualAsync({
+      source,
+      schema,
+      expected
+    })
   })
 })
 
@@ -747,10 +766,11 @@ describe("calc", () => {
       calc
     }
 
-    const builder = new ObjectBuilder({})
-    const results = await buildResultsAsync(builder, schema)
-
-    expect(results).toEqual([expected, expected])
+    await expectToEqualAsync({
+      source: {},
+      schema,
+      expected
+    })
   })
 })
 
@@ -788,9 +808,7 @@ test("nested propiedades", async () => {
       }
     }
   }
-  
-  const builder = new ObjectBuilder(source)
-  const results = await buildResultsAsync(builder, schema)
+
   const expected = {
     mensajeRoot: "prueba",
     nested: {
@@ -799,7 +817,11 @@ test("nested propiedades", async () => {
     }
   }
 
-  expect(results).toEqual([expected, expected])
+  await expectToEqualAsync({
+    source,
+    schema,
+    expected
+  })
 })
 
 describe("comparacion", () => {
@@ -819,11 +841,12 @@ describe("comparacion", () => {
           const: nombre
         }
       }
-
-      const builder = new ObjectBuilder(source)
-      const results = await buildResultsAsync(builder, schema)
       
-      expect(results).toEqual([expected, expected])
+      await expectToEqualAsync({
+        source,
+        schema,
+        expected
+      })
     })
 
   })
@@ -942,11 +965,8 @@ describe("array", () => {
       }
     ]
 
-    test.each(cases)("$name", async ({ source, schema, expected }) => {
-      const builder = new ObjectBuilder(source)
-      const results = await buildResultsAsync(builder, schema)
-
-      expect(results).toEqual([expected, expected])
+    test.each(cases)("$name", async (caseArg: Case) => {
+      await expectToEqualAsync(caseArg)
     })
 
   })
@@ -1023,11 +1043,8 @@ describe("array", () => {
       }
     ]
 
-    test.each(cases)("$name", async ({ source, schema, expected }) => {
-      const builder = new ObjectBuilder(source)
-      const results = await buildResultsAsync(builder, schema)
-
-      expect(results).toEqual([expected, expected])
+    test.each(cases)("$name", async (caseArg: Case) => {
+      await expectToEqualAsync(caseArg)
     })
 
   })
@@ -1058,11 +1075,13 @@ describe("array", () => {
       }
     }
 
-    const builder = new ObjectBuilder({})
-    const results = await buildResultsAsync(builder, schema)
     const expected = [{ id: 1, nombre: "Melany" }, ...ids]
 
-    expect(results).toEqual([expected, expected])
+    await expectToEqualAsync({
+      source: {},
+      schema,
+      expected
+    })
   })
 
   test("map", async () => {
@@ -1078,11 +1097,13 @@ describe("array", () => {
       }
     }
 
-    const builder = new ObjectBuilder({})
-    const results = await buildResultsAsync(builder, schema)
     const expected = numbers.map(id => ({ id }))
 
-    expect(results).toEqual([expected, expected])
+    await expectToEqualAsync({
+      source: {},
+      schema,
+      expected
+    })
   })
 
   describe("array item validation (source items are all equal to filterSchema)", () => {
@@ -1104,11 +1125,13 @@ describe("array", () => {
         }
       }
 
-      const builder = new ObjectBuilder({})
-      const results = await buildResultsAsync(builder, schema)
       const expected = true
 
-      expect(results).toEqual([expected, expected])
+      await expectToEqualAsync({
+        source,
+        schema,
+        expected
+      })
     })
 
   })
@@ -1131,11 +1154,13 @@ describe("array", () => {
         }
       }
 
-      const builder = new ObjectBuilder(source)
-      const results = await buildResultsAsync(builder, schema)
       const expected = true
 
-      expect(results).toEqual([expected, expected])
+      await expectToEqualAsync({
+        source,
+        schema,
+        expected
+      })
     })
 
   })
@@ -1162,11 +1187,13 @@ describe("array", () => {
       }
     }
 
-    const builder = new ObjectBuilder(source)
-    const results = await buildResultsAsync(builder, schema)
     const expected = { total: source.length - 1 }
 
-    expect(results).toEqual([expected, expected])
+    await expectToEqualAsync({
+      source,
+      schema,
+      expected
+    })
   })
 
   describe.todo("orderBy", () => {
@@ -1221,11 +1248,13 @@ describe("mixed", () => {
       ]
     }
 
-    const builder = new ObjectBuilder(source)
-    const results = await buildResultsAsync(builder, schema)
     const expected = [4, 10].map(id => ({ id, nombre: "Melany" }))
 
-    expect(results).toEqual([expected, expected])
+    await expectToEqualAsync({
+      source,
+      schema,
+      expected
+    })
   })
 
   describe("checkout", () => {
@@ -1244,11 +1273,13 @@ describe("mixed", () => {
         }
       }
       
-      const builder = new ObjectBuilder(source)
-      const results = await buildResultsAsync(builder, schema)
       const expected = { nombre: "Melany" }
 
-      expect(results).toEqual([expected, expected])
+      await expectToEqualAsync({
+        source,
+        schema,
+        expected
+      })
     })
 
   })
@@ -1266,11 +1297,13 @@ describe("mixed", () => {
         }
       }
 
-      const builder = new ObjectBuilder({})
-      const results = await buildResultsAsync(builder, schema)
       const expected = { nombre: "Melany" }
 
-      expect(results).toEqual([expected, expected])
+      await expectToEqualAsync({
+        source: {},
+        schema,
+        expected
+      })
     })
 
     test("flat (path)", async () => {
@@ -1287,11 +1320,13 @@ describe("mixed", () => {
         path: "usuario"
       }
 
-      const builder = new ObjectBuilder({})
-      const results = await buildResultsAsync(builder, schema)
       const expected = { nombre: "Melany", provincia: "Santiago" }
 
-      expect(results).toEqual([expected, expected])
+      await expectToEqualAsync({
+        source,
+        schema,
+        expected
+      })
     })
 
   })
@@ -1345,12 +1380,8 @@ describe("mixed", () => {
       }
     ]
 
-    test.each(cases)("$name", async ({ name, source, schema, expected }) => {
-
-      const builder = new ObjectBuilder(source)
-      const results = await buildResultsAsync(builder, schema)
-
-      expect(results).toEqual([expected, expected])
+    test.each(cases)("$name", async ({ name, ...caseArg }) => {
+      await expectToEqualAsync(caseArg)
     })
   })
 
