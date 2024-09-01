@@ -45,9 +45,8 @@ test("UUID", async () => {
   const schema: Schema = {
     UUID: true
   }
-  const builder = new ObjectBuilder(source)
   
-  expect(() => builder.build(schema)).not.toThrow()
+  await expect(buildResultsAsync({ source, schema })).resolves.not.toThrow()
 })
 
 test("increment", async () => {
@@ -327,7 +326,7 @@ test("getPathValue throws on null source", () => {
   expect(() => getPathValue(source, "test")).toThrow()
 })
 
-test("select", () => {
+describe("select", () => {
 
   const source = {
     selected: [
@@ -337,18 +336,24 @@ test("select", () => {
 
   const schema = {
     targetPath: "id",
-    selectSet: "selected"
+    selectSet: "selected",
+    reduce: {
+      path: "selected"
+    }
   }
 
-  // select new
-
   const builder = new ObjectBuilder(source).with({ target: { id: 3 }})
-  
-  builder.build(schema)
-  
-  const selected = builder.getSourcePathValue("selected")
 
-  expect(selected).toEqual([3])
+  const cases = [
+    { selected: [3] },
+    { selected: [] }
+  ]
+
+  test.each(cases)("select value", ({ selected }) => {
+    const resultado = builder.build(schema)
+
+    expect(resultado).toEqual(selected)
+  })
 })
 
 test("includes", async () => {
@@ -1143,7 +1148,7 @@ describe("array", () => {
       [[3, 2, 10, 8].map(id => ({ id })), false]
     ]
 
-    test.each(source)("%o is ordered by id => %s", async (items, value) => {
+    test.each(source)("%o is ordered by id => %s", async (expectedItem, value) => {
 
       const schema: Schema = {
         const: [10, 2, 8, 3].map(id => ({ id })),
@@ -1152,10 +1157,12 @@ describe("array", () => {
         // }
       }
 
-      const builder = new ObjectBuilder({})
-      const resultado = builder.build(schema)
+      const resultados = await buildResultsAsync({ source: {}, schema })
+      const expected = [expectedItem, expectedItem]
 
-      value ? expect(items).toEqual(resultado) : expect(items).not.toEqual(resultado)
+      value 
+      ? expect(resultados).toEqual(expected) 
+      : expect(resultados).not.toEqual(expected)
     })
   })
 })
