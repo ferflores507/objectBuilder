@@ -4,6 +4,40 @@ import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
+test("array filter property 'keywords' contains string", async () => {
+
+  const items = [
+    {
+      name: "ok",
+      keywords: ["Melany", "Fer"]
+    },
+    {
+      name: "fail",
+      keywords: ["Fer"]
+    },
+    {
+      name: "ok",
+      keywords: ["Fer", "Melany"]
+    }
+  ]
+
+  await expectToEqualAsync({
+    source: {},
+    schema: {
+      const: items,
+      filter: {
+        targetPath: "keywords",
+        contains: {
+          equals: {
+            const: "Melany"
+          }
+        }
+      }
+    },
+    expected: items.filter(i => i.name === "ok")
+  })
+})
+
 test("schema as value", async () => {
   const schema: Schema = {
     schema: {
