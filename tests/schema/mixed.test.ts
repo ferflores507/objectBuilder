@@ -4,38 +4,62 @@ import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 
-test("array filter property 'keywords' contains string", async () => {
+describe("array filter property 'keywords' contains string", () => {
 
-  const items = [
+  const cases = [
     {
-      name: "ok",
-      keywords: ["Melany", "Fer"]
+      items: [
+        {
+          name: "ok",
+          keywords: ["Melany", "uno"]
+        },
+        {
+          name: "fail",
+          keywords: ["uno", "dos"]
+        },
+        {
+          name: "ok",
+          keywords: ["uno", "Melany"]
+        }
+      ],
+      get expected() {
+        return this.items.filter(i => i.name === "ok")
+      }
     },
     {
-      name: "fail",
-      keywords: ["Fer"]
-    },
-    {
-      name: "ok",
-      keywords: ["Fer", "Melany"]
+      items: [
+        {
+          name: "fail",
+          keywords: ["uno", "dos"]
+        },
+        {
+          name: "fail",
+          keywords: ["tres", "cuatro"]
+        }
+      ],
+      expected: []
     }
   ]
 
-  await expectToEqualAsync({
-    source: {},
-    schema: {
-      const: items,
-      filter: {
-        targetPath: "keywords",
-        contains: {
-          equals: {
-            const: "Melany"
+  test.each(cases)("case", async ({ items, expected }) => {
+  
+    await expectToEqualAsync({
+      source: {},
+      schema: {
+        const: items,
+        filter: {
+          targetPath: "keywords",
+          contains: {
+            equals: {
+              const: "Melany"
+            }
           }
         }
-      }
-    },
-    expected: items.filter(i => i.name === "ok")
+      },
+      expected
+    })
   })
+
 })
 
 test("schema as value", async () => {
