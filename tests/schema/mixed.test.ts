@@ -6,37 +6,32 @@ import { getPathValue } from '../../src/helpers/varios'
 
 describe("array filter property 'keywords' contains string", () => {
 
-  const cases = [
+  const items = [
     {
-      items: [
-        {
-          name: "ok",
-          keywords: ["Melany", "uno"]
-        },
-        {
-          name: "fail",
-          keywords: ["uno", "dos"]
-        },
-        {
-          name: "ok",
-          keywords: ["uno", "Melany"]
-        }
-      ],
-      get expected() {
-        return this.items.filter(i => i.name === "ok")
-      }
+      match: true,
+      keywords: ["Melany", "uno"]
     },
     {
-      items: [
-        {
-          name: "fail",
-          keywords: ["uno", "dos"]
-        },
-        {
-          name: "fail",
-          keywords: ["tres", "cuatro"]
-        }
-      ],
+      match: false,
+      keywords: ["uno", "dos"]
+    },
+    {
+      match: true,
+      keywords: ["uno", "Melany"]
+    },
+    {
+      match: false,
+      keywords: ["tres", "cuatro"]
+    }
+  ]
+
+  const cases = [
+    {
+      items,
+      expected: items.filter(i => i.match === true)
+    },
+    {
+      items: items.filter(i => i.match === false),
       expected: []
     }
   ]
