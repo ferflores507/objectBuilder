@@ -36,6 +36,7 @@ export abstract class ResultBuilderBase {
             isNullOrWhiteSpace,
             trim,
             increment,
+            decrement,
             UUID,
             schema: schemaAsValue
         } = schema ?? {}
@@ -53,6 +54,7 @@ export abstract class ResultBuilderBase {
             .withIsNullOrWhiteSpace(isNullOrWhiteSpace)
             .withTrim(trim)
             .withIncrement(increment)
+            .withDecrement(decrement)
             .withUUID(UUID)
             .withSchemaAsValue(schemaAsValue)
     }
@@ -81,6 +83,10 @@ export abstract class ResultBuilderBase {
         }
 
         return this
+    }
+
+    withDecrement(path: string | undefined) {
+        return this.withIncrement(path, -1)
     }
 
     withIsNullOrWhiteSpace(isNullOrWhiteSpace: true | undefined) {
