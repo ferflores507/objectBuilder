@@ -23,9 +23,7 @@ export abstract class ResultBuilderBase {
     getTarget = () => this.target
 
     withSchema(schema: Schema | undefined) {
-        const { 
-            path,
-            targetPath,
+        const {
             "const": value,
             schemaFrom, 
             entries, 
@@ -33,8 +31,6 @@ export abstract class ResultBuilderBase {
             unpack,
             stringify,
             parse,
-            sibling,
-            source,
             selectSet,
             not,
             isNullOrWhiteSpace,
@@ -45,10 +41,7 @@ export abstract class ResultBuilderBase {
         } = schema ?? {}
 
         return this.withConst(value)
-            .withPath(this.builder.getSource(), path)
-            .withPath(this.target as {}, targetPath)
-            .withPath(this.options?.siblings as {}, sibling)
-            .withPath(this.options?.sources ?? {}, source)
+            .withPaths(schema)
             .withSchemaFrom(schemaFrom)
             .withEntries(entries)
             .withCalc(calc)
@@ -265,6 +258,15 @@ export abstract class ResultBuilderBase {
         }
 
         return this
+    }
+
+    withPaths(schema: Schema | undefined) {
+        const { path, targetPath, sibling, source } = schema ?? {}
+        
+        return this.withPath(this.builder.getSource(), path)
+            .withPath(this.target as {}, targetPath)
+            .withPath(this.options?.siblings as {}, sibling)
+            .withPath(this.options?.sources ?? {}, source)
     }
 
     withPath(source: {}, path: string | undefined) {
