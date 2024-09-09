@@ -102,6 +102,21 @@ test("UUID", async () => {
   await expect(buildResultsAsync({ source, schema })).resolves.not.toThrow()
 })
 
+test("decrement", async () => {
+  const source = { total: 7 }
+  const schema: Schema = {
+    decrement: "total",
+    reduce: {
+      path: "total"
+    }
+  }
+  const builder = new ObjectBuilder(source)
+  const expected = source.total -1
+  const resultados = [builder.build(schema), await builder.buildAsync(schema)]
+  
+  expect(resultados).toEqual([expected, expected - 1])
+})
+
 test("increment", async () => {
   const source = { total: 7 }
   const schema: Schema = {
