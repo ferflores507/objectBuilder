@@ -39,6 +39,7 @@ export type Schema = Partial<{
     calc: CalcMethod
     checkout: Schema
     const: any
+    decrement: string
     definitions: Schema[]
     delay: number
     else: Schema
