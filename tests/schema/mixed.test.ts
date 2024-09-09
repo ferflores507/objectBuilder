@@ -102,34 +102,26 @@ test("UUID", async () => {
   await expect(buildResultsAsync({ source, schema })).resolves.not.toThrow()
 })
 
-test("decrement", async () => {
-  const source = { total: 7 }
-  const schema: Schema = {
-    decrement: "total",
-    reduce: {
-      path: "total"
-    }
-  }
-  const builder = new ObjectBuilder(source)
-  const expected = source.total -1
-  const resultados = [builder.build(schema), await builder.buildAsync(schema)]
-  
-  expect(resultados).toEqual([expected, expected - 1])
-})
+describe("increment or decrement", () => {
 
-test("increment", async () => {
-  const source = { total: 7 }
-  const schema: Schema = {
-    increment: "total",
-    reduce: {
-      path: "total"
-    }
-  }
-  const builder = new ObjectBuilder(source)
-  const expected = source.total + 1
-  const resultados = [builder.build(schema), await builder.buildAsync(schema)]
+  const operations = ["increment", "decrement"]
   
-  expect(resultados).toEqual([expected, expected + 1])
+  test.each(operations)("%s", async (operation) => {
+    const source = { total: 7 }
+    const schema: Schema = {
+      [operation]: "total",
+      reduce: {
+        path: "total"
+      }
+    }
+    const builder = new ObjectBuilder(source)
+    const amount = schema.increment ? 1 : -1
+    const expected = source.total + amount
+    const resultados = [builder.build(schema), await builder.buildAsync(schema)]
+    
+    expect(resultados).toEqual([expected, expected + amount])
+  })
+
 })
 
 describe("trim", () => {
