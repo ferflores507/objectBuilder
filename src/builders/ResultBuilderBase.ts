@@ -23,37 +23,34 @@ export abstract class ResultBuilderBase {
 
     withSchema(schema: Schema | undefined) {
         const {
-            "const": value,
             schemaFrom, 
             selectSet,
             not,
             increment,
             decrement,
-            schema: schemaAsValue
         } = schema ?? {}
 
-        return this.withConst(value)
-            .withPlainResult(schema)
+        return this.withPlainResult(schema)
             .withSchemaFrom(schemaFrom)
             .withSelectSet(selectSet)
             .withNot(not)
             .withIncrement(increment)
             .withDecrement(decrement)
-            .withSchemaAsValue(schemaAsValue)
     }
 
-    withPlainResult(schema: Schema | undefined) {
-        this.target = this.withPaths(schema)
-            .withSchema(schema)
-            .build()
+    withInitialValue(schema: Schema | undefined) {
+        this.target = schema?.const ?? schema?.schema ?? this.target
 
         return this
     }
 
-    withSchemaAsValue(schema: Schema | undefined) {
-        if(schema) {
-            this.target = schema
-        }
+    withPlainResult(schema: Schema | undefined) {
+        
+        this.target = this
+            .withInitialValue(schema)
+            .withPaths(schema)
+            .withSchema(schema)
+            .build()
 
         return this
     }
@@ -165,15 +162,6 @@ export abstract class ResultBuilderBase {
     withArraySchema(schema: ArraySchema | undefined) {
         this.target = new ArrayBuilder(this.target as [], this.builder)
             .build(schema)
-
-        return this
-    }
-
-    withConst(value: any) {
-
-        if(value !== undefined) {
-            this.target = value
-        }
 
         return this
     }
