@@ -21,7 +21,8 @@ export class PlainResultBuilder {
             UUID
         } = schema ?? {}
 
-        this.target = this.withEntries(entries)
+        this.target = this
+            .withEntries(entries)
             .withCalc(calc)
             .withUnpack(unpack)
             .withStringify(stringify)
