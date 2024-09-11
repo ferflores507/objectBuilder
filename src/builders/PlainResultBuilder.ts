@@ -11,7 +11,6 @@ export class PlainResultBuilder {
 
     withSchema(schema: Schema | undefined) {
         const {
-            "const": value,
             entries, 
             calc, 
             unpack,
