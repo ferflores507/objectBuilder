@@ -1,10 +1,9 @@
-import { Calc } from "../helpers/calc"
-import type { ArraySchema, CalcMethod, Schema } from "../models"
+import type { ArraySchema, Schema } from "../models"
 import { ArrayBuilder } from "./ArrayBuilder"
 import { ObjectBuilder } from "./ObjectBuilder"
 import * as varios from "../helpers/varios"
-import { getPathValue } from "../helpers/varios"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
+import { PlainResultBuilder } from "./PlainResultBuilder"
 
 export abstract class ResultBuilderBase {
     constructor(target: any, builder: ObjectBuilder) {
@@ -26,50 +25,56 @@ export abstract class ResultBuilderBase {
         const {
             "const": value,
             schemaFrom, 
-            entries, 
-            calc, 
-            unpack,
-            stringify,
-            parse,
             selectSet,
             not,
-            isNullOrWhiteSpace,
-            trim,
             increment,
             decrement,
-            UUID,
             schema: schemaAsValue
         } = schema ?? {}
 
         return this.withConst(value)
             .withPaths(schema)
+            .withPlainResult(schema)
             .withSchemaFrom(schemaFrom)
+            .withSelectSet(selectSet)
+            .withNot(not)
+            .withIncrement(increment)
+            .withDecrement(decrement)
+            .withSchemaAsValue(schemaAsValue)
+    }
+
+    withPlainResult(schema: Schema | undefined) {
+
+        const {
+            "const": value,
+            entries, 
+            calc, 
+            unpack,
+            stringify,
+            parse,
+            isNullOrWhiteSpace,
+            trim,
+            UUID,
+            schema: schemaAsValue
+        } = schema ?? {}
+
+        this.target = new PlainResultBuilder(this.target)
             .withEntries(entries)
             .withCalc(calc)
             .withUnpack(unpack)
             .withStringify(stringify)
             .withParse(parse)
-            .withSelectSet(selectSet)
-            .withNot(not)
             .withIsNullOrWhiteSpace(isNullOrWhiteSpace)
             .withTrim(trim)
-            .withIncrement(increment)
-            .withDecrement(decrement)
             .withUUID(UUID)
-            .withSchemaAsValue(schemaAsValue)
+            .build()
+
+        return this
     }
 
     withSchemaAsValue(schema: Schema | undefined) {
         if(schema) {
             this.target = schema
-        }
-
-        return this
-    }
-
-    withUUID(uuid: true | undefined) {
-        if(uuid) {
-            this.target = crypto.randomUUID()
         }
 
         return this
@@ -87,22 +92,6 @@ export abstract class ResultBuilderBase {
 
     withDecrement(path: string | undefined) {
         return this.withIncrement(path, -1)
-    }
-
-    withIsNullOrWhiteSpace(isNullOrWhiteSpace: true | undefined) {
-        if(isNullOrWhiteSpace) {
-            this.target = ((this.target ?? "").toString()).trim() === ""
-        }
-
-        return this
-    }
-
-    withTrim(trim: true | undefined) {
-        if(trim) {
-            this.target = (this.target as string).trim()
-        }
-
-        return this
     }
 
     withNot(schema: Schema | undefined) {
@@ -162,22 +151,6 @@ export abstract class ResultBuilderBase {
         return this
     }
 
-    withStringify(stringify: true | undefined) {
-        if(stringify) {
-            this.target = JSON.stringify(this.target)
-        }
-
-        return this
-    }
-
-    withParse(parse: true | undefined) {
-        if(parse) {
-            this.target = JSON.parse(this.target as string)
-        }
-
-        return this
-    }
-
     withCheckout(schema: Schema | undefined) {
         if(schema) {
             this.target = new ObjectBuilder(this.target as {}).build(schema)
@@ -218,45 +191,6 @@ export abstract class ResultBuilderBase {
         return this
     }
 
-    withUnpack(keys: string[] | undefined) {
-        if (keys) {
-            const target = this.target as Record<string, object>
-            
-            this.target = keys.reduce((obj, key) => {
-                return { ...obj, [key]: target[key] }
-            }, {})
-        }
-
-        return this
-    }
-
-    withCalc(method: CalcMethod | undefined) {
-
-        if (method) {
-
-            const calc = new Calc(...this.target as [])
-
-            const metodos: Record<CalcMethod, () => number> = {
-                "sumar": () => calc.sumar(),
-                "restar": () => calc.restar(),
-                "multiplicar": () => calc.multiplicar(),
-                "dividir": () => calc.dividir()
-            }
-
-            this.target = metodos[method]()
-        }
-
-        return this
-    }
-
-    withEntries(entries: true | undefined){
-        if(entries){
-          this.target = varios.entries(this.target as {})
-        }
-  
-        return this
-      }
-
     withConst(value: any) {
 
         if(value !== undefined) {
@@ -269,16 +203,12 @@ export abstract class ResultBuilderBase {
     withPaths(schema: Schema | undefined) {
         const { path, targetPath, sibling, source } = schema ?? {}
         
-        return this.withPath(this.builder.getSource(), path)
+        this.target = new PlainResultBuilder(this.target)
+            .withPath(this.builder.getSource(), path)
             .withPath(this.target as {}, targetPath)
             .withPath(this.options?.siblings as {}, sibling)
             .withPath(this.options?.sources ?? {}, source)
-    }
-
-    withPath(source: {}, path: string | undefined) {
-        if(path) {
-            this.target = getPathValue(source, path)
-        }
+            .build()
 
         return this
     }
