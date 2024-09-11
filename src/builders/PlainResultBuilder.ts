@@ -1,12 +1,38 @@
 import { Calc } from "../helpers/calc"
 import * as helpers from "../helpers/varios"
-import { CalcMethod } from "../models"
+import { CalcMethod, Schema } from "../models"
 
 export class PlainResultBuilder {
     constructor(private target: any) {}
 
     build() {
         return this.target
+    }
+
+    withSchema(schema: Schema | undefined) {
+        const {
+            "const": value,
+            entries, 
+            calc, 
+            unpack,
+            stringify,
+            parse,
+            isNullOrWhiteSpace,
+            trim,
+            UUID
+        } = schema ?? {}
+
+        this.target = this.withEntries(entries)
+            .withCalc(calc)
+            .withUnpack(unpack)
+            .withStringify(stringify)
+            .withParse(parse)
+            .withIsNullOrWhiteSpace(isNullOrWhiteSpace)
+            .withTrim(trim)
+            .withUUID(UUID)
+            .build()
+
+        return this
     }
 
     withStringify(stringify: true | undefined) {

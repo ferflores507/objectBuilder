@@ -43,29 +43,8 @@ export abstract class ResultBuilderBase {
     }
 
     withPlainResult(schema: Schema | undefined) {
-
-        const {
-            "const": value,
-            entries, 
-            calc, 
-            unpack,
-            stringify,
-            parse,
-            isNullOrWhiteSpace,
-            trim,
-            UUID,
-            schema: schemaAsValue
-        } = schema ?? {}
-
         this.target = this.withPaths(schema)
-            .withEntries(entries)
-            .withCalc(calc)
-            .withUnpack(unpack)
-            .withStringify(stringify)
-            .withParse(parse)
-            .withIsNullOrWhiteSpace(isNullOrWhiteSpace)
-            .withTrim(trim)
-            .withUUID(UUID)
+            .withSchema(schema)
             .build()
 
         return this
