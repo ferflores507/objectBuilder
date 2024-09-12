@@ -5,6 +5,67 @@ import * as varios from "../helpers/varios"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { PlainResultBuilder } from "./PlainResultBuilder"
 
+type Options = {
+    store: Record<string, any>
+    siblings: Record<string, any>
+    sources: Record<string, any>
+}
+
+class SchemaResulBuilder {
+    constructor(private target: any) {}
+
+    private options: Options = {
+        store: {},
+        siblings: {},
+        sources: {}
+    }
+
+    build() {
+        return this.target
+    }
+
+    with(options: Options) {
+        this.options = options
+
+        return this
+    }
+
+    withSchema(schema: Schema | undefined) {
+        if(schema) {
+            this
+            .withPaths(schema)
+            .withInitialSchema(schema)
+        }
+
+        return this
+    }
+
+    getInitialValue(schema: Schema | undefined) {        
+        return schema?.const ?? schema?.schema ?? this.target
+    }
+
+    withInitialSchema(schema: Schema | undefined) {
+        this.target = new PlainResultBuilder(this.getInitialValue(schema))
+            .withSchema(schema)
+            .build()
+
+        return this
+    }
+
+    withPaths(schema: Schema | undefined) {
+        const { path, targetPath, sibling, source } = schema ?? {}
+        
+        this.target = new PlainResultBuilder(this.target)
+            .withPath(this.options.store, path)
+            .withPath(this.target, targetPath)
+            .withPath(this.options.siblings, sibling)
+            .withPath(this.options.sources, source)
+            .build()
+
+        return this
+    }
+}
+
 export abstract class ResultBuilderBase {
     constructor(target: any, builder: ObjectBuilder) {
         this.target = target
@@ -38,18 +99,16 @@ export abstract class ResultBuilderBase {
             .withDecrement(decrement)
     }
 
-    withInitialValue(schema: Schema | undefined) {
-        this.target = schema?.const ?? schema?.schema ?? this.target
-
-        return this
-    }
-
     withPlainResult(schema: Schema | undefined) {
-        
-        this.target = this
-            .withInitialValue(schema)
+
+        this.target = new SchemaResulBuilder(this.target)
+            .with({
+                store: this.builder.getSource(),
+                siblings: this.builder.options.siblings ?? {},
+                sources: this.builder.options.sources ?? {}
+            })
             .withPaths(schema)
-            .withSchema(schema)
+            .withInitialSchema(schema)
             .build()
 
         return this
@@ -164,15 +223,5 @@ export abstract class ResultBuilderBase {
             .build(schema)
 
         return this
-    }
-
-    withPaths(schema: Schema | undefined) {
-        const { path, targetPath, sibling, source } = schema ?? {}
-        
-        return new PlainResultBuilder(this.target)
-            .withPath(this.builder.getSource(), path)
-            .withPath(this.target as {}, targetPath)
-            .withPath(this.options?.siblings as {}, sibling)
-            .withPath(this.options?.sources ?? {}, source)
     }
 }
