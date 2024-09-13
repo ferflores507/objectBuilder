@@ -5,29 +5,29 @@ import * as varios from "../helpers/varios"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { PlainResultBuilder } from "./PlainResultBuilder"
 
-type Options = {
+export type Options = {
     store: Record<string, any>
     siblings: Record<string, any>
     sources: Record<string, any>
 }
 
 class SchemaResulBuilder {
-    constructor(private target: any) {}
-
-    private options: Options = {
-        store: {},
-        siblings: {},
-        sources: {}
+    constructor(private target: any, options?: Options) {
+        this.options = options ?? {
+            store: {},
+            siblings: {},
+            sources: {}
+        }
     }
+
+    readonly options: Options
 
     build() {
         return this.target
     }
 
     with(options: Options) {
-        this.options = options
-
-        return this
+        return new SchemaResulBuilder(this.target, options)
     }
 
     withSchema(schema: Schema | undefined) {
