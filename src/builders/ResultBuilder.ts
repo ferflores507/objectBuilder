@@ -20,7 +20,7 @@ export class ResultBuilder extends ResultBuilderBase {
             checkout 
         } = schema ?? {}
 
-        return this.withSchema(schema)
+        return this.withBaseSchema(schema)
             .withConditional(schema)
             .withDefinitions(definitions)
             .withPropiedades(propiedades)

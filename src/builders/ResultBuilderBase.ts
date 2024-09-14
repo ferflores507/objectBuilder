@@ -82,7 +82,7 @@ export abstract class ResultBuilderBase {
 
     getTarget = () => this.target
 
-    withSchema(schema: Schema | undefined) {
+    withBaseSchema(schema: Schema | undefined) {
         const {
             schemaFrom, 
             selectSet,

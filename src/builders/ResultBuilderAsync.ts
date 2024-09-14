@@ -30,7 +30,7 @@ export class ResultBuilderAsync extends ResultBuilderBase {
             checkout 
         } = schema ?? {}
 
-        this.withSchema(schema)
+        this.withBaseSchema(schema)
         await this.withConditional(schema)
         await this.withDelay(delay)
         await this.withConsultaAsync(consulta)
