@@ -36,7 +36,19 @@ class SchemaResulBuilder {
             this
             .withPaths(schema)
             .withInitialSchema(schema)
+            .withSchemaFrom(schema?.schemaFrom)
             .withPropiedades(schema?.propiedades)
+        }
+
+        return this
+    }
+
+    withSchemaFrom(source: Schema | undefined) {
+        if(source) {
+            const schema = this.withSchema(source).build() as Schema            
+            const result = this.withSchema(schema).build()
+
+            this.target = result
         }
 
         return this
@@ -103,7 +115,6 @@ export abstract class ResultBuilderBase {
         } = schema ?? {}
 
         return this.withPlainResult(schema)
-            .withSchemaFrom(schemaFrom)
             .withSelectSet(selectSet)
             .withNot(not)
             .withIncrement(increment)
@@ -120,6 +131,7 @@ export abstract class ResultBuilderBase {
             })
             .withPaths(schema)
             .withInitialSchema(schema)
+            .withSchemaFrom(schema?.schemaFrom)
             .build()
 
         return this
@@ -199,15 +211,6 @@ export abstract class ResultBuilderBase {
     withCheckout(schema: Schema | undefined) {
         if(schema) {
             this.target = new ObjectBuilder(this.target as {}).build(schema)
-        }
-
-        return this
-    }
-
-    withSchemaFrom(source: Schema | undefined) {
-        if(source) {
-            const schema = this.builder.build(source) as Schema
-            this.target = this.builder.with({ target: this.target }).build(schema)
         }
 
         return this
