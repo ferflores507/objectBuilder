@@ -15,7 +15,7 @@ export class PropiedadesBuilder {
         
         this.entries = entries
         this.result = { ...propiedades }
-        this.builder = builder.with({ siblings: this.result })
+        this.builder = builder.with({ ...builder.options, siblings: this.result })
         this.setComputed(this.result, computedEntries)   
     }
 
