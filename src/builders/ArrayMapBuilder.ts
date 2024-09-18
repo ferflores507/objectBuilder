@@ -41,8 +41,7 @@ export class ArrayMapBuilder extends ArrayBuilderBase {
 
             this.items = this.items.map(item => {
                 const group = this.builder
-                    .with({ target })
-                    .withSource({ item })
+                    .with({ target, sources: { item } })
                     .build(join.match)
 
                 return { item, group }
