@@ -2,14 +2,25 @@ import type { Schema } from "../models"
 import { ResultBuilderBase } from "./ResultBuilderBase"
 import * as varios from "../helpers/varios"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
+import { BuilderOptions } from "./ObjectBuilder"
 
 export class ResultBuilder extends ResultBuilderBase {
+
+    with(options: BuilderOptions) {
+        const builder = this.builder.with(options)
+        
+        return new ResultBuilder(this.target, builder)
+    }
 
     clone() {
         return new ResultBuilder(this.target, this.builder)
     }
 
-    build(schema: Schema | undefined) {
+    build() {
+        return this.getTarget()
+    }
+
+    withSchema(schema: Schema | undefined) {
 
         const { 
             propiedades, 
@@ -20,7 +31,7 @@ export class ResultBuilder extends ResultBuilderBase {
             checkout 
         } = schema ?? {}
 
-        return this.withBaseSchema(schema)
+        this.withBaseSchema(schema)
             .withConditional(schema)
             .withDefinitions(definitions)
             .withPropiedades(propiedades)
@@ -29,7 +40,8 @@ export class ResultBuilder extends ResultBuilderBase {
             .withReduce(reduce)
             .withReduceMany(reduceMany)
             .withCheckout(checkout)
-            .getTarget()
+        
+        return this
     }
 
     withConditional(schema: Schema | undefined) {
@@ -48,7 +60,7 @@ export class ResultBuilder extends ResultBuilderBase {
 
     withDefinitions(schemas: Schema[] | undefined) {
         if(schemas) {
-            this.target = schemas?.map(schema => this.clone().build(schema))
+            this.target = schemas?.map(schema => this.clone().withSchema(schema).build())
         }
 
         return this
@@ -56,7 +68,7 @@ export class ResultBuilder extends ResultBuilderBase {
 
     withReduce(schema: Schema | undefined) {
         if(schema) {
-            this.target = this.build(schema)
+            this.target = this.withSchema(schema).build()
         }
 
         return this
@@ -65,7 +77,7 @@ export class ResultBuilder extends ResultBuilderBase {
     withReduceMany(schemas: Schema[] | undefined) {
         if(schemas) {
             for (const schema of schemas) {
-                this.target = this.build(schema)
+                this.target = this.withSchema(schema).build()
             }
         }
 
@@ -74,10 +86,8 @@ export class ResultBuilder extends ResultBuilderBase {
 
     withPropiedades(propiedades: Record<string, any> | undefined) {
 
-        if (propiedades) {
-            const builder = this.builder.with({ target: this.target })
-            
-            this.target = new PropiedadesBuilder(propiedades, builder).build()
+        if (propiedades) {            
+            this.target = new PropiedadesBuilder(propiedades, this).build()
           }
 
         return this
