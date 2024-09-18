@@ -4,6 +4,7 @@ import { ObjectBuilder } from "./ObjectBuilder"
 import * as varios from "../helpers/varios"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { PlainResultBuilder } from "./PlainResultBuilder"
+import { PropiedadesBuilder } from "./PropiedadesBuilder"
 
 export type Options = {
     store: Record<string, any>
@@ -35,7 +36,17 @@ class SchemaResulBuilder {
             this
             .withPaths(schema)
             .withInitialSchema(schema)
+            .withPropiedades(schema?.propiedades)
         }
+
+        return this
+    }
+
+    withPropiedades(propiedades: Record<string, any> | undefined) {
+
+        if (propiedades) {            
+            this.target = new PropiedadesBuilder(propiedades, this).build()
+          }
 
         return this
     }
