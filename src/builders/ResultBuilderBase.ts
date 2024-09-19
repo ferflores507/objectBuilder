@@ -5,6 +5,7 @@ import * as varios from "../helpers/varios"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { PlainResultBuilder } from "./PlainResultBuilder"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
+import { getPathValue } from "../helpers/varios"
 
 export type Options = {
     store: Record<string, any>
@@ -12,7 +13,7 @@ export type Options = {
     sources: Record<string, any>
 }
 
-class SchemaResulBuilder {
+export class SchemaResulBuilder {
     constructor(private target: any, options?: Options) {
         this.options = options ?? {
             store: {},
@@ -28,17 +29,201 @@ class SchemaResulBuilder {
     }
 
     with(options: Options) {
-        return new SchemaResulBuilder(this.target, options)
+        options = { ...this.options, ...options }
+        const target = options.target ?? this.target
+        return new SchemaResulBuilder(target, options)
     }
 
     withSchema(schema: Schema | undefined) {
         if(schema) {
-            this
-            .withPaths(schema)
-            .withInitialSchema(schema)
-            .withSchemaFrom(schema?.schemaFrom)
-            .withPropiedades(schema?.propiedades)
+
+            const { 
+                propiedades, 
+                spread, 
+                reduce, 
+                reduceMany,
+                definitions, 
+                checkout,
+                schemaFrom,
+                selectSet,
+                not,
+                increment,
+                decrement
+            } = schema ?? {}
+
+            this.withPaths(schema)
+                .withInitialSchema(schema)
+                .withSchemaFrom(schemaFrom)
+                .withSelectSet(selectSet)
+                .withNot(not)
+                .withIncrement(increment)
+                .withDecrement(decrement)
+                .withConditional(schema)
+                .withDefinitions(definitions)
+                .withPropiedades(propiedades)
+                .withSpread(spread)
+                .withEndSchema(schema)
+                .withReduce(reduce)
+                .withReduceMany(reduceMany)
+                .withCheckout(checkout)
         }
+
+        return this
+    }
+
+    getStoreValue(path: string) {
+        return getPathValue(this.options.store, path)
+    }
+
+    set(path: string, value: any) {
+        varios.setPathValue(this.options.store, path, value)
+
+        return value
+    }
+
+    withSelectSet(path: string | undefined) {
+        if(path) {
+            const items = this.getStoreValue(path) as any[]
+            const newItems = new ArrayMapBuilder(items, this)
+                .withSelect({ value: this.target })
+                .build()
+            
+            this.target = this.set(path, newItems)
+        }
+
+        return this
+    }
+
+    withCheckout(schema: Schema | undefined) {
+        if(schema) {
+            this.target = new SchemaResulBuilder(this.target)
+                .with({ store: this.target })
+                .withSchema(schema)
+                .build()
+        }
+
+        return this
+    }
+
+    withIncrement(path: string | undefined, amount = 1) {
+        if(path) {
+            const value = (this.getStoreValue(path) ?? 0) + amount
+
+            this.target = this.set(path, value)
+        }
+
+        return this
+    }
+
+    withDecrement(path: string | undefined) {
+        return this.withIncrement(path, -1)
+    }
+
+    withNot(schema: Schema | undefined) {
+        if(schema) {
+            this.target = ! this.withSchema(schema).build()
+        }
+
+        return this
+    }
+
+    withConditional(schema: Schema | undefined) {
+        if(schema?.if) {
+            const condition = schema.if
+
+            const result = typeof(condition) == "string"
+                ? this.getStoreValue(condition)
+                : this.withSchema(condition).build()
+
+            this.target = this.withSchema(result ? schema.then : schema.else).build()
+        }
+
+        return this
+    }
+
+    withDefinitions(schemas: Schema[] | undefined) {
+        if(schemas) {
+            this.target = schemas?.map(schema => new SchemaResulBuilder(this.target, this.options).withSchema(schema).build())
+        }
+
+        return this
+    }
+
+    withSpread(schema: Schema | undefined) {
+        if(schema) {  
+            const source = new SchemaResulBuilder(this.target, this.options).withSchema(schema).build()
+            this.target = varios.spread(this.target, source)
+        }
+
+        return this
+    }
+
+    withEndSchema(schema: Schema | undefined) {
+        const { equals, set, use, includes } = schema ?? {}
+
+        return this
+            .withArraySchema(schema)
+            .withEquals(equals)
+            .withIncludes(includes)
+            .withSet(set)
+            .withUse(use)
+    }
+
+    withReduce(schema: Schema | undefined) {
+        if(schema) {
+            this.target = this.withSchema(schema).build()
+        }
+
+        return this
+    }
+
+    withReduceMany(schemas: Schema[] | undefined) {
+        if(schemas) {
+            for (const schema of schemas) {
+                this.target = this.withSchema(schema).build()
+            }
+        }
+
+        return this
+    }
+
+    withIncludes(schema: Schema | undefined) {
+        if(schema) {
+            this.target = (this.target as any[]).includes(this.withSchema(schema).build())
+        }
+
+        return this
+    }
+
+    withUse(path: string | undefined) {
+        if(path) {
+            const { functions } = this.options
+            const func = functions?.[path] ?? (() => { throw `La función ${path} no está definida.` })()
+            this.target = func(this.target, this)
+        }
+
+        return this
+    }
+
+    withSet(path: string | undefined) {
+        if(path) {
+            this.set(path, this.target)
+        }
+
+        return this
+    }
+
+    withEquals(schema: Schema | undefined) {
+        if(schema) {
+            this.target = varios.esIgual(this.target, this.withSchema(schema).build())
+        }
+
+        return this
+    }
+
+    withArraySchema(schema: ArraySchema | undefined) {
+        this.target = new ArrayBuilder(this.target as [], this)
+            .build(schema)
 
         return this
     }
