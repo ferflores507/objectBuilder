@@ -33,7 +33,7 @@ export class ArrayFilterBuilder extends ArrayBuilderBase {
 
         for(const item of this.items) {
 
-            if(this.builder.with({ target: item }).build(this.schema) === true) {
+            if(this.builder.with({ target: item }).withSchema(this.schema).build() === true) {
                 matches.push(item)
             }
             

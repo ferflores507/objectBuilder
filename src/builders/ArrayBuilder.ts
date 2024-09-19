@@ -29,7 +29,7 @@ export class ArrayBuilder extends ArrayBuilderBase {
 
     withAdd(schema: Schema | undefined) {
         if(schema) {
-            const item = this.builder.build(schema)
+            const item = this.builder.withSchema(schema).build()
             this.items = [...this.items, item]
         }
 
