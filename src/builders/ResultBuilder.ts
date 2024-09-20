@@ -1,5 +1,5 @@
 import type { Schema } from "../models"
-import { ResultBuilderBase, SchemaResulBuilder } from "./ResultBuilderBase"
+import { ResultBuilderBase, SchemaResultBuilder } from "./ResultBuilderBase"
 
 export class ResultBuilder extends ResultBuilderBase {
 
@@ -9,7 +9,7 @@ export class ResultBuilder extends ResultBuilderBase {
 
     withSchema(schema: Schema | undefined) {
 
-        this.target = new SchemaResulBuilder(this.target)
+        this.target = new SchemaResultBuilder(this.target)
             .with({
                 store: this.builder.getSource(),
                 siblings: this.builder.options.siblings ?? {},

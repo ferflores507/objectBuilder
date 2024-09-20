@@ -13,7 +13,7 @@ export type Options = {
     sources: Record<string, any>
 }
 
-export class SchemaResulBuilder {
+export class SchemaResultBuilder {
     constructor(private target: any, options?: Options) {
         this.options = options ?? {
             store: {},
@@ -31,7 +31,11 @@ export class SchemaResulBuilder {
     with(options: Options) {
         options = { ...this.options, ...options }
         const target = options.target ?? this.target
-        return new SchemaResulBuilder(target, options)
+        return new SchemaResultBuilder(target, options)
+    }
+
+    clone() {
+        return this.with({})
     }
 
     withSchema(schema: Schema | undefined) {
@@ -96,7 +100,7 @@ export class SchemaResulBuilder {
 
     withCheckout(schema: Schema | undefined) {
         if(schema) {
-            this.target = new SchemaResulBuilder(this.target)
+            this.target = this
                 .with({ store: this.target })
                 .withSchema(schema)
                 .build()
@@ -143,7 +147,7 @@ export class SchemaResulBuilder {
 
     withDefinitions(schemas: Schema[] | undefined) {
         if(schemas) {
-            this.target = schemas?.map(schema => new SchemaResulBuilder(this.target, this.options).withSchema(schema).build())
+            this.target = schemas?.map(schema => this.clone().withSchema(schema).build())
         }
 
         return this
@@ -151,7 +155,7 @@ export class SchemaResulBuilder {
 
     withSpread(schema: Schema | undefined) {
         if(schema) {  
-            const source = new SchemaResulBuilder(this.target, this.options).withSchema(schema).build()
+            const source = this.clone().withSchema(schema).build()
             this.target = varios.spread(this.target, source)
         }
 
@@ -308,7 +312,7 @@ export abstract class ResultBuilderBase {
 
     withPlainResult(schema: Schema | undefined) {
 
-        this.target = new SchemaResulBuilder(this.target)
+        this.target = new SchemaResultBuilder(this.target)
             .with({
                 store: this.builder.getSource(),
                 siblings: this.builder.options.siblings ?? {},
