@@ -31,31 +31,28 @@ export class SchemaResultBuilder {
     with(options: Options) {
         options = { ...this.options, ...options }
         const target = options.target ?? this.target
+        
         return new SchemaResultBuilder(target, options)
     }
 
-    clone() {
-        return this.with({})
-    }
-
     withSchema(schema: Schema | undefined) {
-        if(schema) {
+        const { 
+            propiedades, 
+            spread, 
+            reduce, 
+            reduceMany,
+            definitions, 
+            checkout,
+            schemaFrom,
+            selectSet,
+            not,
+            increment,
+            decrement
+        } = schema ?? {}
 
-            const { 
-                propiedades, 
-                spread, 
-                reduce, 
-                reduceMany,
-                definitions, 
-                checkout,
-                schemaFrom,
-                selectSet,
-                not,
-                increment,
-                decrement
-            } = schema ?? {}
-
-            this.withPaths(schema)
+        return schema ?
+            this.with({})
+                .withPaths(schema)
                 .withInitialSchema(schema)
                 .withSchemaFrom(schemaFrom)
                 .withSelectSet(selectSet)
@@ -70,9 +67,7 @@ export class SchemaResultBuilder {
                 .withReduce(reduce)
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
-        }
-
-        return this
+            : this
     }
 
     getStoreValue(path: string) {
@@ -147,7 +142,7 @@ export class SchemaResultBuilder {
 
     withDefinitions(schemas: Schema[] | undefined) {
         if(schemas) {
-            this.target = schemas?.map(schema => this.clone().withSchema(schema).build())
+            this.target = schemas?.map(schema => this.withSchema(schema).build())
         }
 
         return this
@@ -155,7 +150,7 @@ export class SchemaResultBuilder {
 
     withSpread(schema: Schema | undefined) {
         if(schema) {  
-            const source = this.clone().withSchema(schema).build()
+            const source = this.withSchema(schema).build()
             this.target = varios.spread(this.target, source)
         }
 
