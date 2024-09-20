@@ -1,6 +1,6 @@
 import type { Consulta, Schema } from "../models"
 import { ObjectBuilder } from "./ObjectBuilder"
-import { ResultBuilderBase } from "./ResultBuilderBase"
+import { ResultBuilderBase, SchemaResultBuilder } from "./ResultBuilderBase"
 import * as varios from "../helpers/varios"
 import useConsulta from "../helpers/useConsulta"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
@@ -27,17 +27,44 @@ export class ResultBuilderAsync extends ResultBuilderBase {
             reduceMany,
             delay, 
             consulta, 
-            checkout 
+            checkout,
+            selectSet,
+            not, 
+            increment,
+            decrement
         } = schema ?? {}
 
-        this.withBaseSchema(schema)
+        this.target = new SchemaResultBuilder(this.target)
+            .with({
+                store: this.builder.getSource(),
+                siblings: this.builder.options.siblings ?? {},
+                sources: this.builder.options.sources ?? {}
+            })
+            .withPaths(schema)
+            .withInitialSchema(schema)
+            .withSchemaFrom(schema?.schemaFrom)
+            .withSelectSet(selectSet)
+            .withNot(not)
+            .withIncrement(increment)
+            .withDecrement(decrement)
+            .build()
+
         await this.withConditional(schema)
         await this.withDelay(delay)
         await this.withConsultaAsync(consulta)
         await this.withDefinitionsAsync(definitions)
         await this.withPropiedadesAsync(propiedades)
         await this.withSpreadAsync(spread)
-        await this.withEndSchema(schema) // await solo para alinear 
+
+        this.target = new SchemaResultBuilder(this.target)
+            .with({
+                store: this.builder.getSource(),
+                siblings: this.builder.options.siblings ?? {},
+                sources: this.builder.options.sources ?? {}
+            })
+            .withEndSchema(schema)
+            .build()
+
         await this.withReduceAsync(reduce)
         await this.withReduceManyAsync(reduceMany)
         await this.withCheckout(checkout)
