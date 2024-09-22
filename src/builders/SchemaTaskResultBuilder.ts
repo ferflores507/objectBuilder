@@ -1,9 +1,10 @@
-import type { Schema } from "../models"
+import type { ArraySchema, Schema } from "../models"
 import { Options } from "./ResultBuilderBase"
 import * as varios from "../helpers/varios"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
 import { PlainResultBuilder } from "./PlainResultBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
+import { ArrayBuilder } from "./ArrayBuilder"
 
 export class SchemaTaskResultBuilder {
     constructor(private target: any, options?: Options) {
@@ -73,15 +74,51 @@ export class SchemaTaskResultBuilder {
                 .withNot(not)
                 .withIncrement(increment)
                 // .withDecrement(decrement)
-                // .withConditional(schema)
+                .withConditional(schema)
                 .withDefinitions(definitions)
                 .withPropiedades(propiedades)
-                // .withSpread(spread)
+                .withSpread(spread)
                 .withEndSchema(schema)
                 .withReduce(reduce)
                 // .withReduceMany(reduceMany)
                 // .withCheckout(checkout)
             : this
+    }
+
+    withSpread(schema: Schema | undefined) {
+        if(schema) {
+            this.add(() => {
+                const source = this.withSchema(schema).build()
+                
+                return varios.spread(this.target, source)
+            })
+        }
+
+        return this
+    }
+
+    withConditional(schema: Schema | undefined) {
+        if(schema?.if) {
+            const condition = schema.if
+
+            this.add(() => {
+                const result = typeof(condition) == "string"
+                    ? this.getStoreValue(condition)
+                    : this.withSchema(condition).build()
+
+                return this.withSchema(result ? schema.then : schema.else).build()
+            })
+        }
+
+        return this
+    }
+
+    withArraySchema(schema: ArraySchema | undefined) {
+        this.add(
+            () => new ArrayBuilder(this.target as [], this).build(schema)
+        )
+
+        return this
     }
 
     withSet(path: string | undefined) {
@@ -94,7 +131,7 @@ export class SchemaTaskResultBuilder {
         const { equals, set, use, includes } = schema ?? {}
 
         return this
-            // .withArraySchema(schema)
+            .withArraySchema(schema)
             .withEquals(equals)
             // .withIncludes(includes)
             .withSet(set)
