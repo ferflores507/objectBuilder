@@ -97,20 +97,14 @@ export class SchemaTaskResultBuilder {
         return this
     }
 
-    withConditional(schema: Schema | undefined) {
-        if(schema?.if) {
-            const condition = schema.if
+    withConditional(schema: Schema | undefined) : SchemaTaskResultBuilder {
+        const condition = schema?.if
 
-            this.add(() => {
-                const result = typeof(condition) == "string"
-                    ? this.getStoreValue(condition)
-                    : this.withSchema(condition).build()
+        const result = typeof(condition) == "string"
+            ? this.getStoreValue(condition)
+            : this.with({}).withSchema(condition).build() // safe copy build
 
-                return this.withSchema(result ? schema.then : schema.else).build()
-            })
-        }
-
-        return this
+        return this.withSchema(result ? schema?.then : schema?.else)
     }
 
     withArraySchema(schema: ArraySchema | undefined) {
