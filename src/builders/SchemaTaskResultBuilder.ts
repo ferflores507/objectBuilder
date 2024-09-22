@@ -80,7 +80,7 @@ export class SchemaTaskResultBuilder {
                 .withSpread(spread)
                 .withEndSchema(schema)
                 .withReduce(reduce)
-                // .withReduceMany(reduceMany)
+                .withReduceMany(reduceMany)
                 // .withCheckout(checkout)
             : this
     }
@@ -144,6 +144,16 @@ export class SchemaTaskResultBuilder {
         return schema
             ? this.add(() => this.withSchema(schema).build())
             : this
+    }
+
+    withReduceMany(schemas: Schema[] | undefined) {
+        if(schemas) {
+            for (const schema of schemas) {
+                this.add(() => this.withSchema(schema).build())
+            }
+        }
+
+        return this
     }
 
     withIncrement(path: string | undefined, amount = 1) {
