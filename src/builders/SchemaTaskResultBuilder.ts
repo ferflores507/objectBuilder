@@ -199,14 +199,12 @@ export class SchemaTaskResultBuilder {
         return this
     }
 
-    withSchemaFrom(source: Schema | undefined) {
-        const task = () => {
-            const schema = this.withSchema(source).build() as Schema            
-            
-            return this.withSchema(schema).build()
-        }
+    withSchemaFrom(source: Schema | undefined) : SchemaTaskResultBuilder {
+        const schema = this.with({})
+            .withSchema(source)
+            .build() as Schema
 
-        return source ? this.add(task) : this
+        return source ? this.withSchema(schema) : this
     }
 
     getInitialValue(schema: Schema | undefined) {        
