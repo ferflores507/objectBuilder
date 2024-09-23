@@ -147,11 +147,7 @@ export class SchemaTaskResultBuilder {
     }
 
     withReduceMany(schemas: Schema[] | undefined) {
-        if(schemas) {
-            for (const schema of schemas) {
-                this.add(() => this.withSchema(schema).build())
-            }
-        }
+        schemas?.map(s => this.withReduce(s))
 
         return this
     }
