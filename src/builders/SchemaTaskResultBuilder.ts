@@ -133,11 +133,9 @@ export class SchemaTaskResultBuilder {
     }
 
     withNot(schema: Schema | undefined) {
-        if(schema) {
-            this.target = ! this.withSchema(schema).build()
-        }
-
-        return this
+        return schema
+            ? this.add(() => ! this.withSchema(schema).build()) 
+            : this
     }
 
     withReduce(schema: Schema | undefined) {
