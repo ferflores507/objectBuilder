@@ -85,6 +85,12 @@ export class SchemaTaskResultBuilder {
             : this
     }
 
+    withIncludes(schema: Schema | undefined) {
+        return schema 
+            ? this.add(() => (this.target as any[]).includes(this.withSchema(schema).build()))
+            : this
+    }
+
     withUse(path: string | undefined) {
         const task = () => {
             const { functions } = this.options
@@ -138,7 +144,7 @@ export class SchemaTaskResultBuilder {
         return this
             .withArraySchema(schema)
             .withEquals(equals)
-            // .withIncludes(includes)
+            .withIncludes(includes)
             .withSet(set)
             .withUse(use)
     }
