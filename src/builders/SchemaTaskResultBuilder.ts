@@ -85,6 +85,17 @@ export class SchemaTaskResultBuilder {
             : this
     }
 
+    withUse(path: string | undefined) {
+        const task = () => {
+            const { functions } = this.options
+            const func = functions?.[path] ?? (() => { throw `La función ${path} no está definida.` })()
+            
+            return func(this.target, this)
+        }
+
+        return path ? this.add(task) : this
+    }
+
     withSpread(schema: Schema | undefined) {
         if(schema) {
             this.add(() => {
@@ -129,7 +140,7 @@ export class SchemaTaskResultBuilder {
             .withEquals(equals)
             // .withIncludes(includes)
             .withSet(set)
-            // .withUse(use)
+            .withUse(use)
     }
 
     withNot(schema: Schema | undefined) {
