@@ -33,11 +33,14 @@ export class SchemaTaskResultBuilder {
         return this.target
     }
 
-    with(options: Options) {
+    with(options: Options & { schema?: Schema }) : SchemaTaskResultBuilder {
+        const { schema } = options 
         options = { ...this.options, ...options }
         const target = options.target ?? this.target
+        const builder = new SchemaTaskResultBuilder(target, options)
         
-        return new SchemaTaskResultBuilder(target, options)
+        return schema ? builder.withSchema(schema) : builder 
+
     }
 
     getStoreValue(path: string) {
@@ -66,8 +69,7 @@ export class SchemaTaskResultBuilder {
         } = schema ?? {}
 
         return schema ?
-            this.with({})
-                .withPaths(schema)
+            this.withPaths(schema)
                 .withInitialSchema(schema)
                 .withSchemaFrom(schemaFrom)
                 .withSelectSet(selectSet)
@@ -88,10 +90,12 @@ export class SchemaTaskResultBuilder {
     withCheckout(schema: Schema | undefined) : SchemaTaskResultBuilder {
         if(schema) {
             this.add(() => {
-                return this.with({ store: this.target })
-                    .withSchema(schema)
-                    .build()
+                this.options.store = this.target
+
+                return this.target
             })
+            
+            this.withSchema(schema)
         }
 
         return this
@@ -99,7 +103,7 @@ export class SchemaTaskResultBuilder {
 
     withIncludes(schema: Schema | undefined) {
         return schema 
-            ? this.add(() => (this.target as any[]).includes(this.withSchema(schema).build()))
+            ? this.add(() => (this.target as any[]).includes(this.with({ schema }).build()))
             : this
     }
 
@@ -117,7 +121,7 @@ export class SchemaTaskResultBuilder {
     withSpread(schema: Schema | undefined) {
         if(schema) {
             this.add(() => {
-                const source = this.withSchema(schema).build()
+                const source = this.with({ schema }).build()
                 
                 return varios.spread(this.target, source)
             })
@@ -131,7 +135,7 @@ export class SchemaTaskResultBuilder {
 
         const result = typeof(condition) == "string"
             ? this.getStoreValue(condition)
-            : this.with({}).withSchema(condition).build() // safe copy build
+            : this.with({ schema: condition }).build() // safe copy build
 
         return this.withSchema(result ? schema?.then : schema?.else)
     }
@@ -163,7 +167,7 @@ export class SchemaTaskResultBuilder {
 
     withNot(schema: Schema | undefined) {
         return schema
-            ? this.add(() => ! this.withSchema(schema).build()) 
+            ? this.add(() => ! this.with({ schema }).build()) 
             : this
     }
 
@@ -193,7 +197,7 @@ export class SchemaTaskResultBuilder {
 
     withEquals(schema: Schema | undefined) {
         return schema
-            ? this.add(() => varios.esIgual(this.target, this.withSchema(schema).build()))
+            ? this.add(() => varios.esIgual(this.target, this.with({ schema }).build()))
             : this
     }
 
@@ -204,7 +208,7 @@ export class SchemaTaskResultBuilder {
     }
 
     withDefinitions(schemas: Schema[] | undefined) {
-        const task = () => schemas?.map(schema => this.withSchema(schema).build())
+        const task = () => schemas?.map(schema => this.with({ schema }).build())
 
         return schemas ? this.add(task) : this
     }
@@ -227,9 +231,7 @@ export class SchemaTaskResultBuilder {
     }
 
     withSchemaFrom(source: Schema | undefined) : SchemaTaskResultBuilder {
-        const schema = this.with({})
-            .withSchema(source)
-            .build() as Schema
+        const schema = this.with({ schema: source }).build() as Schema
 
         return source ? this.withSchema(schema) : this
     }

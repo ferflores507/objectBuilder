@@ -37,7 +37,7 @@ export class ArrayMapBuilder extends ArrayBuilderBase {
 
     withGroupJoin(join: Join | undefined) {
         if(join) {
-            const target = this.builder.withSchema(join.items).build()
+            const target = this.builder.with({ schema: join.items }).build()
 
             this.items = this.items.map(item => {
                 const group = this.builder

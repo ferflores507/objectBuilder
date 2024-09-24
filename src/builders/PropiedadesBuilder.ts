@@ -50,7 +50,7 @@ export class PropiedadesBuilder {
      
     build() {
         for (const [k, v] of this.entries) {
-            this.result[k] = this.builder.withSchema(v).build()
+            this.result[k] = this.builder.with({ schema: v }).build()
         }
 
         return this.getResult()
