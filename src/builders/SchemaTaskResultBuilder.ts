@@ -81,8 +81,20 @@ export class SchemaTaskResultBuilder {
                 .withEndSchema(schema)
                 .withReduce(reduce)
                 .withReduceMany(reduceMany)
-                // .withCheckout(checkout)
+                .withCheckout(checkout)
             : this
+    }
+
+    withCheckout(schema: Schema | undefined) : SchemaTaskResultBuilder {
+        if(schema) {
+            this.add(() => {
+                return this.with({ store: this.target })
+                    .withSchema(schema)
+                    .build()
+            })
+        }
+
+        return this
     }
 
     withIncludes(schema: Schema | undefined) {
