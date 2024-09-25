@@ -324,10 +324,14 @@ describe("increment or decrement", () => {
         path: "total"
       }
     }
-    const builder = new ObjectBuilder(source)
+    const builder = new SchemaTaskResultBuilder()
+      .with({ 
+        store: source, 
+        schema
+      })
     const amount = schema.increment ? 1 : -1
     const expected = source.total + amount
-    const resultados = [builder.build(schema), await builder.buildAsync(schema)]
+    const resultados = [builder.build(), await builder.buildAsync()]
     
     expect(resultados).toEqual([expected, expected + amount])
   })
@@ -430,8 +434,6 @@ describe("not", () => {
   })
 
   describe("simple not", () => {
-    const source = { activated: false }
-    const builder = new ObjectBuilder(source)
     const schemas: Schema[] = [
       {
         const: false
@@ -442,11 +444,15 @@ describe("not", () => {
     ]
 
     test.each(schemas)("schema: $schema", async (schema: Schema) => {
+      const source = { activated: false }
+      const builder = new SchemaTaskResultBuilder()
+        .with({ store: source })
+
       const results = [
-        !builder.build(schema),
-        builder.build({ not: schema }),
-        !(await builder.buildAsync(schema)),
-        await builder.buildAsync({ not: schema })
+        !builder.with({ schema }).build(),
+        builder.with({ schema: { not: schema } }).build(),
+        !(await builder.with({ schema }).buildAsync()),
+        await builder.with({ schema: { not: schema } }).buildAsync()
       ]
 
       expect(new Set(results).size).toBe(1)
@@ -602,22 +608,13 @@ test("getPathValue throws on null source", () => {
 })
 
 describe("select", () => {
-
-  const source = {
-    selected: [
-      2
-    ]
-  }
-
-  const schema = {
-    targetPath: "id",
-    selectSet: "selected",
-    reduce: {
-      path: "selected"
-    }
-  }
-
-  const builder = new ObjectBuilder(source).with({ target: { id: 3 }})
+  const builder = new SchemaTaskResultBuilder()
+    .with({ 
+      store: {
+        selected: [2]
+      },
+      target: { id: 3 }
+    })
 
   const cases = [
     { selected: [3] },
@@ -625,7 +622,17 @@ describe("select", () => {
   ]
 
   test.each(cases)("select value", ({ selected }) => {
-    const resultado = builder.build(schema)
+    const resultado = builder
+      .with({ 
+        schema: {
+          targetPath: "id",
+          selectSet: "selected",
+          reduce: {
+            path: "selected"
+          }
+        }
+      })
+      .build()
 
     expect(resultado).toEqual(selected)
   })
