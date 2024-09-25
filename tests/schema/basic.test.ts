@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { ObjectBuilder, Schema } from "../.."
+import { Schema } from "../.."
 import { buildResultsAsync, expectToEqualAsync } from "./buildResultsASync"
 
 type Case = {
@@ -12,7 +12,9 @@ type Case = {
 const cases: Case[] = [
   {
     name: "stringify",
-    source: { id: 1 },
+    options: {
+      target: { id: 1 }
+    },
     schema: {
       stringify: true
     },
@@ -20,7 +22,9 @@ const cases: Case[] = [
   },
   {
     name: "parse",
-    source: JSON.stringify({ id: 1 }),
+    options: {
+      target: JSON.stringify({ id: 1 })
+    },
     schema: {
       parse: true
     },
