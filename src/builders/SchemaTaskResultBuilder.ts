@@ -171,10 +171,8 @@ export class SchemaTaskResultBuilder {
             : this
     }
 
-    withReduce(schema: Schema | undefined) {
-        return schema
-            ? this.add(() => this.withSchema(schema).build())
-            : this
+    withReduce(schema: Schema | undefined) : SchemaTaskResultBuilder {
+        return schema ? this.withSchema(schema) : this
     }
 
     withReduceMany(schemas: Schema[] | undefined) {
