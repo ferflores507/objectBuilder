@@ -450,8 +450,8 @@ describe("not", () => {
 
       const results = [
         !builder.with({ schema }).build(),
-        builder.with({ schema: { not: schema } }).build(),
         !(await builder.with({ schema }).buildAsync()),
+        builder.with({ schema: { not: schema } }).build(),
         await builder.with({ schema: { not: schema } }).buildAsync()
       ]
 
