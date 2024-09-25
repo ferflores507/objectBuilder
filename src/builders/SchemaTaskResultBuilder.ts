@@ -27,7 +27,18 @@ export class SchemaTaskResultBuilder {
 
     build() {
         for(const task of this.tasks) {
-            this.target = task()
+            const value = task()
+            const isPromise = typeof value?.then === "function"
+
+            this.target = isPromise ? this.target : value
+        }
+
+        return this.target
+    }
+
+    async buildAsync() {
+        for(const task of this.tasks) {
+            this.target = await task()
         }
 
         return this.target
@@ -54,7 +65,8 @@ export class SchemaTaskResultBuilder {
     }
 
     withSchema(schema: Schema | undefined) {
-        const { 
+        const {
+            delay,
             propiedades, 
             spread, 
             reduce, 
@@ -69,7 +81,9 @@ export class SchemaTaskResultBuilder {
         } = schema ?? {}
 
         return schema ?
-            this.withPaths(schema)
+            this
+                .withDelay(delay)
+                .withPaths(schema)
                 .withInitialSchema(schema)
                 .withSchemaFrom(schemaFrom)
                 .withSelectSet(selectSet)
@@ -84,6 +98,20 @@ export class SchemaTaskResultBuilder {
                 .withReduce(reduce)
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
+            : this
+    }
+
+    withDelay(ms: number | undefined) {
+        const delay = (ms: number) => new Promise<void>((resolve, reject) => {
+            setTimeout(resolve, ms)
+        })
+
+        return ms
+            ? this.add(async () => {
+                await delay(ms)
+
+                return this.target
+            })
             : this
     }
 
