@@ -89,7 +89,7 @@ export class SchemaTaskResultBuilder {
                 .withSelectSet(selectSet)
                 .withNot(not)
                 .withIncrement(increment)
-                // .withDecrement(decrement)
+                .withDecrement(decrement)
                 .withConditional(schema)
                 .withDefinitions(definitions)
                 .withPropiedades(propiedades)
@@ -219,6 +219,10 @@ export class SchemaTaskResultBuilder {
         }
 
         return this
+    }
+
+    withDecrement(path: string | undefined) {
+        return this.withIncrement(path, -1)
     }
 
     withEquals(schema: Schema | undefined) {
