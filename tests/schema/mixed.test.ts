@@ -59,7 +59,7 @@ test("array builder with undefined schema", () => {
 describe.skip("schema task result builder", () => {
 
   test("set", () => {
-    const result = new SchemaTaskResultBuilder({})
+    const result = new SchemaTaskResultBuilder()
       .withSchema({
         const: "Melany",
         set: "nombre",
@@ -73,7 +73,7 @@ describe.skip("schema task result builder", () => {
   })
 
   test("not", () => {
-    const result = new SchemaTaskResultBuilder({})
+    const result = new SchemaTaskResultBuilder()
       .with({
         store: { active: false }
       })
@@ -88,7 +88,7 @@ describe.skip("schema task result builder", () => {
   })
 
   test("increment and reduce", () => {
-    const result = new SchemaTaskResultBuilder({})
+    const result = new SchemaTaskResultBuilder()
       .with({
         store: { total: 7 }
       })
@@ -104,7 +104,7 @@ describe.skip("schema task result builder", () => {
   })
 
   test("equals", () => {
-    const result = new SchemaTaskResultBuilder({})
+    const result = new SchemaTaskResultBuilder()
       .with({
         store: { nombre: "Melany"}
       })
@@ -122,7 +122,7 @@ describe.skip("schema task result builder", () => {
   test("select set", () => {
     const store = { selected: [2] }
 
-    const builder = new SchemaTaskResultBuilder({})
+    const builder = new SchemaTaskResultBuilder()
       .with({ store })
       .withSchema({
         const: 3,
@@ -139,7 +139,7 @@ describe.skip("schema task result builder", () => {
   })
 
   test("definitions", () => {
-    const result = new SchemaTaskResultBuilder({})
+    const result = new SchemaTaskResultBuilder()
       .with({
         store: { tres: 3 }
       })
@@ -164,7 +164,7 @@ describe.skip("schema task result builder", () => {
   })
 
   test("propiedades", () => {
-    const result = new SchemaTaskResultBuilder({})
+    const result = new SchemaTaskResultBuilder()
       .with({
         store: { nombre: "Melany" }
       })
@@ -189,7 +189,7 @@ describe.skip("schema task result builder", () => {
   })
 
   test("schemaFrom", () => {
-    const result = new SchemaTaskResultBuilder({})
+    const result = new SchemaTaskResultBuilder()
       .with({
         store: { nombre: "Melany" }
       })
@@ -206,7 +206,7 @@ describe.skip("schema task result builder", () => {
   })
 
   test("path", () => {
-    const result = new SchemaTaskResultBuilder({})
+    const result = new SchemaTaskResultBuilder()
       .with({
         store: { nombre: "Melany"}
       })
@@ -217,7 +217,7 @@ describe.skip("schema task result builder", () => {
   })
 
   test("simple const", () => {
-    const result = new SchemaTaskResultBuilder({})
+    const result = new SchemaTaskResultBuilder()
       .withSchema({ const: 1 })
       .build()
 

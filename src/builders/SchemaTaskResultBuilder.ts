@@ -8,7 +8,7 @@ import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
 
 export class SchemaTaskResultBuilder {
-    constructor(private target: any, options?: Options) {
+    constructor(private target?: any, options?: Options) {
         this.options = options ?? {
             store: {},
             siblings: {},
