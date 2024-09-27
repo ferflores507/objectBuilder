@@ -7,7 +7,10 @@ import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuil
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 
 test("not", () => {
-  const result = new SchemaTaskResultBuilder({ activated: true })
+  const result = new SchemaTaskResultBuilder()
+    .with({
+      target: { activated: true }
+    })
     .withSchema({
       targetPath: "activated", 
       not: {
@@ -35,7 +38,15 @@ test("array builder with undefined schema", () => {
     { nombre: "Melany" }
   ]
 
-  const builder = new SchemaTaskResultBuilder(target)
+  const builder = new SchemaTaskResultBuilder()
+    .with({ 
+      target: [
+        1, 
+        "dos", 
+        { nombre: "Mari" }, 
+        { nombre: "Melany" }
+      ]
+    })
     .withSchema(schema)
     // .build()
 

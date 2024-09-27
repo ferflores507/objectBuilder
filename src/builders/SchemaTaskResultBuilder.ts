@@ -64,10 +64,9 @@ export class SchemaTaskResultBuilder {
     }
 
     with(options: Options & { schema?: Schema }) : SchemaTaskResultBuilder {
-        const { schema } = options 
-        options = { ...this.options, ...options }
-        const target = options.target ?? this.target
-        const builder = new SchemaTaskResultBuilder(target, options)
+        const { schema, target = this.target, ...rest } = options 
+        const newOptions = { ...this.options, ...rest }
+        const builder = new SchemaTaskResultBuilder(target, newOptions)
         
         return schema ? builder.withSchema(schema) : builder 
 
