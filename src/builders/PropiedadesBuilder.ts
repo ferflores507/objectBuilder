@@ -38,7 +38,7 @@ export class PropiedadesBuilder {
         return entries.reduce((obj, [key, schema]) => {
             return Object.defineProperty(obj, key, {
                 get() {
-                    return builder.build(schema)
+                    return builder.with({ schema }).build()
                 }
             })
         }, obj)
