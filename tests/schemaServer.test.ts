@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from "vitest"
-import { ObjectBuilder } from "../"
+import { SchemaTaskResultBuilder } from "../src/builders/SchemaTaskResultBuilder"
 import { Consulta } from "../src/models"
 import useConsulta from "../src/helpers/useConsulta"
 import { setupServer } from "../src/helpers/schemaServer"
@@ -19,8 +19,10 @@ describe("schema con consulta", () => {
       }
     }
 
-    const builder = new ObjectBuilder({})
-    const { data } = await builder.buildAsync(schema)
+    const builder = new SchemaTaskResultBuilder()
+      .with({ schema })
+
+    const data = await builder.buildAsync()
     const expected = [...Array(10).keys()]
 
     expect(data).toEqual(expected)

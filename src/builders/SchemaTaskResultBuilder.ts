@@ -1,10 +1,11 @@
-import type { ArraySchema, Schema } from "../models"
+import type { ArraySchema, Consulta, Schema } from "../models"
 import { Options } from "./ResultBuilderBase"
 import * as varios from "../helpers/varios"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
 import { PlainResultBuilder } from "./PlainResultBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
+import useConsulta from "../helpers/useConsulta"
 
 export class SchemaTaskResultBuilder {
     constructor(private target: any, options?: Options) {
@@ -17,7 +18,7 @@ export class SchemaTaskResultBuilder {
 
     tasks: any[] = []
 
-    add(task: () => any) {
+    add(task: (controller: AbortController) => any) {
         this.tasks.push(task)
 
         return this
@@ -37,11 +38,29 @@ export class SchemaTaskResultBuilder {
     }
 
     async buildAsync() {
-        for(const task of this.tasks) {
-            this.target = await task()
+        const controller = this.startStatus()
+
+        try {
+            for(const task of this.tasks) {
+                this.target = await task(controller)
+            }
+        }
+        catch (ex) {
+            if (controller.signal.aborted === false) {
+                // this.setStatus({ error })
+                // this.with({ target: ex }).withSchema(errorSchema).build()
+            }
+        }
+        finally {
+            // this.setStatus({ loading: false })
         }
 
         return this.target
+    }
+
+    startStatus() {
+        // this.setStatus({ loading: true })
+        return new AbortController()
     }
 
     with(options: Options & { schema?: Schema }) : SchemaTaskResultBuilder {
@@ -77,7 +96,8 @@ export class SchemaTaskResultBuilder {
             selectSet,
             not,
             increment,
-            decrement
+            decrement,
+            consulta
         } = schema ?? {}
 
         return schema ?
@@ -91,6 +111,7 @@ export class SchemaTaskResultBuilder {
                 .withIncrement(increment)
                 .withDecrement(decrement)
                 .withConditional(schema)
+                .withConsulta(consulta)
                 .withDefinitions(definitions)
                 .withPropiedades(propiedades)
                 .withSpread(spread)
@@ -99,6 +120,21 @@ export class SchemaTaskResultBuilder {
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
             : this
+    }
+
+    withConsulta(consulta: Consulta | undefined) {
+        if(consulta) {
+            const { cargar } = useConsulta()
+
+            this.add(async (controller: AbortController) => {
+                const response = await cargar(consulta, controller.signal)
+                const { ok, data } = response
+
+                return ok ? data : (() => { throw response })
+            })
+        }
+
+        return this
     }
 
     withDelay(ms: number | undefined) {
