@@ -63,7 +63,7 @@ export class SchemaTaskResultBuilder {
         return new AbortController()
     }
 
-    with(options: Options & { schema?: Schema }) : SchemaTaskResultBuilder {
+    with(options: Partial<Options & { schema?: Schema }>) : SchemaTaskResultBuilder {
         const { schema, target = this.target, ...rest } = options 
         const newOptions = { ...this.options, ...rest }
         const builder = new SchemaTaskResultBuilder(target, newOptions)
