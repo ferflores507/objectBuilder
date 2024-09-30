@@ -302,7 +302,7 @@ export class SchemaTaskResultBuilder {
     }
 
     getInitialValue(schema: Schema | undefined) {        
-        return schema?.const ?? schema?.schema ?? this.target
+        return [schema?.const, schema?.schema, this.target].find(val => val !== undefined)
     }
 
     withInitialSchema(schema: Schema | undefined) {
