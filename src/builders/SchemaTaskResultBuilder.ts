@@ -14,8 +14,6 @@ export class SchemaTaskResultBuilder {
             siblings: {},
             sources: {}
         }
-
-        this.options.initialTarget = target
     }
 
     tasks: any[] = []
