@@ -29,17 +29,14 @@ export class SchemaTaskResultBuilder {
     readonly options: Options
 
     build() {
-
-        let target = this.target
-
-        for(const task of this.tasks) {
+        return this.tasks.reduce((target, task) => {
             const value = task(target)
-            const isPromise = typeof value?.then === "function"
 
-            target = isPromise ? target : value
-        }
+            return typeof value?.then === "function"
+                ? target 
+                : value
 
-        return target
+        }, this.target)
     }
 
     async buildAsync() {
