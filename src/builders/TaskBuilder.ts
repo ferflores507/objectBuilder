@@ -1,20 +1,45 @@
 export class TaskBuilder {
     target: any
     tasks: any[] = []
+    errorTasks: any[] = []
+    cleanupTasks: any[] = []
 
-    with({ target } : { target: any }) {
+    with({ target = this.target, tasks = [] } : { target?: any, tasks: any[] }) {
         this.target = target
+        this.tasks = tasks
+
+        return this
+    }
+
+    cleanup() {
+        this.with({ tasks: this.cleanupTasks }).build()
+    }
+
+    doErrorTasks() {
+        this.with({ tasks: this.errorTasks }).build()
+    }
+
+    addTo(task: (target: any) => any, tasks: any[]) {
+        tasks.push(task)
 
         return this
     }
 
     add(task: (target: any) => any) {
-        this.tasks.push(task)
-
-        return this
+        return this.addTo(task, this.tasks)
     }
 
-    build() {
+    addErrorTask(task: (target: any) => any) {
+        return this.addTo(task, this.errorTasks)
+
+    }
+
+    addCleanupTask(task: (target: any) => any) {
+        return this.addTo(task, this.cleanupTasks)
+
+    }
+
+    buildSyncTasks() {
         return this.tasks.reduce((target, task) => {
             const value = task(target)
 
@@ -23,6 +48,18 @@ export class TaskBuilder {
                 : value
 
         }, this.target)
+    }
+
+    build() {
+        try {
+            return this.buildSyncTasks()
+        }
+        catch {
+            this.doErrorTasks()
+        }
+        finally {
+            // this.cleanup()
+        }
     }
 
     async buildAsync() {
@@ -36,11 +73,10 @@ export class TaskBuilder {
             return target
         }
         catch (ex) {
-            // this.setStatus({ error })
-            // this.with({ target: ex }).withSchema(errorSchema).build()
+            this.doErrorTasks()
         }
         finally {
-            // this.setStatus({ loading: false })
+            this.cleanup()
         }
     }
 }
