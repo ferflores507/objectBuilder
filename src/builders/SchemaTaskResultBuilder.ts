@@ -7,24 +7,21 @@ import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
 
-export class SchemaTaskResultBuilder {
-    constructor(private target?: any, options?: Options) {
-        this.options = options ?? {
-            store: {},
-            siblings: {},
-            sources: {}
-        }
-    }
-
+class TaskBuilder {
+    target: any
     tasks: any[] = []
 
-    add(task: (target: any, controller: AbortController) => any) {
-        this.tasks.push(task)
+    with({ target } : { target: any }) {
+        this.target = target
 
         return this
     }
 
-    readonly options: Options
+    add(task: (target: any) => any) {
+        this.tasks.push(task)
+
+        return this
+    }
 
     build() {
         return this.tasks.reduce((target, task) => {
@@ -38,31 +35,53 @@ export class SchemaTaskResultBuilder {
     }
 
     async buildAsync() {
-        const controller = this.startStatus()
-
         try {
             let target = this.target
             
             for(const task of this.tasks) {
-                target = await task(target, controller)
+                target = await task(target)
             }
 
             return target
         }
         catch (ex) {
-            if (controller.signal.aborted === false) {
-                // this.setStatus({ error })
-                // this.with({ target: ex }).withSchema(errorSchema).build()
-            }
+            // this.setStatus({ error })
+            // this.with({ target: ex }).withSchema(errorSchema).build()
         }
         finally {
             // this.setStatus({ loading: false })
         }
     }
 
-    startStatus() {
-        // this.setStatus({ loading: true })
-        return new AbortController()
+}
+
+export class SchemaTaskResultBuilder {
+    constructor(private target?: any, options?: Options) {
+        this.options = options ?? {
+            store: {},
+            siblings: {},
+            sources: {}
+        }
+
+        this.taskBuilder = new TaskBuilder().with({ target })
+    }
+
+    taskBuilder: TaskBuilder
+
+    add(task: (target: any) => any) {
+        this.taskBuilder.add(task)
+
+        return this
+    }
+
+    readonly options: Options
+
+    build() {
+        return this.taskBuilder.build()
+    }
+
+    async buildAsync() {
+        return this.taskBuilder.buildAsync()
     }
 
     with(options: Partial<Options & { schema?: Schema, functions?: {} }>) : SchemaTaskResultBuilder {
@@ -127,8 +146,8 @@ export class SchemaTaskResultBuilder {
         if(consulta) {
             const { cargar } = useConsulta()
 
-            this.add(async (target: any, controller: AbortController) => {
-                const response = await cargar(consulta, controller.signal)
+            this.add(async (target: any) => {
+                const response = await cargar(consulta, new AbortController().signal)
                 const { ok, data } = response
 
                 return ok ? data : (() => { throw response })
