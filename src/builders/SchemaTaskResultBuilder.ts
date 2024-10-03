@@ -6,54 +6,7 @@ import { PlainResultBuilder } from "./PlainResultBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
-
-class TaskBuilder {
-    target: any
-    tasks: any[] = []
-
-    with({ target } : { target: any }) {
-        this.target = target
-
-        return this
-    }
-
-    add(task: (target: any) => any) {
-        this.tasks.push(task)
-
-        return this
-    }
-
-    build() {
-        return this.tasks.reduce((target, task) => {
-            const value = task(target)
-
-            return typeof value?.then === "function"
-                ? target 
-                : value
-
-        }, this.target)
-    }
-
-    async buildAsync() {
-        try {
-            let target = this.target
-            
-            for(const task of this.tasks) {
-                target = await task(target)
-            }
-
-            return target
-        }
-        catch (ex) {
-            // this.setStatus({ error })
-            // this.with({ target: ex }).withSchema(errorSchema).build()
-        }
-        finally {
-            // this.setStatus({ loading: false })
-        }
-    }
-
-}
+import { TaskBuilder } from "./TaskBuilder"
 
 export class SchemaTaskResultBuilder {
     constructor(private target?: any, options?: Options) {
@@ -66,15 +19,14 @@ export class SchemaTaskResultBuilder {
         this.taskBuilder = new TaskBuilder().with({ target })
     }
 
-    taskBuilder: TaskBuilder
+    readonly options: Options
+    readonly taskBuilder: TaskBuilder
 
     add(task: (target: any) => any) {
         this.taskBuilder.add(task)
 
         return this
     }
-
-    readonly options: Options
 
     build() {
         return this.taskBuilder.build()
