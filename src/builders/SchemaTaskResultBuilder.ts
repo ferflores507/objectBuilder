@@ -41,9 +41,13 @@ export class SchemaTaskResultBuilder {
         const controller = this.startStatus()
 
         try {
+            let target = this.target
+            
             for(const task of this.tasks) {
-                this.target = await task(this.target, controller)
+                target = await task(target, controller)
             }
+
+            return target
         }
         catch (ex) {
             if (controller.signal.aborted === false) {
@@ -54,8 +58,6 @@ export class SchemaTaskResultBuilder {
         finally {
             // this.setStatus({ loading: false })
         }
-
-        return this.target
     }
 
     startStatus() {
