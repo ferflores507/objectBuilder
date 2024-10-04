@@ -55,7 +55,7 @@ export class SchemaTaskResultBuilder {
         return value
     }
 
-    withSchema(schema: Schema | undefined) {
+    withSchema(schema: Schema | undefined) : SchemaTaskResultBuilder {
         const {
             status,
             delay,
@@ -221,8 +221,9 @@ export class SchemaTaskResultBuilder {
     }
 
     withNot(schema: Schema | undefined) {
-        return schema
-            ? this.add(() => ! this.with({ schema }).build()) 
+        return schema ? 
+            this.withSchema(schema)
+                .add((target) => !target)
             : this
     }
 
