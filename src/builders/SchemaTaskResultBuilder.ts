@@ -57,6 +57,7 @@ export class SchemaTaskResultBuilder {
 
     withSchema(schema: Schema | undefined) {
         const {
+            status,
             delay,
             propiedades, 
             spread, 
@@ -74,6 +75,7 @@ export class SchemaTaskResultBuilder {
 
         return schema ?
             this
+                .withStatus(status)
                 .withDelay(delay)
                 .withPaths(schema)
                 .withInitialSchema(schema)
@@ -92,6 +94,23 @@ export class SchemaTaskResultBuilder {
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
             : this
+    }
+
+    withStatus(path: string | undefined) {
+        if(path) {
+            this.add(target => {
+                // const value = this.getStoreValue(path) as number
+                // this.set(path, { loading: value + 1 })
+
+                // this.with({}).withIncrement(path).build()
+                
+                this.with({ schema: { increment: path }}).build()
+
+                return target
+            })
+        }
+
+        return this
     }
 
     withConsulta(consulta: Consulta | undefined) {
