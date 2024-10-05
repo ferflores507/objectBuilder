@@ -25,6 +25,10 @@ export class TaskBuilder {
         return this
     }
 
+    merge() {
+        return this.add(value => this.target = value)
+    }
+
     add(task: (target: any) => any) {
         return this.addTo(task, this.tasks)
     }
