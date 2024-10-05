@@ -1262,9 +1262,9 @@ describe("array", () => {
                   }
                 ],
                 find: {
-                  targetPath: "nombre",
+                  path: "current.nombre",
                   equals: {
-                    path: "nombre"
+                    targetPath: "nombre"
                   }
                 }
               }
@@ -1387,7 +1387,7 @@ describe("array", () => {
             find: {
               path: "current.id",
               equals: {
-                path: "id"
+                targetPath: "id"
               }
             }
           }
@@ -1572,7 +1572,7 @@ describe("mixed", () => {
           checkout: {
             propiedades: {
               nombre: {
-                path: "nombre"
+                targetPath: "nombre"
               }
             }
           }

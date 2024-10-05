@@ -145,7 +145,7 @@ export class SchemaTaskResultBuilder {
     withCheckout(schema: Schema | undefined) : SchemaTaskResultBuilder {
         if(schema) {
             this.add((target) => {
-                this.options.store = target
+                this.target = target
 
                 return target
             })
