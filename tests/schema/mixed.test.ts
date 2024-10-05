@@ -82,7 +82,7 @@ test("not", () => {
 test("array builder with undefined schema", () => {
   const schema = {
     find: {
-      targetPath: "nombre",
+      path: "current.nombre",
       equals: {
         const: "Melany"
       }
@@ -322,7 +322,7 @@ describe("array filter property 'keywords' contains string", () => {
       schema: {
         const: items,
         filter: {
-          targetPath: "keywords",
+          path: "current.keywords",
           contains: {
             equals: {
               const: "Melany"
@@ -1297,7 +1297,7 @@ describe("array", () => {
         name: "find",
         schema: {
           find: {
-            targetPath: "nombre",
+            path: "current.nombre",
             equals: {
               const: "Melany"
             }
@@ -1354,7 +1354,7 @@ describe("array", () => {
         schema: {
           const: Array(3).fill({ nombre: "Melany" }).toSpliced(1, 0, { nombre: "Fernando" }),
           filter: {
-            targetPath: "nombre",
+            path: "current.nombre",
             equals: {
               path: "nombre"
             }
@@ -1385,7 +1385,7 @@ describe("array", () => {
               }
             ],
             find: {
-              targetPath: "id",
+              path: "current.id",
               equals: {
                 path: "id"
               }
@@ -1436,7 +1436,7 @@ describe("array", () => {
         schema: {
           const: Array(2).fill(source),
           contains: {
-            targetPath: "nombre",
+            path: "current.nombre",
             equals: {
               const: "Melany"
             }
@@ -1482,7 +1482,7 @@ describe("array", () => {
       schema: {
         const: source,
         filter: {
-          targetPath: "nombre",
+          path: "current.nombre",
           equals: {
             const: "Melany"
           }

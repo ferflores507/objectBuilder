@@ -28,7 +28,14 @@ export class ArrayMapBuilder extends ArrayBuilderBase {
     withMap(schema: Schema | undefined) {
         if(schema) {
             this.items = this.items.map(x => {
-                return this.builder.with({ target: x }).withSchema(schema).build()
+                return this.builder
+                    .with({
+                        schema: {
+                            const: x,
+                            reduce: schema
+                        }
+                    })
+                    .build()
             })
         }
 

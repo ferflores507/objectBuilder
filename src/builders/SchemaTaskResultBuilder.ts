@@ -314,8 +314,8 @@ export class SchemaTaskResultBuilder {
 
         return this.add((target) =>
             new PlainResultBuilder(target)
-                .withPath(path ? { ...this.options, ...this.options.store, target } : {}, path)
-                .withPath(target, targetPath)
+                .withPath(path ? { ...this.options, ...this.options.store, target: this.target, current: target } : {}, path)
+                .withPath(this.target, targetPath)
                 .withPath(this.options.siblings, sibling)
                 .withPath(this.options.sources, source)
                 .build()
