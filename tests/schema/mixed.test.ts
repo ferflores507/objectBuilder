@@ -6,6 +6,23 @@ import { getPathValue } from '../../src/helpers/varios'
 import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuilder'
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 
+test("map targetPath", async () => {
+
+  await expectToEqualAsync({
+    schema: {
+      const: [1, 2, 3, 4],
+      map: {
+        path: "target"
+      }
+    },
+    expected: [1, 1, 1, 1],
+    options: {
+      target: 1
+    }
+  })
+
+})
+
 test("includes", async () => {
   const schema = {
     path: "local.selectedItems",
