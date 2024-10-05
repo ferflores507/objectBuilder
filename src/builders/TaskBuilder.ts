@@ -1,3 +1,5 @@
+type Task = (current: any, previous: any) => any
+
 export class TaskBuilder {
     target: any
     tasks: any[] = []
@@ -19,29 +21,31 @@ export class TaskBuilder {
         this.with({ tasks: this.errorTasks }).build()
     }
 
-    addTo(task: (target: any) => any, tasks: any[]) {
+    addTo(task: Task, tasks: Task[]) {
         tasks.push(task)
 
         return this
     }
 
-    add(task: (target: any) => any) {
+    merge() {
+        return this.add(value => this.target = value)
+    }
+
+    add(task: Task) {
         return this.addTo(task, this.tasks)
     }
 
-    addErrorTask(task: (target: any) => any) {
+    addErrorTask(task: Task) {
         return this.addTo(task, this.errorTasks)
-
     }
 
-    addCleanupTask(task: (target: any) => any) {
+    addCleanupTask(task: Task) {
         return this.addTo(task, this.cleanupTasks)
-
     }
 
     buildSyncTasks() {
         return this.tasks.reduce((target, task) => {
-            const value = task(target)
+            const value = task(target, this.target)
 
             return typeof value?.then === "function"
                 ? target 
@@ -67,7 +71,7 @@ export class TaskBuilder {
             let target = this.target
             
             for(const task of this.tasks) {
-                target = await task(target)
+                target = await task(target, this.target)
             }
 
             return target
