@@ -1,4 +1,4 @@
-type Task = (current: any, previous: any) => any
+export type Task = (current: any, previous: any) => any
 
 export class TaskBuilder {
     target: any

@@ -6,7 +6,7 @@ import { PlainResultBuilder } from "./PlainResultBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
-import { TaskBuilder } from "./TaskBuilder"
+import { Task, TaskBuilder } from "./TaskBuilder"
 
 export class SchemaTaskResultBuilder {
     constructor(private target?: any, options?: Options) {
@@ -22,7 +22,13 @@ export class SchemaTaskResultBuilder {
     readonly options: Options
     readonly taskBuilder: TaskBuilder
 
-    add(task: (target: any) => any) {
+    addMerge() {
+        this.taskBuilder.merge()
+
+        return this
+    }
+
+    add(task: Task) {
         this.taskBuilder.add(task)
 
         return this
@@ -175,11 +181,9 @@ export class SchemaTaskResultBuilder {
 
     withSpread(schema: Schema | undefined) {
         if(schema) {
-            this.add((target) => {
-                const source = this.with({ schema }).build()
-                
-                return varios.spread(target, source)
-            })
+            this.addMerge()
+                .withSchema(schema)
+                .add((current, prev) => varios.spread(prev, current))
         }
 
         return this
