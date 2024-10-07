@@ -30,10 +30,8 @@ export class ArrayMapBuilder extends ArrayBuilderBase {
             this.items = this.items.map(x => {
                 return this.builder
                     .with({
-                        schema: {
-                            const: x,
-                            reduce: schema
-                        }
+                        initial: x,
+                        schema
                     })
                     .build()
             })
