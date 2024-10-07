@@ -317,14 +317,10 @@ export class SchemaTaskResultBuilder implements Builder {
         return source ? this.withSchema(schema) : this
     }
 
-    getInitialValue(schema: Schema | undefined) {        
-        return [schema?.const, schema?.schema, this.target].find(val => val !== undefined)
-    }
-
     withInitialSchema(schema: Schema | undefined) {
         return this.add((target) => {
-
-            const initialValue = [schema?.const, schema?.schema, target].find(val => val !== undefined)
+            const prop = (["schema", "const"] as const).find(str => str in (schema ?? {}))
+            const initialValue = prop ? schema?.[prop] : target
 
             return new PlainResultBuilder(initialValue)
                 .withSchema(schema)
