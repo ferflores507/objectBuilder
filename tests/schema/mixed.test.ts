@@ -90,7 +90,7 @@ test("path target", async () => {
       map: {
         propiedades: {
           id: {
-            path: "target"
+            path: "current"
           }
         }
       }
@@ -1525,7 +1525,7 @@ describe("array", () => {
         reduce: {
           propiedades: {
             total: {
-              targetPath: "length"
+              path: "current.length"
             }
           }
         }

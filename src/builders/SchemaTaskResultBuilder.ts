@@ -265,7 +265,7 @@ export class SchemaTaskResultBuilder {
 
     withPropiedades(propiedades: Record<string, any> | undefined) {
         return propiedades
-            ? this.add((target) => new PropiedadesBuilder(propiedades, this.with({ target })).build())
+            ? this.add((target) => new PropiedadesBuilder(propiedades, this.with({ initial: target })).build())
             : this
     }
 
