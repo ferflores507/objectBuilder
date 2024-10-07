@@ -49,7 +49,8 @@ export class ObjectBuilder {
     const target = this.getInitialTarget(schema)
 
     return new ResultBuilder(target, this)
-      .build(schema)
+      .withSchema(schema)
+      .build()
   }
 
   async buildAsync(schema: Schema | undefined, controller: AbortController = new AbortController()) {

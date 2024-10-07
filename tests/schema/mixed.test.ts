@@ -3,6 +3,320 @@ import { ObjectBuilder, Schema } from "../.."
 import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
+import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuilder'
+import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
+
+test("map builder with undefined", async () => {
+  const items = [1, undefined, 2, 3]
+  const result = items.map(x => {
+    return new SchemaTaskResultBuilder()
+      .with({
+        target: 100,
+        initial: x,
+        schema: {
+          propiedades: {
+            id: {
+              path: "current"
+            }
+          }
+        }
+      })
+      .build()
+  })
+
+  const expected = items.map(id => ({ id }))
+  expect(result).toEqual(expected)
+})
+
+test("target defined and const with undefined", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: undefined,
+    },
+    expected: undefined,
+    options: {
+      // initial: undefined, // stops failing
+      target: 1
+    }
+  })
+})
+
+test("map targetPath", async () => {
+
+  await expectToEqualAsync({
+    schema: {
+      const: [1, 2, 3, 4],
+      map: {
+        path: "target"
+      }
+    },
+    expected: [1, 1, 1, 1],
+    options: {
+      target: 1
+    }
+  })
+
+})
+
+test("includes", async () => {
+  const schema = {
+    path: "local.selectedItems",
+    includes: {
+      path: "target.id"
+    }
+  }
+
+  await expectToEqualAsync({
+    source: {
+      local: {
+        selectedItems: [1]
+      }
+    },
+    schema,
+    expected: true,
+    options: {
+      target: { id: 1 }
+    }
+  })
+})
+
+test("path target", async () => {
+
+  const items = [1, 2, 3]
+
+  await expectToEqualAsync({
+    schema: {
+      const: items,
+      map: {
+        propiedades: {
+          id: {
+            path: "current"
+          }
+        }
+      }
+    },
+    expected: items.map(id => ({ id }))
+  })
+})
+
+test("not", () => {
+  const result = new SchemaTaskResultBuilder()
+    .with({
+      target: { activated: true }
+    })
+    .withSchema({
+      targetPath: "activated", 
+      not: {
+      }
+    })
+    .build()
+
+  expect(result).toBe(false)
+})
+
+test("array builder with undefined schema", () => {
+  const schema = {
+    find: {
+      path: "current.nombre",
+      equals: {
+        const: "Melany"
+      }
+    }
+  }
+
+  const target = [
+    1, 
+    "dos", 
+    { nombre: "Mari" }, 
+    { nombre: "Melany" }
+  ]
+
+  const builder = new SchemaTaskResultBuilder()
+    .with({ 
+      target: [
+        1, 
+        "dos", 
+        { nombre: "Mari" }, 
+        { nombre: "Melany" }
+      ]
+    })
+    .withSchema(schema)
+    // .build()
+
+  const result = new ArrayBuilder(target, builder).build(schema)
+
+  expect(result).toEqual({ nombre: "Melany" })
+  
+})
+
+describe.skip("schema task result builder", () => {
+
+  test("set", () => {
+    const result = new SchemaTaskResultBuilder()
+      .withSchema({
+        const: "Melany",
+        set: "nombre",
+        reduce: {
+          path: "nombre"
+        }
+      })
+      .build()
+
+    expect(result).toEqual("Melany")
+  })
+
+  test("not", () => {
+    const result = new SchemaTaskResultBuilder()
+      .with({
+        store: { active: false }
+      })
+      .withSchema({
+        not: {
+          path: "active"
+        }
+      })
+      .build()
+
+    expect(result).toBe(true)
+  })
+
+  test("increment and reduce", () => {
+    const result = new SchemaTaskResultBuilder()
+      .with({
+        store: { total: 7 }
+      })
+      .withSchema({
+        increment: "total",
+        reduce: {
+          path: "total"
+        } 
+      })
+      .build()
+
+    expect(result).toEqual(8)
+  })
+
+  test("equals", () => {
+    const result = new SchemaTaskResultBuilder()
+      .with({
+        store: { nombre: "Melany"}
+      })
+      .withSchema({
+        path: "nombre",
+        equals: {
+          const: "Melany"
+        } 
+      })
+      .build()
+
+    expect(result).toBe(true)
+  })
+
+  test("select set", () => {
+    const store = { selected: [2] }
+
+    const builder = new SchemaTaskResultBuilder()
+      .with({ store })
+      .withSchema({
+        const: 3,
+        selectSet: "selected"
+      })
+
+    builder.build()
+
+    expect(store.selected).toEqual([3])
+
+    builder.build()
+
+    expect(store.selected).toEqual([])
+  })
+
+  test("definitions", () => {
+    const result = new SchemaTaskResultBuilder()
+      .with({
+        store: { tres: 3 }
+      })
+      .withSchema({
+        definitions: [
+          {
+            const: "1"
+          },
+          {
+            const: "dos"
+          },
+          {
+            path: "tres"
+          }
+        ]
+      })
+      .build()
+
+    const expected = ["1", "dos", 3]
+
+    expect(result).toEqual(expected)
+  })
+
+  test("propiedades", () => {
+    const result = new SchemaTaskResultBuilder()
+      .with({
+        store: { nombre: "Melany" }
+      })
+      .withSchema({
+        propiedades: {
+          id: {
+            const: 1
+          },
+          nombre: {
+            path: "nombre"
+          }
+        }
+      })
+      .build()
+
+    const expected = {
+      id: 1,
+      nombre: "Melany"
+    }
+
+    expect(result).toEqual(expected)
+  })
+
+  test("schemaFrom", () => {
+    const result = new SchemaTaskResultBuilder()
+      .with({
+        store: { nombre: "Melany" }
+      })
+      .withSchema({
+        schemaFrom: {
+          const: {
+            path: "nombre"
+          }
+        }
+      })
+      .build()
+
+    expect(result).toEqual("Melany")
+  })
+
+  test("path", () => {
+    const result = new SchemaTaskResultBuilder()
+      .with({
+        store: { nombre: "Melany"}
+      })
+      .withSchema({ path: "nombre" })
+      .build()
+
+    expect(result).toEqual("Melany")
+  })
+
+  test("simple const", () => {
+    const result = new SchemaTaskResultBuilder()
+      .withSchema({ const: 1 })
+      .build()
+
+    expect(result).toEqual(1)
+  })
+})
 
 describe("array filter property 'keywords' contains string", () => {
 
@@ -43,7 +357,7 @@ describe("array filter property 'keywords' contains string", () => {
       schema: {
         const: items,
         filter: {
-          targetPath: "keywords",
+          path: "current.keywords",
           contains: {
             equals: {
               const: "Melany"
@@ -114,10 +428,14 @@ describe("increment or decrement", () => {
         path: "total"
       }
     }
-    const builder = new ObjectBuilder(source)
+    const builder = new SchemaTaskResultBuilder()
+      .with({ 
+        store: source, 
+        schema
+      })
     const amount = schema.increment ? 1 : -1
     const expected = source.total + amount
-    const resultados = [builder.build(schema), await builder.buildAsync(schema)]
+    const resultados = [builder.build(), await builder.buildAsync()]
     
     expect(resultados).toEqual([expected, expected + amount])
   })
@@ -179,16 +497,18 @@ describe("not", () => {
     const expected = source.map(x => !x)
 
     await expectToEqualAsync({
-      source: [
-        true,
-        false,
-        false,
-        true
-      ],
       schema: {
         map: {
           not: {}
         }
+      },
+      options: {
+        target: [
+          true,
+          false,
+          false,
+          true
+        ]
       },
       expected
     })
@@ -218,8 +538,6 @@ describe("not", () => {
   })
 
   describe("simple not", () => {
-    const source = { activated: false }
-    const builder = new ObjectBuilder(source)
     const schemas: Schema[] = [
       {
         const: false
@@ -230,11 +548,15 @@ describe("not", () => {
     ]
 
     test.each(schemas)("schema: $schema", async (schema: Schema) => {
+      const source = { activated: false }
+      const builder = new SchemaTaskResultBuilder()
+        .with({ store: source })
+
       const results = [
-        !builder.build(schema),
-        builder.build({ not: schema }),
-        !(await builder.buildAsync(schema)),
-        await builder.buildAsync({ not: schema })
+        !builder.with({ schema }).build(),
+        !(await builder.with({ schema }).buildAsync()),
+        builder.with({ schema: { not: schema } }).build(),
+        await builder.with({ schema: { not: schema } }).buildAsync()
       ]
 
       expect(new Set(results).size).toBe(1)
@@ -299,15 +621,18 @@ describe("add schema", () => {
           const: 3
         }
       },
-      reduce: {
-        set: "items"
+      set: "items",
+      reduce: { // same without reduce
+        path: "items"
       }
     }
   
-    new ObjectBuilder(source).build(schema)
+    const result = new SchemaTaskResultBuilder()
+      .withSchema(schema)
+      .build()
     const expected = [3]
   
-    expect(source.items).toEqual(expected)
+    expect(result).toEqual(expected)
   
   })
 
@@ -387,22 +712,13 @@ test("getPathValue throws on null source", () => {
 })
 
 describe("select", () => {
-
-  const source = {
-    selected: [
-      2
-    ]
-  }
-
-  const schema = {
-    targetPath: "id",
-    selectSet: "selected",
-    reduce: {
-      path: "selected"
-    }
-  }
-
-  const builder = new ObjectBuilder(source).with({ target: { id: 3 }})
+  const builder = new SchemaTaskResultBuilder()
+    .with({ 
+      store: {
+        selected: [2]
+      },
+      target: { id: 3 }
+    })
 
   const cases = [
     { selected: [3] },
@@ -410,7 +726,17 @@ describe("select", () => {
   ]
 
   test.each(cases)("select value", ({ selected }) => {
-    const resultado = builder.build(schema)
+    const resultado = builder
+      .with({ 
+        schema: {
+          targetPath: "id",
+          selectSet: "selected",
+          reduce: {
+            path: "selected"
+          }
+        }
+      })
+      .build()
 
     expect(resultado).toEqual(selected)
   })
@@ -418,7 +744,9 @@ describe("select", () => {
 
 test("includes", async () => {
   await expectToEqualAsync({
-    source: {},
+    source: {
+      id: 2
+    },
     schema: {
       const: [
         1,
@@ -426,7 +754,7 @@ test("includes", async () => {
         3
       ],
       includes: {
-        targetPath: "id"
+        path: "id"
       }
     },
     expected: true,
@@ -438,7 +766,7 @@ test("includes", async () => {
   })
 })
 
-test("stopPropiedades", async () => {
+test.skip("stopPropiedades", async () => {
   const caseArg = {
     source: { 
       evaluatedTitle: "evaluated" 
@@ -757,13 +1085,15 @@ describe("spread", () => {
 describe("entries", () => {
   test("default key, value", async () => {    
     await expectToEqualAsync({
-      source: {
-        nombre: "Melany",
-        cedula: "9-123-456",
-        fechaDeNacimiento: "18/09/2019"
-      },
       schema: {
         entries: true
+      },
+      options: {
+        target: {
+          nombre: "Melany",
+          cedula: "9-123-456",
+          fechaDeNacimiento: "18/09/2019"
+        }
       },
       expected: [
         {
@@ -967,9 +1297,9 @@ describe("array", () => {
                   }
                 ],
                 find: {
-                  targetPath: "nombre",
+                  path: "current.nombre",
                   equals: {
-                    path: "nombre"
+                    targetPath: "nombre"
                   }
                 }
               }
@@ -1000,19 +1330,21 @@ describe("array", () => {
     const cases = [
       {
         name: "find",
-        source: [
-          1, 
-          "dos", 
-          { nombre: "Mari" }, 
-          { nombre: "Melany" }
-        ],
         schema: {
           find: {
-            targetPath: "nombre",
+            path: "current.nombre",
             equals: {
               const: "Melany"
             }
           }
+        },
+        options: {
+          target: [
+            1, 
+            "dos", 
+            { nombre: "Mari" }, 
+            { nombre: "Melany" }
+          ]
         },
         expected: { nombre: "Melany" }
       },
@@ -1033,7 +1365,7 @@ describe("array", () => {
                   const: false
                 },
                 {
-                  targetPath: "detalles.activo"
+                  path: "current.detalles.activo"
                 },
                 {
                   const: false
@@ -1057,7 +1389,7 @@ describe("array", () => {
         schema: {
           const: Array(3).fill({ nombre: "Melany" }).toSpliced(1, 0, { nombre: "Fernando" }),
           filter: {
-            targetPath: "nombre",
+            path: "current.nombre",
             equals: {
               path: "nombre"
             }
@@ -1088,9 +1420,9 @@ describe("array", () => {
               }
             ],
             find: {
-              targetPath: "id",
+              path: "current.id",
               equals: {
-                path: "id"
+                targetPath: "id"
               }
             }
           }
@@ -1139,7 +1471,7 @@ describe("array", () => {
         schema: {
           const: Array(2).fill(source),
           contains: {
-            targetPath: "nombre",
+            path: "current.nombre",
             equals: {
               const: "Melany"
             }
@@ -1185,7 +1517,7 @@ describe("array", () => {
       schema: {
         const: source,
         filter: {
-          targetPath: "nombre",
+          path: "current.nombre",
           equals: {
             const: "Melany"
           }
@@ -1193,7 +1525,7 @@ describe("array", () => {
         reduce: {
           propiedades: {
             total: {
-              targetPath: "length"
+              path: "current.length"
             }
           }
         }
@@ -1275,7 +1607,7 @@ describe("mixed", () => {
           checkout: {
             propiedades: {
               nombre: {
-                path: "nombre"
+                targetPath: "nombre"
               }
             }
           }

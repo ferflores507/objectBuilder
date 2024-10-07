@@ -28,7 +28,12 @@ export class ArrayMapBuilder extends ArrayBuilderBase {
     withMap(schema: Schema | undefined) {
         if(schema) {
             this.items = this.items.map(x => {
-                return this.builder.with({ target: x }).build(schema)
+                return this.builder
+                    .with({
+                        initial: x,
+                        schema
+                    })
+                    .build()
             })
         }
 
@@ -37,13 +42,13 @@ export class ArrayMapBuilder extends ArrayBuilderBase {
 
     withGroupJoin(join: Join | undefined) {
         if(join) {
-            const target = this.builder.build(join.items)
+            const target = this.builder.with({ schema: join.items }).build()
 
             this.items = this.items.map(item => {
                 const group = this.builder
-                    .with({ target })
-                    .withSource({ item })
-                    .build(join.match)
+                    .with({ target, sources: { item } })
+                    .withSchema(join.match)
+                    .build()
 
                 return { item, group }
             })

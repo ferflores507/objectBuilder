@@ -1,7 +1,7 @@
 import { expect, describe, test } from 'vitest';
-import { ObjectBuilder, Schema } from "../";
+import { Schema } from "../";
 import * as varios from '../src/helpers/varios';
-import { ResultBuilder } from '../src/builders/ResultBuilder';
+import { SchemaTaskResultBuilder } from '../src/builders/SchemaTaskResultBuilder';
 
 describe("getObjPath works with custom separator or default: '.'", () => {
     const cases = [
@@ -111,9 +111,10 @@ describe("spread", () => {
             }
         }
 
-        const builder = new ObjectBuilder({})
-        const resultBuilder = await new ResultBuilder(source, builder).withSpread(schema)
-        const resultado = resultBuilder.getTarget()
+        const resultBuilder = new SchemaTaskResultBuilder()
+            .with({ target: source })
+            .withSpread(schema)
+        const resultado = resultBuilder.build()
         const expected = { 
             uno: 1, 
             dos: 2, 

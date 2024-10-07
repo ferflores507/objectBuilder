@@ -1,6 +1,68 @@
 import { describe, expect, test } from "vitest"
-import { ObjectBuilder, Schema } from "../.."
+import { Schema } from "../.."
 import { buildResultsAsync, expectToEqualAsync } from "./buildResultsASync"
+
+test("abortcontroller onabort catch", async () => {
+  const controller = new AbortController();
+  const signal = controller.signal;
+
+  const waitForEvent = () => {
+    return new Promise<any>((resolve, reject) => {
+      
+      signal.onabort = () => {
+        console.log("onbort executed")
+        reject()
+      };
+
+      controller.abort()
+      console.log("abort called")
+    })
+  }
+
+  try {
+    await waitForEvent()
+  }
+  catch {
+    console.log("Request aborted");
+  }
+})
+
+test("abortcontroller abort", () => {
+  const controller = new AbortController();
+  const signal = controller.signal;
+
+  signal.onabort = () => {
+    console.log("Request aborted");
+  };
+
+  controller.abort()
+  console.log("abort called")
+})
+
+test("abortcontroller onabort", async () => {
+  const controller = new AbortController();
+  const signal = controller.signal;
+
+  const waitForEvent = () => {
+    return new Promise<any>((resolve, reject) => {
+      
+      // signal.onabort = () => {
+      //   console.log("Request aborted");
+      //   resolve()
+      // };
+
+      signal.addEventListener("abort", () => {
+        console.log("Request aborted");
+        resolve(true)
+      });
+
+      controller.abort()
+      console.log("abort called")
+    })
+  }
+
+  await waitForEvent()
+})
 
 type Case = {
   name: string,
@@ -12,7 +74,9 @@ type Case = {
 const cases: Case[] = [
   {
     name: "stringify",
-    source: { id: 1 },
+    options: {
+      target: { id: 1 }
+    },
     schema: {
       stringify: true
     },
@@ -20,7 +84,9 @@ const cases: Case[] = [
   },
   {
     name: "parse",
-    source: JSON.stringify({ id: 1 }),
+    options: {
+      target: JSON.stringify({ id: 1 })
+    },
     schema: {
       parse: true
     },
@@ -72,7 +138,7 @@ const cases: Case[] = [
               const: false
             },
             {
-              targetPath: "detalles.activo"
+              path: "current.detalles.activo"
             },
             {
               const: false
@@ -103,14 +169,14 @@ const cases: Case[] = [
         {
           propiedades: {
             titulo: {
-              targetPath: "nombre"
+              path: "current.nombre"
             }
           }
         },
         {
           propiedades: {
             habilitado: {
-              targetPath: "activo"
+              path: "current.activo"
             }
           }
         }

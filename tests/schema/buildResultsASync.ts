@@ -1,16 +1,24 @@
 import { expect } from "vitest"
-import { ObjectBuilder, Schema } from "../.."
+import { Schema } from "../.."
+import { SchemaTaskResultBuilder } from "../../src/builders/SchemaTaskResultBuilder"
 import { BuilderOptions } from "../../src/builders/ObjectBuilder"
 
 export const buildResultsAsync = async (caseArg: CaseBase) => {
     const { source, schema, options } = caseArg
-    const builder = new ObjectBuilder(source, options)
+    const builder = new SchemaTaskResultBuilder()
+        .with({
+            target: options?.target,
+            store: source,
+            functions: options?.functions,
+            sources: options?.sources,
+            ...options
+        })
 
-    return [builder.build(schema), await builder.buildAsync(schema)]
+    return [builder.with({ schema }).build(), await builder.with({ schema }).buildAsync()]
 }
 
 export type CaseBase = {
-    source: Record<string, any>
+    source?: Record<string, any>
     schema: Schema
     options?: BuilderOptions
 }
