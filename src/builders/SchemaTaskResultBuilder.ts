@@ -16,7 +16,7 @@ export class SchemaTaskResultBuilder {
             sources: {}
         }
 
-        this.taskBuilder = new TaskBuilder().with({ target })
+        this.taskBuilder = new TaskBuilder().with({ target: "initial" in this.options ? this.options.initial : target })
     }
 
     readonly options: Options

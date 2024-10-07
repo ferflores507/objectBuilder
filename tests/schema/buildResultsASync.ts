@@ -10,7 +10,8 @@ export const buildResultsAsync = async (caseArg: CaseBase) => {
             target: options?.target,
             store: source,
             functions: options?.functions,
-            sources: options?.sources
+            sources: options?.sources,
+            ...options
         })
 
     return [builder.with({ schema }).build(), await builder.with({ schema }).buildAsync()]
