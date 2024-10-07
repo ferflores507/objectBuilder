@@ -6,6 +6,41 @@ import { getPathValue } from '../../src/helpers/varios'
 import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuilder'
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 
+test("map builder with undefined", async () => {
+  const items = [1, undefined, 2, 3]
+  const result = items.map(x => {
+    return new SchemaTaskResultBuilder()
+      .with({
+        target: 100,
+        initial: x,
+        schema: {
+          propiedades: {
+            id: {
+              path: "current"
+            }
+          }
+        }
+      })
+      .build()
+  })
+
+  const expected = items.map(id => ({ id }))
+  expect(result).toEqual(expected)
+})
+
+test("target defined and const with undefined", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: undefined,
+    },
+    expected: undefined,
+    options: {
+      // initial: undefined, // stops failing
+      target: 1
+    }
+  })
+})
+
 test("map targetPath", async () => {
 
   await expectToEqualAsync({
