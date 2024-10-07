@@ -138,7 +138,7 @@ const cases: Case[] = [
               const: false
             },
             {
-              targetPath: "detalles.activo"
+              path: "current.detalles.activo"
             },
             {
               const: false
@@ -169,14 +169,14 @@ const cases: Case[] = [
         {
           propiedades: {
             titulo: {
-              targetPath: "nombre"
+              path: "current.nombre"
             }
           }
         },
         {
           propiedades: {
             habilitado: {
-              targetPath: "activo"
+              path: "current.activo"
             }
           }
         }

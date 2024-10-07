@@ -1365,7 +1365,7 @@ describe("array", () => {
                   const: false
                 },
                 {
-                  targetPath: "detalles.activo"
+                  path: "current.detalles.activo"
                 },
                 {
                   const: false

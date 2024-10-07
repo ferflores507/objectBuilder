@@ -270,7 +270,7 @@ export class SchemaTaskResultBuilder {
     }
 
     withDefinitions(schemas: Schema[] | undefined) {
-        const task = (target) => schemas?.map(schema => this.with({ schema, target }).build())
+        const task = (target) => schemas?.map(schema => this.with({ initial: target, schema }).build())
 
         return schemas ? this.add(task) : this
     }
