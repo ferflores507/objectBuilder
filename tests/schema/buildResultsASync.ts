@@ -1,7 +1,6 @@
 import { expect } from "vitest"
 import { Schema } from "../.."
-import { SchemaTaskResultBuilder } from "../../src/builders/SchemaTaskResultBuilder"
-import { BuilderOptions } from "../../src/builders/ObjectBuilder"
+import { BuilderOptions, SchemaTaskResultBuilder } from "../../src/builders/SchemaTaskResultBuilder"
 
 export const buildResultsAsync = async (caseArg: CaseBase) => {
     const { source, schema, options } = caseArg

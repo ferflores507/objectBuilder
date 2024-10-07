@@ -1,13 +1,6 @@
 import { Schema } from "../..";
 import { partition } from "../helpers/varios";
-import { BuilderOptions, ObjectBuilder } from "./ObjectBuilder";
-
-type Builder = {
-    options: BuilderOptions
-    with: (options: BuilderOptions) => Builder
-    withSchema: (schema: Schema | undefined) => Builder
-    build: () => any
-}
+import { Builder, BuilderOptions } from "./SchemaTaskResultBuilder";
 
 export class PropiedadesBuilder {
     constructor(propiedades: Record<string, Schema>, builder: Builder) {
@@ -23,7 +16,7 @@ export class PropiedadesBuilder {
     private readonly entries: [string, Schema][]
     private readonly builder: Builder
 
-    filterEntries(propiedades: Record<string, Schema>, options: BuilderOptions) {
+    filterEntries(propiedades: Record<string, Schema>, options: Partial<BuilderOptions>) {
         const initialEntries = Object.entries(propiedades)
             .filter(([k]) => !options.stopPropiedades?.includes(k))
 
@@ -58,7 +51,7 @@ export class PropiedadesBuilder {
 
     async buildAsync() {        
         for (const [k, v] of this.entries) {
-            this.result[k] = await this.builder.buildAsync(v)
+            this.result[k] = await this.builder.with({ schema: v }).buildAsync()
         }
 
         return this.getResult()

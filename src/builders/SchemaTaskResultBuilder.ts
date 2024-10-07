@@ -1,5 +1,4 @@
 import type { ArraySchema, Consulta, Schema } from "../models"
-import { Options } from "./ResultBuilderBase"
 import * as varios from "../helpers/varios"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
 import { PlainResultBuilder } from "./PlainResultBuilder"
@@ -8,8 +7,28 @@ import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder } from "./TaskBuilder"
 
-export class SchemaTaskResultBuilder {
-    constructor(private target?: any, options?: Options) {
+export type BuilderOptions = {
+    store: Record<string, any>
+    siblings: Record<string, any>
+    sources: Record<string, any>
+
+    target: any
+    stopPropiedades: string[]
+    functions: Record<string, Function>
+    schema: Schema
+    initial: any
+}
+
+export type Builder = {
+    options: Partial<BuilderOptions>
+    with: (options: Partial<BuilderOptions>) => Builder
+    withSchema: (schema: Schema | undefined) => Builder
+    build: () => any
+    buildAsync: () => Promise<any>
+}
+
+export class SchemaTaskResultBuilder implements Builder {
+    constructor(private target?: any, options?: BuilderOptions) {
         this.options = options ?? {
             store: {},
             siblings: {},
@@ -19,7 +38,7 @@ export class SchemaTaskResultBuilder {
         this.taskBuilder = new TaskBuilder().with({ target: "initial" in this.options ? this.options.initial : target })
     }
 
-    readonly options: Options
+    readonly options: Partial<BuilderOptions>
     readonly taskBuilder: TaskBuilder
 
     addMerge() {
@@ -42,7 +61,7 @@ export class SchemaTaskResultBuilder {
         return this.taskBuilder.buildAsync()
     }
 
-    with(options: Partial<Options & { schema?: Schema, functions?: {} }>) : SchemaTaskResultBuilder {
+    with(options: Partial<BuilderOptions>) : SchemaTaskResultBuilder {
         const { schema, target = this.target, ...rest } = options 
         const newOptions = { ...this.options, ...rest }
         const builder = new SchemaTaskResultBuilder(target, newOptions)
