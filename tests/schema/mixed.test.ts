@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'vitest'
-import { ObjectBuilder, Schema } from "../.."
 import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { getPathValue } from '../../src/helpers/varios'
 import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuilder'
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
+import { Schema } from '../..'
 
 test("map builder with undefined", async () => {
   const items = [1, undefined, 2, 3]
@@ -828,7 +828,7 @@ describe("propiedades builder", () => {
 
   const expectResultsAsync = async (options: CaseOptions) => {
     const { source, target, propiedades, expected } = options
-    const builder = new ObjectBuilder(source, { target })
+    const builder = new SchemaTaskResultBuilder(target, { store: source })
     const propiedadesBuilder = new PropiedadesBuilder(propiedades, builder)
     const results = [propiedadesBuilder.build(), await propiedadesBuilder.buildAsync()]
 
@@ -855,7 +855,7 @@ describe("propiedades builder", () => {
           targetPath: "detalles",
           propiedades: {
             titulo: {
-              targetPath: "titulo"
+              path: "current.titulo"
             }
           }
         }

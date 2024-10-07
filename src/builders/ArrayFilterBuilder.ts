@@ -1,10 +1,10 @@
 import type { Schema } from "../models"
 import { ArrayBuilderBase } from "./ArrayBuilderBase"
-import { ObjectBuilder } from "./ObjectBuilder"
+import { Builder } from "./SchemaTaskResultBuilder"
 
 export class ArrayFilterBuilder extends ArrayBuilderBase {
 
-    constructor(items: any[], builder: ObjectBuilder) {
+    constructor(items: any[], builder: Builder) {
         super(items, builder)
         this.min = this.items.length
     }
