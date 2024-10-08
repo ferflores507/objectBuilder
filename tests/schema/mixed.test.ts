@@ -58,25 +58,42 @@ test("map targetPath", async () => {
 
 })
 
-test("includes", async () => {
-  const schema = {
-    path: "local.selectedItems",
-    includes: {
-      path: "target.id"
-    }
-  }
+describe("includes", () => {
 
-  await expectToEqualAsync({
-    source: {
-      local: {
-        selectedItems: [1]
+  const keywords = ["h", "o", "l", "a", "ho", "ol", "la", "hol", "ola", "hola"]
+
+  test.each(keywords)("includes", async (keyword) => {
+    await expectToEqualAsync({
+      schema: {
+        const: "hola",
+        includes: {
+          const: keyword
+        }
+      },
+      expected: true,
+    })
+  })
+
+  test("with array", async () => {
+    const schema = {
+      path: "local.selectedItems",
+      includes: {
+        path: "target.id"
       }
-    },
-    schema,
-    expected: true,
-    options: {
-      target: { id: 1 }
     }
+  
+    await expectToEqualAsync({
+      source: {
+        local: {
+          selectedItems: [1]
+        }
+      },
+      schema,
+      expected: true,
+      options: {
+        target: { id: 1 }
+      }
+    })
   })
 })
 
