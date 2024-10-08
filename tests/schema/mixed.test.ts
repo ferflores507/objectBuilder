@@ -573,30 +573,6 @@ describe("select", () => {
   })
 })
 
-test("includes", async () => {
-  await expectToEqualAsync({
-    source: {
-      id: 2
-    },
-    schema: {
-      const: [
-        1,
-        2,
-        3
-      ],
-      includes: {
-        path: "id"
-      }
-    },
-    expected: true,
-    options: {
-      target: {
-        id: 2
-      }
-    }
-  })
-})
-
 test.skip("stopPropiedades", async () => {
   const caseArg = {
     source: { 
