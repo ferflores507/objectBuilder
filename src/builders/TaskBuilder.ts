@@ -58,8 +58,9 @@ export class TaskBuilder {
         try {
             return this.buildSyncTasks()
         }
-        catch {
+        catch (e) {
             this.doErrorTasks()
+            throw e
         }
         finally {
             // this.cleanup()
@@ -76,8 +77,9 @@ export class TaskBuilder {
 
             return target
         }
-        catch (ex) {
+        catch (e) {
             this.doErrorTasks()
+            throw e
         }
         finally {
             this.cleanup()
