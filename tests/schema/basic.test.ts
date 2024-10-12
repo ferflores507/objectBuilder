@@ -2,6 +2,13 @@ import { describe, expect, test } from "vitest"
 import { Schema } from "../.."
 import { buildResultsAsync, expectToEqualAsync } from "./buildResultsASync"
 
+describe("string includes", () => {
+  test.each([null, undefined])("textual %s", value => {
+    const str = "hello, " + value + " is included"
+    expect(str.includes(value)).toBe(true)
+  })
+})
+
 test("abortcontroller onabort catch", async () => {
   const controller = new AbortController();
   const signal = controller.signal;
