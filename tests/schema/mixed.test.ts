@@ -206,10 +206,8 @@ describe("array filter property 'keywords' contains string", () => {
         const: items,
         filter: {
           path: "current.keywords",
-          contains: {
-            equals: {
-              const: "Melany"
-            }
+          includes: {
+            const: "Melany"
           }
         }
       },
