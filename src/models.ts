@@ -12,12 +12,18 @@ export type SelectSchema = {
     multiple?: true
 }
 
+export type FilterSchema = {
+    source?: Schema,
+    item?: Schema,
+    match: Schema
+}
+
 export type ArraySchema = Partial<{
     add: Schema
     select: {
         [P in keyof SelectSchema]: Schema;
     },
-    filter: Schema,
+    filter: FilterSchema,
     find: Schema,
     items: Schema,
     contains: Schema,
