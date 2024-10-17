@@ -2,6 +2,153 @@ import { describe, expect, test } from "vitest"
 import { Schema } from "../.."
 import { buildResultsAsync, expectToEqualAsync } from "./buildResultsASync"
 
+test("flatMap components", () => {
+  const obj = [
+    {
+      names: ["btn"],
+      loader: "provider/components/btn"
+    },
+    {
+      names: ["card", "cardTitle"],
+      loader: "provider/components/card"
+    }
+  ]
+  .flatMap(({ names, loader }) => names.map(name => ({ [name]: loader })))
+  .reduce((obj, curr) => ({ ...obj, ...curr }))
+
+  expect(obj).toEqual({
+    btn: "provider/components/btn",
+    card: "provider/components/card",
+    cardTitle: "provider/components/card"
+  })
+})
+
+test("flatMap with inner map", () => {
+  const result = [
+    {
+      numbers: [1, 2],
+      group: "digits"
+    },
+    {
+      numbers: [20, 30],
+      group: "ten"
+    }
+  ]
+  .flatMap(obj => obj.numbers.map(number => ({ number, group: obj.group })))
+
+  expect(result).toEqual([
+    {
+      number: 1,
+      group: "digits"
+    },
+    {
+      number: 2,
+      group: "digits"
+    },
+    {
+      number: 20,
+      group: "ten"
+    },
+    {
+      number: 30,
+      group: "ten"
+    }
+  ])
+})
+
+test("map with inner map then flat", () => {
+  const result = [
+    {
+      names: ["uno", "dos"]
+    },
+    {
+      names: ["tres"]
+    }
+  ]
+  .map(obj => obj.names.map(name => ({ name })))
+  .flat()
+
+  expect(result).toEqual([
+    {
+      name: "uno"
+    },
+    {
+      name: "dos"
+    },
+    {
+      name: "tres"
+    }
+  ])
+})
+
+test("map then flat", () => {
+  const names = [
+    {
+      names: ["uno", "dos"]
+    },
+    {
+      names: ["tres"]
+    }
+  ]
+  .map(obj => obj.names)
+  .flat()
+
+  expect(names).toEqual(["uno", "dos", "tres"])
+})
+
+test("concat apply then reduce", () => {
+  const components = [
+    {
+      names: ["btn"],
+      loader: "provider/components/btn"
+    },
+    {
+      names: ["card", "cardTitle"],
+      loader: "provider/components/card"
+    }
+  ]
+
+  const result = ([] as any[]).concat.apply([], components.map(({ names, loader }) => {
+    return names.map(name => ({ [name]: loader}))
+  }))
+  .reduce((obj, curr) => ({ ...obj, ...curr }))
+
+  expect(result).toEqual({
+    btn: "provider/components/btn",
+    card: "provider/components/card",
+    cardTitle: "provider/components/card"
+  })
+})
+
+test("concat apply", () => {
+  const components = [
+    {
+      names: ["btn"],
+      loader: "provider/components/btn"
+    },
+    {
+      names: ["card", "cardTitle"],
+      loader: "provider/components/card"
+    }
+  ]
+
+  const result = ([] as any[]).concat.apply([], components.map(({ names, loader }) => {
+    return names.map(name => ({ [name]: loader}))
+  }))
+
+  expect(result).toEqual([
+    {
+      "btn": "provider/components/btn",
+    },
+    {
+      "card": "provider/components/card",
+    },
+    {
+      "cardTitle": "provider/components/card"
+    }
+  ])
+})
+
 describe("string includes", () => {
   test.each([null, undefined])("textual %s", value => {
     const str = "hello, " + value + " is included"
