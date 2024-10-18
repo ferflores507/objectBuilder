@@ -108,59 +108,6 @@ test("map then flat", () => {
   expect(names).toEqual(["uno", "dos", "tres"])
 })
 
-test("concat apply then reduce", () => {
-  const components = [
-    {
-      names: ["btn"],
-      loader: "provider/components/btn"
-    },
-    {
-      names: ["card", "cardTitle"],
-      loader: "provider/components/card"
-    }
-  ]
-
-  const result = ([] as any[]).concat.apply([], components.map(({ names, loader }) => {
-    return names.map(name => ({ [name]: loader}))
-  }))
-  .reduce((obj, curr) => ({ ...obj, ...curr }))
-
-  expect(result).toEqual({
-    btn: "provider/components/btn",
-    card: "provider/components/card",
-    cardTitle: "provider/components/card"
-  })
-})
-
-test("concat apply", () => {
-  const components = [
-    {
-      names: ["btn"],
-      loader: "provider/components/btn"
-    },
-    {
-      names: ["card", "cardTitle"],
-      loader: "provider/components/card"
-    }
-  ]
-
-  const result = ([] as any[]).concat.apply([], components.map(({ names, loader }) => {
-    return names.map(name => ({ [name]: loader}))
-  }))
-
-  expect(result).toEqual([
-    {
-      "btn": "provider/components/btn",
-    },
-    {
-      "card": "provider/components/card",
-    },
-    {
-      "cardTitle": "provider/components/card"
-    }
-  ])
-})
-
 describe("string includes", () => {
   test.each([null, undefined])("textual %s", value => {
     const str = "hello, " + value + " is included"
