@@ -73,9 +73,10 @@ export class TaskBuilder {
     async buildAsync() {
         try {
             let target = this.target
-            
-            for(const task of this.tasks) {
-                target = await task(target, this.target)
+            let currentTask = null
+
+            while(currentTask = this.tasks.shift()){
+                target = await currentTask(target, this.target)
             }
 
             return target
