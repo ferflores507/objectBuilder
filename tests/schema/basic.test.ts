@@ -2,6 +2,18 @@ import { describe, expect, test } from "vitest"
 import { Schema } from "../.."
 import { buildResultsAsync, expectToEqualAsync } from "./buildResultsASync"
 
+test.fails("in operator in primitive fails", () => {
+  const isIn = "id" in true
+  
+  expect(isIn).toBe(true)
+})
+
+test("destructure primitive does not throw", () => {
+  const { prueba } = true
+  
+  expect(prueba).toBe(undefined)
+})
+
 describe("string includes", () => {
   test.each([null, undefined])("textual %s", value => {
     const str = "hello, " + value + " is included"
