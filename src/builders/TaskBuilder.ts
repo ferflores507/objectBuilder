@@ -44,14 +44,17 @@ export class TaskBuilder {
     }
 
     buildSyncTasks() {
-        return this.tasks.reduce((target, task) => {
-            const value = task(target, this.target)
+        let target = this.target
+        let currentTask = null
 
-            return typeof value?.then === "function"
-                ? target 
-                : value
+        while (currentTask = this.tasks.shift()) {
+            const value = currentTask(target, this.target)
+            const isAsync = value?.then === "function"
 
-        }, this.target)
+            target = isAsync ? target : value
+        }
+
+        return target
     }
 
     build() {
