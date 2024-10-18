@@ -6,6 +6,54 @@ import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuil
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
 
+test("filter with source dos", async () => {
+  await expectToEqualAsync(
+    {
+      source: {
+        search: "  in  "
+      },
+      schema: {
+        const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
+        filter: {
+          source: {
+            path: "search",
+            trim: true
+          },
+          match: {
+            path: "current",
+            includes: {
+              path: "source"
+            }
+          }
+        }
+      },
+      expected: ["cinco"]
+    }
+  )
+})
+ 
+test("filter with source", async () => {
+  await expectToEqualAsync(
+    {
+      schema: {
+        const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
+        filter: {
+          source: {
+            path: "current.length"
+          },
+          match: {
+            path: "current.length",
+            equals: {
+              path: "source"
+            }
+          }
+        }
+      },
+      expected: ["Melany", "cuatro"]
+    }
+  )
+})
+
 test("map builder with undefined", async () => {
   const items = [1, undefined, 2, 3]
   const result = items.map(x => {
