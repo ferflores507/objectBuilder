@@ -6,6 +6,99 @@ import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuil
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
 
+test("filter with empty schema return all items === true", async () => {
+  await expectToEqualAsync(
+    {
+      schema: {
+        const: [1, true, 0, "0", {}, false, "", " ", true, [], NaN],
+        filter: {}
+      },
+      expected: [1, true, "0", {}, " ", true, []]
+    }
+  )
+})
+
+test("filter with source tres", async () => {
+  await expectToEqualAsync(
+    {
+      schema: {
+        const: ["tres", "dos", "cuatro"],
+        filter: {
+          source: {
+            propiedades: {
+              length: {
+                path: "current.length"
+              },
+              sourceSchema: {
+                schema: {
+                  path: "current.length",
+                  equals: {
+                    path: "source.length"
+                  }
+                }
+              }
+            }
+          },
+          match: {
+            schemaFrom: {
+              path: "source.sourceSchema"
+            }
+          }
+        }
+      },
+      expected: ["dos"]
+    }
+  )
+})
+
+test("filter with source dos", async () => {
+  await expectToEqualAsync(
+    {
+      source: {
+        search: "  in  "
+      },
+      schema: {
+        const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
+        filter: {
+          source: {
+            path: "search",
+            trim: true
+          },
+          match: {
+            path: "current",
+            includes: {
+              path: "source"
+            }
+          }
+        }
+      },
+      expected: ["cinco"]
+    }
+  )
+})
+ 
+test("filter with source", async () => {
+  await expectToEqualAsync(
+    {
+      schema: {
+        const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
+        filter: {
+          source: {
+            path: "current.length"
+          },
+          match: {
+            path: "current.length",
+            equals: {
+              path: "source"
+            }
+          }
+        }
+      },
+      expected: ["Melany", "cuatro"]
+    }
+  )
+})
+
 test("map builder with undefined", async () => {
   const items = [1, undefined, 2, 3]
   const result = items.map(x => {
@@ -206,10 +299,8 @@ describe("array filter property 'keywords' contains string", () => {
         const: items,
         filter: {
           path: "current.keywords",
-          contains: {
-            equals: {
-              const: "Melany"
-            }
+          includes: {
+            const: "Melany"
           }
         }
       },
