@@ -15,4 +15,13 @@ export class Queue {
             return value
         }
     }
+
+    unshift(...items: any[]) {
+        let offset = this.offset - items.length
+        this.offset = offset
+        
+        for(const item of items) {
+            this.map.set(offset++, item)
+        }
+    }
 }

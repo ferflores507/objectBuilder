@@ -7,6 +7,25 @@ import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 
+test("Queue with unshift", () => {
+  const queue = new Queue()
+  const items = ["tres", "cuatro", "cinco"]
+  
+  items.map(item => queue.enqueue(item))
+  queue.unshift("uno", "dos")
+
+  const result = []
+  let item = null
+
+  while (item = queue.dequeue()) {
+    result.push(item)
+  }
+
+  const expected = ["uno", "dos", "tres", "cuatro", "cinco"]
+
+  expect(result).toEqual(expected)
+})
+
 test("Queue", () => {
   const queue = new Queue()
   const items = ["uno", "dos", "tres"]
