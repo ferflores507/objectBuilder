@@ -5,6 +5,23 @@ import { getPathValue } from '../../src/helpers/varios'
 import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuilder'
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
+import { Queue } from '../../src/helpers/Queue'
+
+test("Queue", () => {
+  const queue = new Queue()
+  const items = ["uno", "dos", "tres"]
+  
+  items.map(item => queue.enqueue(item))
+
+  const expected = []
+  let item = null
+
+  while (item = queue.dequeue()) {
+    expected.push(item)
+  }
+
+  expect(expected).toEqual(items)
+})
 
 test("filter with empty schema return all items === true", async () => {
   await expectToEqualAsync(
