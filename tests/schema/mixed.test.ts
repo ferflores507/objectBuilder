@@ -6,6 +6,18 @@ import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuil
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
 
+test("filter with empty schema return all items === true", async () => {
+  await expectToEqualAsync(
+    {
+      schema: {
+        const: [1, true, 0, "0", {}, false, "", " ", true, [], NaN],
+        filter: {}
+      },
+      expected: [1, true, "0", {}, " ", true, []]
+    }
+  )
+})
+
 test("filter with source tres", async () => {
   await expectToEqualAsync(
     {
