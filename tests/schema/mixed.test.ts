@@ -9,9 +9,8 @@ import { Queue } from '../../src/helpers/Queue'
 
 test("Queue with unshift", () => {
   const queue = new Queue()
-  const items = ["tres", "cuatro", "cinco"]
   
-  items.map(item => queue.enqueue(item))
+  queue.enqueue("tres", "cuatro", "cinco")
   queue.unshift("uno", "dos")
 
   const result = []
@@ -28,9 +27,8 @@ test("Queue with unshift", () => {
 
 test("Queue", () => {
   const queue = new Queue()
-  const items = ["uno", "dos", "tres"]
   
-  items.map(item => queue.enqueue(item))
+  queue.enqueue("uno", "dos", "tres")
 
   const expected = []
   let item = null
@@ -39,7 +37,7 @@ test("Queue", () => {
     expected.push(item)
   }
 
-  expect(expected).toEqual(items)
+  expect(expected).toEqual(["uno", "dos", "tres"])
 })
 
 test("filter with empty schema return all items === true", async () => {

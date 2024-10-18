@@ -6,9 +6,15 @@ export class Queue {
         return this.map.size
     }
 
-    enqueue(item: any) {
-        const current = this.offset + this.length
-        this.map.set(current, item)
+    set(offset: number, ...items: any[]) {
+        for(const item of items) {
+            this.map.set(offset++, item)
+        }
+    }
+
+    enqueue(...items: any[]) {
+        const offset = this.offset + this.length
+        this.set(offset, ...items)
     }
 
     dequeue() {
@@ -21,11 +27,7 @@ export class Queue {
     }
 
     unshift(...items: any[]) {
-        let offset = this.offset - items.length
-        this.offset = offset
-        
-        for(const item of items) {
-            this.map.set(offset++, item)
-        }
+        this.offset = this.offset - items.length
+        this.set(this.offset, ...items)
     }
 }
