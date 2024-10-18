@@ -6,6 +6,39 @@ import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuil
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
 
+test("filter with source tres", async () => {
+  await expectToEqualAsync(
+    {
+      schema: {
+        const: ["tres", "dos", "cuatro"],
+        filter: {
+          source: {
+            propiedades: {
+              length: {
+                path: "current.length"
+              },
+              sourceSchema: {
+                schema: {
+                  path: "current.length",
+                  equals: {
+                    path: "source.length"
+                  }
+                }
+              }
+            }
+          },
+          match: {
+            schemaFrom: {
+              path: "source.sourceSchema"
+            }
+          }
+        }
+      },
+      expected: ["dos"]
+    }
+  )
+})
+
 test("filter with source dos", async () => {
   await expectToEqualAsync(
     {
