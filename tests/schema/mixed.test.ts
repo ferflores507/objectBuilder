@@ -408,7 +408,7 @@ describe("increment or decrement", () => {
       })
     const amount = schema.increment ? 1 : -1
     const expected = source.total + amount
-    const resultados = [builder.build(), await builder.buildAsync()]
+    const resultados = [builder.build(), await builder.with({ schema }).buildAsync()]
     
     expect(resultados).toEqual([expected, expected + amount])
   })
