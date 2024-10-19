@@ -1,12 +1,14 @@
+import { Queue } from "../helpers/Queue"
+
 export type Task = (current: any, previous: any) => any
 
 export class TaskBuilder {
     target: any
-    tasks: any[] = []
-    errorTasks: any[] = []
-    cleanupTasks: any[] = []
+    tasks: Queue = new Queue()
+    errorTasks: Queue = new Queue()
+    cleanupTasks: Queue = new Queue()
 
-    with({ target = this.target, tasks = [] } : { target?: any, tasks: any[] }) {
+    with({ target = this.target, tasks = new Queue() } : { target?: any, tasks: Queue }) {
         this.target = target
         this.tasks = tasks
 
@@ -21,8 +23,8 @@ export class TaskBuilder {
         this.with({ tasks: this.errorTasks }).build()
     }
 
-    addTo(task: Task, tasks: Task[]) {
-        tasks.push(task)
+    addTo(task: Task, tasks: Queue) {
+        tasks.enqueue(task)
 
         return this
     }
@@ -47,7 +49,7 @@ export class TaskBuilder {
         let target = this.target
         let currentTask = null
 
-        while (currentTask = this.tasks.shift()) {
+        while (currentTask = this.tasks.dequeue()) {
             const value = currentTask(target, this.target)
             const isAsync = value?.then === "function"
 
@@ -75,7 +77,7 @@ export class TaskBuilder {
             let target = this.target
             let currentTask = null
 
-            while(currentTask = this.tasks.shift()){
+            while(currentTask = this.tasks.dequeue()){
                 target = await currentTask(target, this.target)
             }
 
