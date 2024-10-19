@@ -1,16 +1,22 @@
+import { Queue } from "../helpers/Queue"
+
 export type Task = (current: any, previous: any) => any
 
 export class TaskBuilder {
     target: any
-    tasks: any[] = []
-    errorTasks: any[] = []
-    cleanupTasks: any[] = []
+    tasks: Queue = new Queue()
+    errorTasks: Queue = new Queue()
+    cleanupTasks: Queue = new Queue()
 
-    with({ target = this.target, tasks = [] } : { target?: any, tasks: any[] }) {
+    with({ target = this.target, tasks = new Queue() } : { target?: any, tasks: Queue }) {
         this.target = target
         this.tasks = tasks
 
         return this
+    }
+
+    unshift(...tasks: Task[]) {
+        this.tasks.unshift(...tasks)
     }
 
     cleanup() {
@@ -21,37 +27,34 @@ export class TaskBuilder {
         this.with({ tasks: this.errorTasks }).build()
     }
 
-    addTo(task: Task, tasks: Task[]) {
-        tasks.push(task)
-
-        return this
-    }
-
     merge() {
         return this.add(value => this.target = value)
     }
 
     add(task: Task) {
-        return this.addTo(task, this.tasks)
+        this.tasks.enqueue(task)
     }
 
     addErrorTask(task: Task) {
-        return this.addTo(task, this.errorTasks)
+        this.errorTasks.enqueue(task)
     }
 
     addCleanupTask(task: Task) {
-        return this.addTo(task, this.cleanupTasks)
+        this.cleanupTasks.enqueue(task)
     }
 
     buildSyncTasks() {
-        return this.tasks.reduce((target, task) => {
-            const value = task(target, this.target)
+        let target = this.target
+        let currentTask = null
 
-            return typeof value?.then === "function"
-                ? target 
-                : value
+        while (currentTask = this.tasks.dequeue()) {
+            const value = currentTask(target, this.target)
+            const isAsync = value?.then === "function"
 
-        }, this.target)
+            target = isAsync ? target : value
+        }
+
+        return target
     }
 
     build() {
@@ -70,9 +73,10 @@ export class TaskBuilder {
     async buildAsync() {
         try {
             let target = this.target
-            
-            for(const task of this.tasks) {
-                target = await task(target, this.target)
+            let currentTask = null
+
+            while(currentTask = this.tasks.dequeue()){
+                target = await currentTask(target, this.target)
             }
 
             return target

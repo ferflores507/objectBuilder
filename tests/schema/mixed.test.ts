@@ -6,6 +6,17 @@ import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuil
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
+import { TaskBuilder } from '../../src/builders/TaskBuilder'
+
+test("task builder", () => {
+  const builder = new TaskBuilder().with({ target: 2})
+
+  builder.add(target => target + 1) // current = 6 + 1 = 7
+  builder.add(target => target + 3) // current = 7 + 3 = 10
+  builder.unshift(target => target * 3) // initial task: current = 2 * 3 = 6
+
+  expect(builder.build()).toEqual(10)
+})
 
 test("Queue with unshift", () => {
   const queue = new Queue()
