@@ -47,6 +47,12 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
+    unshift(...tasks: Task[]) {
+        this.taskBuilder.unshift(...tasks)
+
+        return this
+    }
+
     add(task: Task) {
         this.taskBuilder.add(task)
 
