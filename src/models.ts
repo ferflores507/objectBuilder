@@ -62,6 +62,7 @@ export type Schema = Partial<{
     parse: true
     propiedades: Record<string, Schema>
     reduce: Schema
+    reduceOrDefault: Schema
     reduceMany: Schema[]
     required: string[]
     schemaFrom: Schema

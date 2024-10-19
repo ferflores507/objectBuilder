@@ -85,7 +85,8 @@ export class SchemaTaskResultBuilder implements Builder {
             status,
             delay,
             propiedades, 
-            spread, 
+            spread,
+            reduceOrDefault, 
             reduce, 
             reduceMany,
             definitions, 
@@ -115,6 +116,7 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withPropiedades(propiedades)
                 .withSpread(spread)
                 .withEndSchema(schema)
+                .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
@@ -248,6 +250,12 @@ export class SchemaTaskResultBuilder implements Builder {
             this.withSchema(schema)
                 .add((target) => !target)
             : this
+    }
+
+    withReduceOrDefault(schema: Schema | undefined) : SchemaTaskResultBuilder {
+        console.warn("withReduceOrDefault not implemented... yet!")
+
+        return this
     }
 
     withReduce(schema: Schema | undefined) : SchemaTaskResultBuilder {
