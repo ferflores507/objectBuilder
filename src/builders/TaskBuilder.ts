@@ -15,6 +15,10 @@ export class TaskBuilder {
         return this
     }
 
+    unshift(...tasks: Task[]) {
+        this.tasks.unshift(...tasks)
+    }
+
     cleanup() {
         this.with({ tasks: this.cleanupTasks }).build()
     }
