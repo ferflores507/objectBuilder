@@ -23,26 +23,20 @@ export class TaskBuilder {
         this.with({ tasks: this.errorTasks }).build()
     }
 
-    addTo(task: Task, tasks: Queue) {
-        tasks.enqueue(task)
-
-        return this
-    }
-
     merge() {
         return this.add(value => this.target = value)
     }
 
     add(task: Task) {
-        return this.addTo(task, this.tasks)
+        this.tasks.enqueue(task)
     }
 
     addErrorTask(task: Task) {
-        return this.addTo(task, this.errorTasks)
+        this.errorTasks.enqueue(task)
     }
 
     addCleanupTask(task: Task) {
-        return this.addTo(task, this.cleanupTasks)
+        this.cleanupTasks.enqueue(task)
     }
 
     buildSyncTasks() {
