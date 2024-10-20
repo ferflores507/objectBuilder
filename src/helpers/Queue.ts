@@ -30,4 +30,8 @@ export class Queue {
         this.offset = this.offset - items.length
         this.set(this.offset, ...items)
     }
+
+    values() {
+        return this.map.values()
+    }
 }
