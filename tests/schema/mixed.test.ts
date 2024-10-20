@@ -8,6 +8,62 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("reduceOrDefault with nested checkout", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: " uno ",
+      reduceOrDefault: {
+        trim: true,
+        checkout: {
+          path: "target.length",
+        }
+      },
+      reduce: {
+        path: "target"
+      }
+    },
+    expected: undefined
+  })
+})
+
+test("reduceOrDefault followed by reduce", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: " uno ",
+      reduceOrDefault: {
+        trim: true,
+      },
+      reduce: {
+        path: "current.length"
+      },
+    },
+    expected: 3
+  })
+})
+
+test("reduceOrDefault", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: " uno ",
+      reduceOrDefault: {
+        trim: true
+      }
+    },
+    expected: "uno"
+  })
+})
+
+test("reduceOrDefault doesnt fail with null or undefined", async () => {
+  await expectToEqualAsync({
+    schema: {
+      reduceOrDefault: {
+        trim: true
+      }
+    },
+    expected: undefined
+  })
+})
+
 test("task builder", () => {
   const builder = new TaskBuilder().with({ target: 2})
 

@@ -259,9 +259,16 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withReduceOrDefault(schema: Schema | undefined) : SchemaTaskResultBuilder {
-        console.warn("withReduceOrDefault not implemented... yet!")
+        return schema 
+            ? this.add(current => {
+                if(current != null) {
+                    const { tasks } = this.with({ schema }).taskBuilder
+                    this.unshift(...tasks.values())
+                }
 
-        return this
+                return current
+            }) 
+            : this
     }
 
     withReduce(schema: Schema | undefined) : SchemaTaskResultBuilder {
