@@ -318,9 +318,18 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withSchemaFrom(source: Schema | undefined) : SchemaTaskResultBuilder {
-        const schema = this.with({ schema: source }).build() as Schema
+        return source 
+            ? this
+                .addMerge()
+                .withSchema(source)
+                .add((current, prev) => {
+                    const { tasks  } = this.with({ schema: current }).taskBuilder
 
-        return source ? this.withSchema(schema) : this
+                    this.unshift(...tasks.values())
+
+                    return prev
+                })
+            : this
     }
 
     withInitialSchema(schema: Schema | undefined) {
