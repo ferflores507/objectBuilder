@@ -3,8 +3,8 @@ import { Queue } from "../helpers/Queue"
 export type Task = (current: any, previous: any) => any
 export type AsyncTask = (current: any, previous: any) => Promise<any>
 export type Builder = {
-    build(): any
-    buildAsync(): Promise<any>
+    build: Task
+    buildAsync: AsyncTask
 }
 
 export class TaskBuilder {
@@ -20,14 +20,21 @@ export class TaskBuilder {
         return this
     }
 
-    unshift(task: Task | Builder) {
-        const { build = task, buildAsync = task } = task as Builder
+    getBuilder(task: Task | Builder) {
+        return (task as Builder).build
+            ? task
+            : {
+                build: task,
+                buildAsync: task
+            }
+    }
 
-        this.tasks.unshift({ build, buildAsync })
+    unshift(task: Task | Builder) {
+        this.tasks.unshift(this.getBuilder(task))
     }
 
     unshiftAsync(task: AsyncTask) {
-        this.tasks.unshift({ 
+        this.unshift({ 
             build: (curr: any) => curr,
             buildAsync: task
         })
@@ -46,7 +53,7 @@ export class TaskBuilder {
     }
 
     add(task: Task) {
-        this.tasks.enqueue(task)
+        this.tasks.enqueue(this.getBuilder(task))
     }
 
     addErrorTask(task: Task) {
