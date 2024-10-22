@@ -8,6 +8,15 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("definitions async", async () => {
+  await expectToEqualAsync({
+    schema: {
+      definitions: [1,2,3].map(n => ({ delay: 2000, reduce: { const: n } }))
+    },
+    expected: [1,2,3]
+  })
+})
+
 test("schemaFrom nested", async () => {
   await expectToEqualAsync({
     source: {
