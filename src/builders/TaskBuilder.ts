@@ -1,6 +1,11 @@
 import { Queue } from "../helpers/Queue"
 
 export type Task = (current: any, previous: any) => any
+export type AsyncTask = (current: any, previous: any) => Promise<any>
+export type Builder = {
+    build(): any
+    buildAsync(): Promise<any>
+}
 
 export class TaskBuilder {
     target: any
@@ -15,8 +20,17 @@ export class TaskBuilder {
         return this
     }
 
-    unshift(...tasks: Task[]) {
-        this.tasks.unshift(...tasks)
+    unshift(task: Task | Builder) {
+        const { build = task, buildAsync = task } = task as Builder
+
+        this.tasks.unshift({ build, buildAsync })
+    }
+
+    unshiftAsync(task: AsyncTask) {
+        this.tasks.unshift({ 
+            build: (curr: any) => curr,
+            buildAsync: task
+        })
     }
 
     cleanup() {
