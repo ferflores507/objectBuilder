@@ -8,6 +8,31 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("schemaFrom nested", async () => {
+  await expectToEqualAsync({
+    source: {
+      schemaFinal: {
+        const: {
+          nombre: "Fernando"
+        }
+      },
+      usuario: {
+        schemaFrom: {
+          path: "schemaFinal"
+        }
+      }
+    },
+    schema: {
+      schemaFrom: {
+        path: "usuario"
+      }
+    },
+    expected: {
+      nombre: "Fernando"
+    }
+  })
+})
+
 test("reduceOrDefault with nested checkout", async () => {
   await expectToEqualAsync({
     schema: {
