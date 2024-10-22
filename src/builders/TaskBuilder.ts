@@ -40,6 +40,13 @@ export class TaskBuilder {
         })
     }
 
+    unshiftArray(builders: TaskBuilder[]) {
+        this.tasks.unshift({
+            build: () => builders.map(builder => builder.build()),
+            buildAsync: () => Promise.all(builders.map(builder => builder.buildAsync()))
+        })
+    }
+
     cleanup() {
         this.with({ tasks: this.cleanupTasks }).build()
     }
