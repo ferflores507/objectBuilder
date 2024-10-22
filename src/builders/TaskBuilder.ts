@@ -34,7 +34,7 @@ export class TaskBuilder {
     }
 
     unshiftAsync(task: AsyncTask) {
-        this.unshift({ 
+        this.tasks.unshift({ 
             build: (curr: any) => curr,
             buildAsync: task
         })
