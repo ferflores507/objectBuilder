@@ -69,10 +69,7 @@ export class TaskBuilder {
         let currentTask = null
 
         while (currentTask = this.tasks.dequeue()) {
-            const value = currentTask(target, this.target)
-            const isAsync = value?.then === "function"
-
-            target = isAsync ? target : value
+            target = currentTask.build(target, this.target)
         }
 
         return target
@@ -97,7 +94,7 @@ export class TaskBuilder {
             let currentTask = null
 
             while(currentTask = this.tasks.dequeue()){
-                target = await currentTask(target, this.target)
+                target = await currentTask.buildAsync(target, this.target)
             }
 
             return target
