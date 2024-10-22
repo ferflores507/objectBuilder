@@ -5,7 +5,7 @@ import { PlainResultBuilder } from "./PlainResultBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
-import { Task, TaskBuilder } from "./TaskBuilder"
+import { Task, TaskBuilder, Builder as BuilderBase } from "./TaskBuilder"
 
 export type BuilderOptions = {
     store: Record<string, any>
@@ -47,8 +47,8 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
-    unshift(...tasks: Task[]) {
-        this.taskBuilder.unshift(...tasks)
+    unshift(task: Task | BuilderBase) {
+        this.taskBuilder.unshift(task)
 
         return this
     }
@@ -262,8 +262,8 @@ export class SchemaTaskResultBuilder implements Builder {
         return schema 
             ? this.add(current => {
                 if(current != null) {
-                    const { tasks } = this.with({ schema }).taskBuilder
-                    this.unshift(...tasks.values())
+                    const { taskBuilder } = this.with({ initial: current, schema })
+                    this.unshift(taskBuilder)
                 }
 
                 return current
