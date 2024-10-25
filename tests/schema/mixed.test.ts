@@ -8,6 +8,38 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("use with reduce", async () => {
+
+  const sumar = ({ a, b } : { a: number, b: number }) => a + b
+
+  await expectToEqualAsync({
+    options: {
+      functions: {
+        sumar
+      }
+    },
+    schema: {
+      use: "sumar",
+      const: {
+        a: 1,
+        b: 2
+      },
+      reduce: {
+        use: "sumar",
+        propiedades: {
+          a: {
+            path: "current"
+          },
+          b: {
+            path: "current"
+          }
+        }
+      }
+    },
+    expected: 6
+  })
+})
+
 test("schemaFrom nested", async () => {
   await expectToEqualAsync({
     source: {
