@@ -102,7 +102,8 @@ export class SchemaTaskResultBuilder implements Builder {
             not,
             increment,
             decrement,
-            consulta
+            consulta,
+            function: functionSchema
         } = schema ?? {}
 
         return schema ?
@@ -126,7 +127,16 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withReduce(reduce)
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
+                .withFunction(functionSchema)
             : this
+    }
+
+    withFunction(functionSchema: Schema | undefined) {
+        if(functionSchema) {
+            throw "not implemented yet..."
+        }
+
+        return this
     }
 
     withStatus(path: string | undefined) {

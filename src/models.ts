@@ -54,6 +54,7 @@ export type Schema = Partial<{
     flat: true
     if: Schema | string
     isComputed: true
+    function: Schema
     isNullOrWhiteSpace: true
     includes: Schema
     increment: string
