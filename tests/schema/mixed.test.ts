@@ -8,6 +8,22 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("withFunction", async () => {
+  const functionValue = new SchemaTaskResultBuilder()
+    .with({
+      store: {
+        nombre: "Melany"
+      },
+      schema: {
+        function: {
+          path: "nombre"
+        }
+      }
+    }).build()
+
+    expect(functionValue()).toEqual("Melany")
+})
+
 test("schemaFrom nested", async () => {
   await expectToEqualAsync({
     source: {

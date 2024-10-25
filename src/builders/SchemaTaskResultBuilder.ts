@@ -133,7 +133,10 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withFunction(functionSchema: Schema | undefined) {
         if(functionSchema) {
-            throw "not implemented yet..."
+            this.add(current => () => this.with({ 
+                initial: current, 
+                schema: functionSchema 
+            }).build())
         }
 
         return this
