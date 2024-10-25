@@ -8,6 +8,22 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("withFunction", async () => {
+  const functionValue = new SchemaTaskResultBuilder()
+    .with({
+      store: {
+        nombre: "Melany"
+      },
+      schema: {
+        function: {
+          path: "nombre"
+        }
+      }
+    }).build()
+
+  expect(functionValue()).toEqual("Melany")
+})
+
 test("use with reduce", async () => {
 
   const sumar = ({ a, b } : { a: number, b: number }) => a + b

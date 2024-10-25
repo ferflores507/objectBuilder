@@ -52,6 +52,7 @@ export type Schema = Partial<{
     entries: true
     equals: Schema
     flat: true
+    function: Schema
     if: Schema | string
     isComputed: true
     isNullOrWhiteSpace: true
