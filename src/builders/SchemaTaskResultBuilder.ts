@@ -5,7 +5,7 @@ import { PlainResultBuilder } from "./PlainResultBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
-import { Task, TaskBuilder } from "./TaskBuilder"
+import { Task, TaskBuilder, Builder as BuilderBase } from "./TaskBuilder"
 
 export type BuilderOptions = {
     store: Record<string, any>
@@ -47,8 +47,8 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
-    unshift(...tasks: Task[]) {
-        this.taskBuilder.unshift(...tasks)
+    unshift(task: Task | BuilderBase) {
+        this.taskBuilder.unshift(task)
 
         return this
     }
@@ -275,8 +275,8 @@ export class SchemaTaskResultBuilder implements Builder {
         return schema 
             ? this.add(current => {
                 if(current != null) {
-                    const { tasks } = this.with({ schema }).taskBuilder
-                    this.unshift(...tasks.values())
+                    const { taskBuilder } = this.with({ initial: current, schema })
+                    this.unshift(taskBuilder)
                 }
 
                 return current
@@ -312,7 +312,15 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withEquals(schema: Schema | undefined) {
         return schema
-            ? this.add((target) => varios.esIgual(target, this.with({ schema }).build()))
+            ? this
+                .addMerge()
+                .add(target => {
+                    const { taskBuilder } = this.with({ schema })
+                    this.unshift(taskBuilder)
+
+                    return target
+                })
+                .add((target, prev) => varios.esIgual(prev, target))
             : this
     }
 
@@ -323,9 +331,13 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withDefinitions(schemas: Schema[] | undefined) {
-        const task = (target) => schemas?.map(schema => this.with({ initial: target, schema }).build())
+        const task = (target) => schemas?.map(schema => this.with({ initial: target, schema }).taskBuilder)
 
-        return schemas ? this.add(task) : this
+        return schemas 
+            ? this
+                .add(task)
+                .add(builders => this.taskBuilder.unshiftArray(builders))
+            : this
     }
 
     withSelectSet(path: string | undefined) {

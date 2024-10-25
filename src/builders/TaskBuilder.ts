@@ -1,6 +1,11 @@
 import { Queue } from "../helpers/Queue"
 
 export type Task = (current: any, previous: any) => any
+export type AsyncTask = (current: any, previous: any) => Promise<any>
+export type Builder = {
+    build: Task
+    buildAsync: AsyncTask
+}
 
 export class TaskBuilder {
     target: any
@@ -15,8 +20,31 @@ export class TaskBuilder {
         return this
     }
 
-    unshift(...tasks: Task[]) {
-        this.tasks.unshift(...tasks)
+    getBuilder(task: Task | Builder) {
+        return (task as Builder).build
+            ? task
+            : {
+                build: task,
+                buildAsync: task
+            }
+    }
+
+    unshift(task: Task | Builder) {
+        this.tasks.unshift(this.getBuilder(task))
+    }
+
+    unshiftAsync(task: AsyncTask) {
+        this.tasks.unshift({ 
+            build: (curr: any) => curr,
+            buildAsync: task
+        })
+    }
+
+    unshiftArray(builders: TaskBuilder[]) {
+        this.tasks.unshift({
+            build: () => builders.map(builder => builder.build()),
+            buildAsync: () => Promise.all(builders.map(builder => builder.buildAsync()))
+        })
     }
 
     cleanup() {
@@ -32,7 +60,7 @@ export class TaskBuilder {
     }
 
     add(task: Task) {
-        this.tasks.enqueue(task)
+        this.tasks.enqueue(this.getBuilder(task))
     }
 
     addErrorTask(task: Task) {
@@ -48,10 +76,7 @@ export class TaskBuilder {
         let currentTask = null
 
         while (currentTask = this.tasks.dequeue()) {
-            const value = currentTask(target, this.target)
-            const isAsync = value?.then === "function"
-
-            target = isAsync ? target : value
+            target = currentTask.build(target, this.target)
         }
 
         return target
@@ -76,7 +101,7 @@ export class TaskBuilder {
             let currentTask = null
 
             while(currentTask = this.tasks.dequeue()){
-                target = await currentTask(target, this.target)
+                target = await currentTask.buildAsync(target, this.target)
             }
 
             return target
