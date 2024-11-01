@@ -252,7 +252,7 @@ export class SchemaTaskResultBuilder implements Builder {
 
         return this
             .withArraySchema(schema)
-            .withBinary(schema)
+            .withComparison(schema)
             .withUse(use)
             .withSet(set)
     }
@@ -303,7 +303,7 @@ export class SchemaTaskResultBuilder implements Builder {
         return this.withIncrement(path, -1)
     }
 
-    withBinary(schema: Schema | undefined) {
+    withComparison(schema: Schema | undefined) {
 
         const comparison: Record<string, any> = {
             equals: varios.esIgual,
