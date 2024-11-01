@@ -202,12 +202,6 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
-    withIncludes(schema: Schema | undefined) {
-        return schema 
-            ? this.add((target) => target.includes(this.with({ schema }).build()))
-            : this
-    }
-
     withUse(path: string | undefined) {
         const task = (target) => {
             const { functions } = this.options
@@ -254,12 +248,11 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withEndSchema(schema: Schema | undefined) {
-        const { equals, set, use, includes } = schema ?? {}
+        const { set, use } = schema ?? {}
 
         return this
             .withArraySchema(schema)
             .withBinary(schema)
-            .withIncludes(includes)
             .withUse(use)
             .withSet(set)
     }
@@ -313,7 +306,8 @@ export class SchemaTaskResultBuilder implements Builder {
     withBinary(schema: Schema | undefined) {
 
         const comparison: Record<string, any> = {
-            equals: varios.esIgual
+            equals: varios.esIgual,
+            includes: (target: any[] | string, result: any) => target.includes(result)
         }
 
         const entries = Object.entries(schema ?? {})
