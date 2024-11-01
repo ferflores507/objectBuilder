@@ -312,15 +312,13 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withEquals(schema: Schema | undefined) {
         return schema
-            ? this
-                .addMerge()
-                .add(target => {
-                    const { taskBuilder } = this.with({ schema })
-                    this.unshift(taskBuilder)
-
-                    return target
+            ? this.add((target, prev) => {
+                    this.taskBuilder.unshiftArray([
+                        this.with({ initial: target }).taskBuilder,
+                        this.with({ initial: prev, schema }).taskBuilder
+                    ])
                 })
-                .add((target, prev) => varios.esIgual(prev, target))
+                .add(([a, b]) => varios.esIgual(a, b))
             : this
     }
 
