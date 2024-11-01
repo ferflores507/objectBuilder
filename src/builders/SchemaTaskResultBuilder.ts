@@ -258,7 +258,7 @@ export class SchemaTaskResultBuilder implements Builder {
 
         return this
             .withArraySchema(schema)
-            .withEquals(equals)
+            .withBinary(schema)
             .withIncludes(includes)
             .withUse(use)
             .withSet(set)
@@ -308,17 +308,6 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withDecrement(path: string | undefined) {
         return this.withIncrement(path, -1)
-    }
-
-    withEquals(schema: Schema | undefined) {
-        return schema
-            ? this.add((target, prev) => {
-                    const builder = this.with({ initial: prev, schema })
-                        .add(result => varios.esIgual(target, result))
-
-                    this.unshift(builder)
-                })
-            : this
     }
 
     withBinary(schema: Schema | undefined) {
