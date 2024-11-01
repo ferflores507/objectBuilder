@@ -285,7 +285,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withReduce(schema: Schema | undefined) : SchemaTaskResultBuilder {
-        return schema ? this.withSchema(schema) : this
+        return schema ? this.addMerge().withSchema(schema) : this
     }
 
     withReduceMany(schemas: Schema[] | undefined) {
