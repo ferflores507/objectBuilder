@@ -2,12 +2,13 @@ import { Queue } from "../helpers/Queue"
 
 export type Task = (current: any, previous: any) => any
 export type AsyncTask = (current: any, previous: any) => Promise<any>
-export type Builder = {
-    build: Task
-    buildAsync: AsyncTask
+
+export type BuilderBase = {
+    build(): any
+    buildAsync(): Promise<any>
 }
 
-export class TaskBuilder {
+export class TaskBuilder implements BuilderBase {
     target: any
     tasks: Queue = new Queue()
     errorTasks: Queue = new Queue()
@@ -20,16 +21,16 @@ export class TaskBuilder {
         return this
     }
 
-    getBuilder(task: Task | Builder) {
-        return (task as Builder).build
-            ? task
-            : {
+    getBuilder(task: Function | BuilderBase) {
+        return typeof(task) === "function"
+            ? {
                 build: task,
                 buildAsync: task
             }
+            : task
     }
 
-    unshift(task: Task | Builder) {
+    unshift(task: Task | BuilderBase) {
         this.tasks.unshift(this.getBuilder(task))
     }
 

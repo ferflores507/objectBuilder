@@ -5,7 +5,7 @@ import { PlainResultBuilder } from "./PlainResultBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
-import { Task, TaskBuilder, Builder as BuilderBase } from "./TaskBuilder"
+import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
 
 export type BuilderOptions = {
     store: Record<string, any>
@@ -313,12 +313,11 @@ export class SchemaTaskResultBuilder implements Builder {
     withEquals(schema: Schema | undefined) {
         return schema
             ? this.add((target, prev) => {
-                    this.taskBuilder.unshiftArray([
-                        this.with({ initial: target }).taskBuilder,
-                        this.with({ initial: prev, schema }).taskBuilder
-                    ])
+                    const { taskBuilder } = this.with({ initial: prev, schema })
+                        .add(result => varios.esIgual(target, result))
+
+                    this.unshift(taskBuilder)
                 })
-                .add(([a, b]) => varios.esIgual(a, b))
             : this
     }
 
