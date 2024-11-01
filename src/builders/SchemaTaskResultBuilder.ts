@@ -122,12 +122,12 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withDefinitions(definitions)
                 .withPropiedades(propiedades)
                 .withSpread(spread)
+                .withFunction(functionSchema)
                 .withEndSchema(schema)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
-                .withFunction(functionSchema)
             : this
     }
 
@@ -260,8 +260,8 @@ export class SchemaTaskResultBuilder implements Builder {
             .withArraySchema(schema)
             .withEquals(equals)
             .withIncludes(includes)
-            .withSet(set)
             .withUse(use)
+            .withSet(set)
     }
 
     withNot(schema: Schema | undefined) {
