@@ -41,7 +41,7 @@ export class TaskBuilder implements BuilderBase {
         })
     }
 
-    unshiftArray(builders: TaskBuilder[]) {
+    unshiftArray(builders: BuilderBase[]) {
         this.tasks.unshift({
             build: () => builders.map(builder => builder.build()),
             buildAsync: () => Promise.all(builders.map(builder => builder.buildAsync()))

@@ -275,8 +275,8 @@ export class SchemaTaskResultBuilder implements Builder {
         return schema 
             ? this.add(current => {
                 if(current != null) {
-                    const { taskBuilder } = this.with({ initial: current, schema })
-                    this.unshift(taskBuilder)
+                    const builder = this.with({ initial: current, schema })
+                    this.unshift(builder)
                 }
 
                 return current
@@ -313,10 +313,10 @@ export class SchemaTaskResultBuilder implements Builder {
     withEquals(schema: Schema | undefined) {
         return schema
             ? this.add((target, prev) => {
-                    const { taskBuilder } = this.with({ initial: prev, schema })
+                    const builder = this.with({ initial: prev, schema })
                         .add(result => varios.esIgual(target, result))
 
-                    this.unshift(taskBuilder)
+                    this.unshift(builder)
                 })
             : this
     }
@@ -328,7 +328,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withDefinitions(schemas: Schema[] | undefined) {
-        const task = (target) => schemas?.map(schema => this.with({ initial: target, schema }).taskBuilder)
+        const task = (target) => schemas?.map(schema => this.with({ initial: target, schema }))
 
         return schemas 
             ? this
