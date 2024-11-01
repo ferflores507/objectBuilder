@@ -34,9 +34,9 @@ test("equals with current properties", async () => {
         one: 1
       },
       reduce: {
-        path: "current.uno",
+        path: "target.uno",
         equals: {
-          path: "current.one"
+          path: "target.one"
         }
       }
     },

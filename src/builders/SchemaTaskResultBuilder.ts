@@ -270,7 +270,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withReduce(schema: Schema | undefined) : SchemaTaskResultBuilder {
-        return schema ? this.addMerge().withSchema(schema) : this
+        return schema ? this.add(current => this.target = current).withSchema(schema) : this
     }
 
     withReduceMany(schemas: Schema[] | undefined) {
