@@ -133,8 +133,8 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withFunction(functionSchema: Schema | undefined) {
         if(functionSchema) {
-            this.add(current => () => this.with({ 
-                initial: current, 
+            this.add(() => (initial: any) => this.with({ 
+                initial, 
                 schema: functionSchema 
             }).build())
         }
