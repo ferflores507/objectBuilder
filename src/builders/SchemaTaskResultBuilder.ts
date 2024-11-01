@@ -321,6 +321,33 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
+    withBinary(schema: Schema | undefined) {
+
+        const comparison: Record<string, any> = {
+            equals: varios.esIgual
+        }
+
+        const entries = Object.entries(schema ?? {})
+            .filter(([k]) => comparison.hasOwnProperty(k))
+
+        if(entries.length) {
+            this.add((target, prev) => {
+                const builders = entries.map(([k, v]) => {
+                    return this.with({
+                        initial: prev,
+                        schema: v
+                    })
+                    .add(result => comparison[k](target, result))
+                })
+    
+                this.taskBuilder.unshiftArray(builders)
+            })
+            .add((results: []) => results.every(Boolean))
+        }
+
+        return this
+    }
+
     withPropiedades(propiedades: Record<string, any> | undefined) {
         return propiedades
             ? this.add((target) => new PropiedadesBuilder(propiedades, this.with({ initial: target })).build())
