@@ -8,6 +8,42 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("equals with current properties", async () => {
+  await expectToEqualAsync({
+    schema: {
+      path: "current.uno",
+      equals: {
+        path: "current.one"
+      }
+    },
+    options: {
+      initial: {
+        uno: 1,
+        one: 1
+      }
+    },
+    expected: true
+  })
+})
+
+test("equals with current properties", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: {
+        uno: 1,
+        one: 1
+      },
+      reduce: {
+        path: "current.uno",
+        equals: {
+          path: "current.one"
+        }
+      }
+    },
+    expected: true
+  })
+})
+
 test("definitions async", async () => {
   await expectToEqualAsync({
     schema: {
