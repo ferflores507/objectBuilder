@@ -114,7 +114,6 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withInitialSchema(schema)
                 .withSchemaFrom(schemaFrom)
                 .withSelectSet(selectSet)
-                .withNot(not)
                 .withIncrement(increment)
                 .withDecrement(decrement)
                 .withConditional(schema)
@@ -257,13 +256,6 @@ export class SchemaTaskResultBuilder implements Builder {
             .withSet(set)
     }
 
-    withNot(schema: Schema | undefined) {
-        return schema ? 
-            this.withSchema(schema)
-                .add((target) => !target)
-            : this
-    }
-
     withReduceOrDefault(schema: Schema | undefined) : SchemaTaskResultBuilder {
         return schema 
             ? this.add(current => {
@@ -307,7 +299,8 @@ export class SchemaTaskResultBuilder implements Builder {
 
         const comparison: Record<string, any> = {
             equals: varios.esIgual,
-            includes: (target: any[] | string, result: any) => target.includes(result)
+            includes: (target: any[] | string, result: any) => target.includes(result),
+            not: (target: any) => !target
         }
 
         const entries = Object.entries(schema ?? {})
