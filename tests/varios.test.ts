@@ -4,6 +4,48 @@ import * as varios from '../src/helpers/varios';
 import { SchemaTaskResultBuilder } from '../src/builders/SchemaTaskResultBuilder';
 
 describe("getObjPath works with custom separator or default: '.'", () => {
+
+    const source = {
+        user: {
+            address: {
+                country: "Panama",
+            },
+            description: null,
+            id: undefined
+        }
+    }
+
+    const cases = [
+        {
+            source,
+            path: "user.address.country",
+            expected: { value: "Panama" }
+        },
+        {
+            source,
+            path: "user.address.city",
+            expected: null
+        },
+        {
+            source,
+            path: "user.description",
+            expected: { value: null }
+        },
+        {
+            source,
+            path: "user.id",
+            expected: { value: undefined }
+        },
+    ]
+
+    test.each(cases)("expects path $path to equal $expected", ({ source, path, expected }) => {
+        const container = varios.getPathValueContainer(source, path)
+
+        expect(container).toEqual(expected)
+    })
+})
+
+describe("getObjPath works with custom separator or default: '.'", () => {
     const cases = [
         {
             path: "user.address.country",
