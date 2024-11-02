@@ -135,7 +135,19 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withImport(path: string | undefined) {
         if(path) {
-            throw "withImport not implemented yet..."
+            this.add(current => {
+                const container = varios.getPathValueContainer(this.options.store, path)
+
+                return "value" in container 
+                    ? container.value
+                    : this.unshift(
+                        this.with({ initial: current })
+                            .withSchemaFrom({
+                                path: ["exports", ...container.paths].join(".")
+                            })
+                            .withSet(path)
+                    )
+            })
         }
 
         return this
