@@ -103,7 +103,8 @@ export class SchemaTaskResultBuilder implements Builder {
             increment,
             decrement,
             consulta,
-            function: functionSchema
+            function: functionSchema,
+            import: importPath
         } = schema ?? {}
 
         return schema ?
@@ -111,6 +112,7 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withStatus(status)
                 .withDelay(delay)
                 .withPaths(schema)
+                .withImport(importPath)
                 .withInitialSchema(schema)
                 .withSchemaFrom(schemaFrom)
                 .withSelectSet(selectSet)
@@ -129,6 +131,14 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
             : this
+    }
+
+    withImport(path: string | undefined) {
+        if(path) {
+            throw "withImport not implemented yet..."
+        }
+
+        return this
     }
 
     withFunction(functionSchema: Schema | undefined) {

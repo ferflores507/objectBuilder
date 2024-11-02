@@ -58,6 +58,7 @@ export type Schema = Partial<{
     isNullOrWhiteSpace: true
     includes: Schema
     increment: string
+    import: string
     not: Schema
     path: string
     parse: true
