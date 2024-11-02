@@ -103,7 +103,8 @@ export class SchemaTaskResultBuilder implements Builder {
             increment,
             decrement,
             consulta,
-            function: functionSchema
+            function: functionSchema,
+            import: importPath
         } = schema ?? {}
 
         return schema ?
@@ -111,6 +112,7 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withStatus(status)
                 .withDelay(delay)
                 .withPaths(schema)
+                .withImport(importPath)
                 .withInitialSchema(schema)
                 .withSchemaFrom(schemaFrom)
                 .withSelectSet(selectSet)
@@ -128,6 +130,30 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
             : this
+    }
+
+    withUnshift(options: Partial<BuilderOptions>) {
+        return this.unshift(this.with(options))
+    }
+
+    withImport(path: string | undefined) {
+        return path == null 
+            ? this
+            : this.add(initial => {
+                const container = varios.getPathValueContainer(this.options.store, path)
+
+                return "value" in container
+                    ? container.value
+                    : this.withUnshift({
+                        initial,
+                        schema: {
+                            set: path,
+                            schemaFrom: {
+                                path: ["exports", ...container.paths].join(".")
+                            }
+                        }
+                    })
+            })
     }
 
     withFunction(functionSchema: Schema | undefined) {

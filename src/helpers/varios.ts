@@ -35,18 +35,34 @@ export const getFormData = (source: {}) => {
     return data
 }
 
-export const getValueFromPaths: any = (obj: Record<string, any>, paths: string[]) => {
+export const getValueFromPaths = (obj: Record<string, any> | undefined, paths: string[]) => {
 
     obj = obj ?? (() => { throw "source object is null or undefined" })()
 
-    return paths.reduce((p, c) => p?.[c], obj);
+    return paths.reduce((p, c) => p?.[c], obj as Record<string, any> | undefined);
 }
 
-export const getPathValue = (obj: {}, path: string | string[], separator = ".") => {
+const getPaths = (path: string | string[], separator = ".") => {
+    return Array.isArray(path) ? path : path.split(separator)
+}
 
-    const paths = Array.isArray(path) ? path : path.split(separator)
+export const getPathValueContainer = (obj: Record<string, any> | undefined, path: string | string[], separator = ".") => {
+    const paths = getPaths(path, separator)
+    const [last, ...objPaths] = [paths.pop(), ...paths]
+    const container = getValueFromPaths(obj, objPaths)
+    
+    paths.push(last)
 
-    return getValueFromPaths(obj, paths)
+    return (last && container?.hasOwnProperty(last))
+        ? { 
+            value: container[last],
+            paths
+        }
+        : { paths }
+}
+
+export const getPathValue = (obj: Record<string, any> | undefined, path: string | string[], separator = ".") => {
+    return getValueFromPaths(obj, getPaths(path, separator))
 }
 
 export const spread = (target: any, source: any) => {

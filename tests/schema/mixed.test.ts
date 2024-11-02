@@ -8,6 +8,70 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+describe("schema import", () => {
+  const exports = {
+    total: {
+      const: 7
+    }
+  }
+  const cases = [
+    {
+      sourcePath: "empty",
+      source: {
+        exports
+      },
+      expected: 7,
+    },
+    {
+      sourcePath: "null",
+      source: {
+        exports,
+        total: null 
+      },
+      expected: null
+    },
+    {
+      sourcePath: "undefined",
+      source: {
+        exports,
+        total: undefined 
+      },
+      expected: undefined
+    }
+  ]
+
+  test.each(cases)("expects 'total' with source path $sourcePath to equal $expected", async ({ source, expected }) => {
+    await expectToEqualAsync({
+      source,
+      schema: {
+        import: "total",
+        reduce: {
+          path: "total"
+        }
+      },
+      expected
+    })
+  })
+})
+
+test("builder with and chain", () => {
+  const result = new SchemaTaskResultBuilder()
+    .with({
+      store: {
+        numero: 1
+      },
+      schema: {
+        const: 7
+      }
+    })
+    .withEquals({
+      const: 7
+    })
+    .build()
+
+    expect(result).toEqual(true)
+})
+
 test("equals with current properties", async () => {
   await expectToEqualAsync({
     schema: {
