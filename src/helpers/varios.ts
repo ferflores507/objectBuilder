@@ -46,7 +46,7 @@ const getPaths = (path: string | string[], separator = ".") => {
     return Array.isArray(path) ? path : path.split(separator)
 }
 
-export const getPathValueContainer = (obj: {}, path: string | string[], separator = ".") => {
+export const getPathValueContainer = (obj: Record<string, any> | undefined, path: string | string[], separator = ".") => {
     const paths = getPaths(path, separator)
     const [last, ...objPaths] = [paths.pop(), ...paths]
     const container = getValueFromPaths(obj, objPaths)
