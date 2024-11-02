@@ -18,6 +18,13 @@ describe("getObjPath works with custom separator or default: '.'", () => {
     const cases = [
         {
             source,
+            path: "path.does.not.exists",
+            expected: {
+                paths: ["path", "does", "not", "exists"]
+            }
+        },
+        {
+            source,
             path: "user.address.country",
             expected: { 
                 value: "Panama", 

@@ -35,11 +35,11 @@ export const getFormData = (source: {}) => {
     return data
 }
 
-export const getValueFromPaths = (obj: Record<string, any> | undefined, paths: string[]) : any => {
+export const getValueFromPaths = (obj: Record<string, any> | undefined, paths: string[]) => {
 
     obj = obj ?? (() => { throw "source object is null or undefined" })()
 
-    return paths.reduce((p, c) => p?.[c], obj);
+    return paths.reduce((p, c) => p?.[c], obj as Record<string, any> | undefined);
 }
 
 const getPaths = (path: string | string[], separator = ".") => {
@@ -53,7 +53,7 @@ export const getPathValueContainer = (obj: Record<string, any> | undefined, path
     
     paths.push(last)
 
-    return (last && container.hasOwnProperty(last))
+    return (last && container?.hasOwnProperty(last))
         ? { 
             value: container[last],
             paths
