@@ -8,6 +8,24 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("builder with and chain", () => {
+  const result = new SchemaTaskResultBuilder()
+    .with({
+      store: {
+        numero: 1
+      },
+      schema: {
+        const: 7
+      }
+    })
+    .withEquals({
+      const: 7
+    })
+    .build()
+
+    expect(result).toEqual(true)
+})
+
 test("definitions async", async () => {
   await expectToEqualAsync({
     schema: {
