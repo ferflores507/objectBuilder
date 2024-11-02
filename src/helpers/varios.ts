@@ -42,11 +42,12 @@ export const getValueFromPaths: any = (obj: Record<string, any>, paths: string[]
     return paths.reduce((p, c) => p?.[c], obj);
 }
 
+const getPaths = (path: string | string[], separator = ".") => {
+    return Array.isArray(path) ? path : path.split(separator)
+}
+
 export const getPathValue = (obj: {}, path: string | string[], separator = ".") => {
-
-    const paths = Array.isArray(path) ? path : path.split(separator)
-
-    return getValueFromPaths(obj, paths)
+    return getValueFromPaths(obj, getPaths(path, separator))
 }
 
 export const spread = (target: any, source: any) => {
