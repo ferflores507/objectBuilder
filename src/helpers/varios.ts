@@ -46,6 +46,16 @@ const getPaths = (path: string | string[], separator = ".") => {
     return Array.isArray(path) ? path : path.split(separator)
 }
 
+export const getPathValueContainer = (obj: {}, path: string | string[], separator = ".") => {
+    const paths = getPaths(path, separator)
+    const [last, ...objPaths] = [paths.pop(), ...paths]
+    const container = getValueFromPaths(obj, objPaths)
+
+    return (last && container.hasOwnProperty(last))
+        ? { value: container[last] }
+        : null
+}
+
 export const getPathValue = (obj: {}, path: string | string[], separator = ".") => {
     return getValueFromPaths(obj, getPaths(path, separator))
 }
