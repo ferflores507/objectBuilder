@@ -310,7 +310,8 @@ export class SchemaTaskResultBuilder implements Builder {
             this.add((target, prev) => {
                 const builders = entries.map(([k, v]) => {
                     return this.with({
-                        initial: prev,
+                        target: prev,
+                        initial: target,
                         schema: v
                     })
                     .add(result => comparison[k](target, result))

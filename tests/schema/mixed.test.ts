@@ -13,7 +13,7 @@ test("equals with current properties", async () => {
     schema: {
       path: "current.uno",
       equals: {
-        path: "current.one"
+        path: "target.one"
       }
     },
     options: {
@@ -34,7 +34,7 @@ test("equals with current properties", async () => {
         one: 1
       },
       reduce: {
-        path: "target.uno",
+        path: "current.uno",
         equals: {
           path: "target.one"
         }
