@@ -133,24 +133,28 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
+    withUnshift(options: Partial<BuilderOptions>) {
+        return this.unshift(this.with(options))
+    }
+
     withImport(path: string | undefined) {
-        if(path) {
-            this.add(current => {
+        return path == null 
+            ? this
+            : this.add(initial => {
                 const container = varios.getPathValueContainer(this.options.store, path)
 
-                return "value" in container 
+                return "value" in container
                     ? container.value
-                    : this.unshift(
-                        this.with({ initial: current })
-                            .withSchemaFrom({
+                    : this.withUnshift({
+                        initial,
+                        schema: {
+                            set: path,
+                            schemaFrom: {
                                 path: ["exports", ...container.paths].join(".")
-                            })
-                            .withSet(path)
-                    )
+                            }
+                        }
+                    })
             })
-        }
-
-        return this
     }
 
     withFunction(functionSchema: Schema | undefined) {
