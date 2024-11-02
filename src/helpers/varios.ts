@@ -50,10 +50,15 @@ export const getPathValueContainer = (obj: Record<string, any> | undefined, path
     const paths = getPaths(path, separator)
     const [last, ...objPaths] = [paths.pop(), ...paths]
     const container = getValueFromPaths(obj, objPaths)
+    
+    paths.push(last)
 
     return (last && container.hasOwnProperty(last))
-        ? { value: container[last] }
-        : null
+        ? { 
+            value: container[last],
+            paths
+        }
+        : { paths }
 }
 
 export const getPathValue = (obj: Record<string, any> | undefined, path: string | string[], separator = ".") => {

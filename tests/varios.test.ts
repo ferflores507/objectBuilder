@@ -19,22 +19,33 @@ describe("getObjPath works with custom separator or default: '.'", () => {
         {
             source,
             path: "user.address.country",
-            expected: { value: "Panama" }
+            expected: { 
+                value: "Panama", 
+                paths: ["user", "address", "country"] 
+            }
         },
         {
             source,
             path: "user.address.city",
-            expected: null
+            expected: {
+                paths: ["user", "address", "city"]
+            }
         },
         {
             source,
             path: "user.description",
-            expected: { value: null }
+            expected: { 
+                value: null,
+                paths: ["user", "description"]
+            }
         },
         {
             source,
             path: "user.id",
-            expected: { value: undefined }
+            expected: { 
+                value: undefined,
+                paths: ["user", "id"]
+            }
         },
     ]
 
