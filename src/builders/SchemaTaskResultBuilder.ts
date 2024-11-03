@@ -134,6 +134,12 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
+    withCall(path: string | undefined) {
+        return path 
+            ? this.add(current => (this.getStoreValue(path) as Function)(current))  
+            : this
+    }
+
     withStore(schema: Schema | undefined) {
         if(schema) {
             this.add(current => {
@@ -287,11 +293,12 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withEndSchema(schema: Schema | undefined) {
-        const { set, use } = schema ?? {}
+        const { set, use, call } = schema ?? {}
 
         return this
             .withArraySchema(schema)
             .withComparison(schema)
+            .withCall(call)
             .withUse(use)
             .withSet(set)
     }

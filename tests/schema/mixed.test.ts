@@ -8,6 +8,25 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("with call", async () => {
+  await expectToEqualAsync(
+    {
+      source: {},
+      schema: {
+        set: "getName",
+        function: {
+          path: "current"
+        },
+        reduce: {
+          const: "Melany",
+          call: "getName"
+        }
+      },
+      expected: "Melany"
+    }
+  )
+})
+
 test("schema with multiple stores", async () => {  
   await expectToEqualAsync({
     schema: {
