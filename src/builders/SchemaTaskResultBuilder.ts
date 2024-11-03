@@ -133,11 +133,9 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withCall(path: string | undefined) {
-        if(path){
-            throw "withCall is not implemented yet"
-        }
-
-        return this
+        return path 
+            ? this.add(current => (this.getStoreValue(path) as Function)(current))  
+            : this
     }
 
     withUnshift(options: Partial<BuilderOptions>) {
