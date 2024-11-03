@@ -104,7 +104,8 @@ export class SchemaTaskResultBuilder implements Builder {
             decrement,
             consulta,
             function: functionSchema,
-            import: importPath
+            import: importPath,
+            store
         } = schema ?? {}
 
         return schema ?
@@ -125,11 +126,20 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withSpread(spread)
                 .withFunction(functionSchema)
                 .withEndSchema(schema)
+                .withStore(store)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
             : this
+    }
+
+    withStore(schema: Schema | undefined) {
+        if(schema) {
+            throw "withStore not implemented yet"
+        }
+
+        return this
     }
 
     withUnshift(options: Partial<BuilderOptions>) {

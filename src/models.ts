@@ -75,6 +75,7 @@ export type Schema = Partial<{
     some: any
     source: string
     status: string
+    store: Schema
     stringify: true
     spread: Schema
     targetPath: string
