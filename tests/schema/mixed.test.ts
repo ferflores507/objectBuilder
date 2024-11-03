@@ -8,6 +8,50 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("schema with multiple stores", async () => {  
+  await expectToEqualAsync({
+    schema: {
+      propiedades: [1, 2, 3, 4].reduce((obj, id) => {
+        return { 
+          ...obj,
+          ["grandParent" + id]: {
+            store: {
+              const: {
+                id
+              }
+            },
+            propiedades: {
+              parent: {
+                propiedades: {
+                  child: {
+                    propiedades: {
+                      grandChild: {
+                        path: "id"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }, {})
+    },
+    expected: [1, 2, 3, 4].reduce((obj, id) => {
+      return { 
+        ...obj,
+        ["grandParent" + id]: {
+          parent: {
+            child: {
+              grandChild: id
+            }
+          }
+        }
+      }
+    }, {})
+  })
+})
+
 test("schema withStore", async () => {
   await expectToEqualAsync({
     schema: {
