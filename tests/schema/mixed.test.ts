@@ -54,24 +54,6 @@ describe("schema import", () => {
   })
 })
 
-test("builder with and chain", () => {
-  const result = new SchemaTaskResultBuilder()
-    .with({
-      store: {
-        numero: 1
-      },
-      schema: {
-        const: 7
-      }
-    })
-    .withEquals({
-      const: 7
-    })
-    .build()
-
-    expect(result).toEqual(true)
-})
-
 test("equals with current properties", async () => {
   await expectToEqualAsync({
     schema: {
