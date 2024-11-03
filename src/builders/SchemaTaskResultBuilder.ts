@@ -111,6 +111,7 @@ export class SchemaTaskResultBuilder implements Builder {
         return schema ?
             this
                 .withStatus(status)
+                .withStore(store)
                 .withDelay(delay)
                 .withPaths(schema)
                 .withImport(importPath)
@@ -126,7 +127,6 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withSpread(spread)
                 .withFunction(functionSchema)
                 .withEndSchema(schema)
-                .withStore(store)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
                 .withReduceMany(reduceMany)
@@ -136,7 +136,11 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withStore(schema: Schema | undefined) {
         if(schema) {
-            throw "withStore not implemented yet"
+            this.add(current => {
+                this.options.store = this.with({ initial: current, schema }).build()
+
+                return current
+            })
         }
 
         return this

@@ -8,6 +8,22 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("schema withStore", async () => {
+  await expectToEqualAsync({
+    schema: {
+      store: {
+        propiedades: {
+          nombre: {
+            const: "Melany"
+          }
+        }
+      },
+      path: "nombre"
+    },
+    expected: "Melany"
+  })
+})
+
 describe("schema import", () => {
   const exports = {
     total: {
