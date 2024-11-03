@@ -43,6 +43,7 @@ export type Consulta = { url: string } & Partial<{
 export type Schema = Partial<{
     consulta: Consulta
     calc: CalcMethod
+    call: string
     checkout: Schema
     const: any
     decrement: string

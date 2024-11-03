@@ -132,6 +132,14 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
+    withCall(path: string | undefined) {
+        if(path){
+            throw "withCall is not implemented yet"
+        }
+
+        return this
+    }
+
     withUnshift(options: Partial<BuilderOptions>) {
         return this.unshift(this.with(options))
     }
@@ -273,11 +281,12 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withEndSchema(schema: Schema | undefined) {
-        const { set, use } = schema ?? {}
+        const { set, use, call } = schema ?? {}
 
         return this
             .withArraySchema(schema)
             .withComparison(schema)
+            .withCall(call)
             .withUse(use)
             .withSet(set)
     }
