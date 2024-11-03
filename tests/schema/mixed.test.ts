@@ -8,6 +8,47 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("nested stores with call to root store", async () => {
+  const source = {}
+  await expectToEqualAsync({
+    source,
+    schema: {
+      set: "setName",
+      function: {
+        set: "store.name",
+        path: "current"
+      },
+      reduce: {
+        propiedades: {
+          child: {
+            store: {
+              propiedades: {
+                nombre: {
+                  const: "Melany"
+                },
+                setName: {
+                  path: "setName"
+                }
+              }
+            },
+            reduce: {
+              set: "updateName",
+              function: {
+                path: "nombre",
+                call: "setName"
+              },
+              reduce: {
+                call: "updateName"
+              }
+            }
+          }
+        }
+      }
+    },
+    expected: { child: "Melany"}
+  })
+})
+
 test("with call", async () => {
   await expectToEqualAsync(
     {
