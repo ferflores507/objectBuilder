@@ -141,7 +141,7 @@ export class SchemaTaskResultBuilder implements Builder {
 
         Object.entries(schema ?? {})
             .filter(([name]) => functions?.hasOwnProperty(name))
-            .sort((a, b) => a[0].localeCompare(b[1]))
+            .sort(([a], [b]) => a.localeCompare(b))
             .forEach(([name, schema]) => {
                 this.add(initial => functions?.[name]?.(this.with({ initial, schema }).build()))
             })
