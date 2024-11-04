@@ -105,12 +105,14 @@ export class SchemaTaskResultBuilder implements Builder {
             consulta,
             function: functionSchema,
             import: importPath,
-            store
+            store,
+            ...rest
         } = schema ?? {}
 
         return schema ?
             this
                 .withStatus(status)
+                .withUses(rest)
                 .withStore(store)
                 .withDelay(delay)
                 .withPaths(schema)
@@ -132,6 +134,19 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
             : this
+    }
+
+    withUses(schema: Schema | undefined) {
+        const { functions } = this.options
+
+        Object.entries(schema ?? {})
+            .filter(([name]) => functions?.hasOwnProperty(name))
+            .sort((a, b) => a[0].localeCompare(b[1]))
+            .forEach(([name, schema]) => {
+                this.add(initial => functions?.[name]?.(this.with({ initial, schema }).build()))
+            })
+
+        return this
     }
 
     withCall(path: string | undefined) {

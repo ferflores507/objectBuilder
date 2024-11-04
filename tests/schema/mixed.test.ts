@@ -1217,24 +1217,43 @@ describe("use", () => {
 
   const cases = [
     {
-      use: "first",
+      schema: {
+        use: "first",
+        path: "items",
+      },
       expected: "a"
     },
     {
-      use: "last",
+      schema: {
+        use: "last",
+        path: "items",
+      },
       expected: "c"
-    }
+    },
+    {
+      schema: {
+        first: {
+          path: "items"
+        }
+      },
+      expected: "a"
+    },
+    {
+      schema: {
+        last: {
+          path: "items"
+        }
+      },
+      expected: "c"
+    },
   ]
 
-  test.each(cases)("use %s", async ({ use, expected }) => {  
+  test.each(cases)("use %s", async ({ schema, expected }) => {  
     await expectToEqualAsync({
       source: {
         items: ["a", "b", "c"]
       },
-      schema: {
-        path: "items",
-        use
-      },
+      schema,
       expected,
       options: {
         functions: {
