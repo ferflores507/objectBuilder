@@ -8,6 +8,40 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+describe("schema with functions useFirst and useLast with source (a, b, c)", () => {
+  
+  const cases = [
+    {
+      use: "First",
+      expected: "a"
+    },
+    {
+      use: "Last",
+      expected: "c"
+    }
+  ]
+
+  test.each(cases)("expects use$use to return $expected", async ({ use, expected }) => {
+    await expectToEqualAsync({
+      options: {
+        functions: {
+          useFirst: (items: any[], builder: SchemaTaskResultBuilder) => {
+            builder.add(() => items[0])
+          },
+          useLast: (items: any[], builder: SchemaTaskResultBuilder) => {
+            builder.add(() => items[items.length - 1])
+          }
+        },
+      },
+      schema: {
+        ["use" + use]: ["a", "b", "c"]
+      },
+      expected
+    })
+  })
+
+})
+
 test("nested stores with call to root store", async () => {
   const source = {}
   await expectToEqualAsync({
