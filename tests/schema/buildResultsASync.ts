@@ -6,10 +6,7 @@ export const buildResultsAsync = async (caseArg: CaseBase) => {
     const { source, schema, options } = caseArg
     const builder = new SchemaTaskResultBuilder()
         .with({
-            target: options?.target,
             store: source,
-            functions: options?.functions,
-            sources: options?.sources,
             ...options
         })
 
