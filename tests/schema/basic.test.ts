@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { Schema } from "../.."
-import { buildResultsAsync, expectToEqualAsync } from "./buildResultsASync"
+import { buildResultsAsync, Case, expectToEqualAsync } from "./buildResultsASync"
 
 test.fails("in operator in primitive fails", () => {
   const isIn = "id" in true
@@ -177,19 +177,10 @@ test("abortcontroller onabort", async () => {
   await waitForEvent()
 })
 
-type Case = {
-  name: string,
-  source: any,
-  schema: Schema,
-  expected: any
-}
-
-const cases: Case[] = [
+const cases: ({ name: string } & Case)[] = [
   {
     name: "stringify",
-    options: {
-      target: { id: 1 }
-    },
+    target: { id: 1 },
     schema: {
       stringify: true
     },
@@ -197,9 +188,7 @@ const cases: Case[] = [
   },
   {
     name: "parse",
-    options: {
-      target: JSON.stringify({ id: 1 })
-    },
+    target: JSON.stringify({ id: 1 }),
     schema: {
       parse: true
     },
@@ -207,7 +196,7 @@ const cases: Case[] = [
   },
   {
     name: "schemaFrom",
-    source: {
+    store: {
       info: {
         nombre: "Melany",
       },
@@ -236,7 +225,7 @@ const cases: Case[] = [
   },
   {
     name: "definitions",
-    source: {},
+    store: {},
     schema: {
       const: {
         detalles: {
@@ -270,7 +259,7 @@ const cases: Case[] = [
   },
   {
     name: "definitions con propiedades",
-    source: {
+    store: {
       detalles: {
         nombre: "Melany",
         activo: true
@@ -306,7 +295,7 @@ const cases: Case[] = [
   },
   {
     name: "definitions con varios paths",
-    source: {
+    store: {
       detalles: {
         nombre: "Melany",
         apellido: "Flores"
@@ -326,7 +315,7 @@ const cases: Case[] = [
   },
   {
     name: "spread",
-    source: {},
+    store: {},
     schema: {
       const: {
         nombre: "Melany"
@@ -344,7 +333,7 @@ const cases: Case[] = [
   },
   {
     name: "propiedades",
-    source: {},
+    store: {},
     schema: {
       propiedades: {
         nombre: {
@@ -362,7 +351,7 @@ const cases: Case[] = [
   },
   {
     name: "const",
-    source: {},
+    store: {},
     schema: {
       const: {
         nombre: "Fernando",
@@ -376,7 +365,7 @@ const cases: Case[] = [
   },
   {
     name: "path",
-    source: {
+    store: {
       usuario: { 
         nombre: "Melany", 
         id: 1 
@@ -404,7 +393,7 @@ describe("basico old", () => {
   
     test("set", async () => {
       const caseArg = {
-        source: {
+        store: {
           nombre: "Melany",
           apellido: "Flores"
         },
@@ -417,13 +406,13 @@ describe("basico old", () => {
       await buildResultsAsync(caseArg)
   
       const expected = {
-        ...caseArg.source,
+        ...caseArg.store,
         detalles: {
           id: 1
         }
       }
   
-      expect(caseArg.source).toEqual(expected)
+      expect(caseArg.store).toEqual(expected)
     })
   
     describe("equals", () => {
@@ -459,7 +448,7 @@ describe("basico old", () => {
   
       test.each(cases)("case", async (schema) => {
         await expectToEqualAsync({
-          source: {},
+          store: {},
           schema,
           expected: true
         })

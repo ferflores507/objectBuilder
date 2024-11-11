@@ -109,15 +109,13 @@ describe("schema with functions useFirst and useLast with source (a, b, c)", () 
 
   test.each(cases)("expects use$use to return $expected", async ({ use, expected }) => {
     await expectToEqualAsync({
-      options: {
-        functions: {
-          useFirst: (items: any[], builder: SchemaTaskResultBuilder) => {
-            builder.add(() => items[0])
-          },
-          useLast: (items: any[], builder: SchemaTaskResultBuilder) => {
-            builder.add(() => items[items.length - 1])
-          }
+      functions: {
+        useFirst: (items: any[], builder: SchemaTaskResultBuilder) => {
+          builder.add(() => items[0])
         },
+        useLast: (items: any[], builder: SchemaTaskResultBuilder) => {
+          builder.add(() => items[items.length - 1])
+        }
       },
       schema: {
         ["use" + use]: ["a", "b", "c"]
@@ -129,9 +127,9 @@ describe("schema with functions useFirst and useLast with source (a, b, c)", () 
 })
 
 test("nested stores with call to root store", async () => {
-  const source = {}
+  const store = {}
   await expectToEqualAsync({
-    source,
+    store,
     schema: {
       set: "setName",
       function: {
@@ -172,7 +170,7 @@ test("nested stores with call to root store", async () => {
 test("with call", async () => {
   await expectToEqualAsync(
     {
-      source: {},
+      store: {},
       schema: {
         set: "getName",
         function: {
@@ -252,7 +250,7 @@ describe("schema import", () => {
   const cases = [
     {
       sourcePath: "empty",
-      source: {
+      store: {
         total: {
           const: 7
         }
@@ -261,9 +259,9 @@ describe("schema import", () => {
     },
   ]
 
-  test.each(cases)("expects 'total' with source path $sourcePath to equal $expected", async ({ source, expected }) => {
+  test.each(cases)("expects 'total' with source path $sourcePath to equal $expected", async ({ store, expected }) => {
     await expectToEqualAsync({
-      source,
+      store,
       schema: {
         import: "total",
       },
@@ -280,11 +278,9 @@ test("equals with current properties", async () => {
         path: "target.one"
       }
     },
-    options: {
-      initial: {
-        uno: 1,
-        one: 1
-      }
+    initial: {
+      uno: 1,
+      one: 1
     },
     expected: true
   })
@@ -338,10 +334,8 @@ test("use with reduce", async () => {
   const sumar = ({ a, b } : { a: number, b: number }) => a + b
 
   await expectToEqualAsync({
-    options: {
-      functions: {
-        sumar
-      }
+    functions: {
+      sumar
     },
     schema: {
       use: "sumar",
@@ -367,7 +361,7 @@ test("use with reduce", async () => {
 
 test("schemaFrom nested", async () => {
   await expectToEqualAsync({
-    source: {
+    store: {
       schemaFinal: {
         const: {
           nombre: "Fernando"
@@ -447,7 +441,7 @@ test("reduceOrDefault doesnt fail with null or undefined", async () => {
 })
 
 test("task builder", () => {
-  const builder = new TaskBuilder().with({ target: 2})
+  const builder = new TaskBuilder().with({ target: 2 })
 
   builder.add(target => target + 1) // current = 6 + 1 = 7
   builder.add(target => target + 3) // current = 7 + 3 = 10
@@ -537,7 +531,7 @@ test("filter with source tres", async () => {
 test("filter with source dos", async () => {
   await expectToEqualAsync(
     {
-      source: {
+      store: {
         search: "  in  "
       },
       schema: {
@@ -610,10 +604,8 @@ test("target defined and const with undefined", async () => {
       const: undefined,
     },
     expected: undefined,
-    options: {
-      // initial: undefined, // stops failing
-      target: 1
-    }
+    // initial: undefined, // stops failing
+    target: 1
   })
 })
 
@@ -627,9 +619,7 @@ test("map targetPath", async () => {
       }
     },
     expected: [1, 1, 1, 1],
-    options: {
-      target: 1
-    }
+    target: 1
   })
 
 })
@@ -659,16 +649,14 @@ describe("includes", () => {
     }
   
     await expectToEqualAsync({
-      source: {
+      store: {
         local: {
           selectedItems: [1]
         }
       },
       schema,
       expected: true,
-      options: {
-        target: { id: 1 }
-      }
+      target: { id: 1 }
     })
   })
 })
@@ -777,7 +765,7 @@ describe("array filter property 'keywords' contains string", () => {
   test.each(cases)("case", async ({ items, expected }) => {
   
     await expectToEqualAsync({
-      source: {},
+      store: {},
       schema: {
         const: items,
         filter: {
@@ -808,7 +796,7 @@ test("schema as value", async () => {
   }
   
   await expectToEqualAsync({
-    source: {},
+    store: {},
     schema,
     expected: schema.schema
   })
@@ -816,7 +804,7 @@ test("schema as value", async () => {
 
 test("add", async () => {
   await expectToEqualAsync({
-    source: {},
+    store: {},
     schema: {
       const: [
         1, 2, 3
@@ -830,12 +818,12 @@ test("add", async () => {
 })
 
 test("UUID", async () => {
-  const source = {}
+  const store = {}
   const schema: Schema = {
     UUID: true
   }
   
-  await expect(buildResultsAsync({ source, schema })).resolves.not.toThrow()
+  await expect(buildResultsAsync({ store, schema })).resolves.not.toThrow()
 })
 
 describe("increment or decrement", () => {
@@ -843,7 +831,7 @@ describe("increment or decrement", () => {
   const operations = ["increment", "decrement"]
   
   test.each(operations)("%s", async (operation) => {
-    const source = { total: 7 }
+    const store = { total: 7 }
     const schema: Schema = {
       [operation]: "total",
       reduce: {
@@ -852,11 +840,11 @@ describe("increment or decrement", () => {
     }
     const builder = new SchemaTaskResultBuilder()
       .with({ 
-        store: source, 
+        store, 
         schema
       })
     const amount = schema.increment ? 1 : -1
-    const expected = source.total + amount
+    const expected = store.total + amount
     const resultados = [builder.build(), await builder.with({ schema }).buildAsync()]
     
     expect(resultados).toEqual([expected, expected + amount])
@@ -874,7 +862,7 @@ describe("trim", () => {
 
   test.each(cases)("(%s).trim equals: (%s)", async (value, expected) => {
     await expectToEqualAsync({
-      source: { value },
+      store: { value },
       schema: {
         path: "value",
         trim: true
@@ -896,7 +884,7 @@ describe("isNullOrWhiteSpace (value)?", () => {
 
   test.each(cases)("(%s): %s", async (value, expected) => {
     await expectToEqualAsync({
-      source: { value },
+      store: { value },
       schema: {
         path: "value",
         isNullOrWhiteSpace: true
@@ -924,21 +912,19 @@ describe("not", () => {
           not: {}
         }
       },
-      options: {
-        target: [
-          true,
-          false,
-          false,
-          true
-        ]
-      },
+      target: [
+        true,
+        false,
+        false,
+        true
+      ],
       expected
     })
   })
 
   test("propiedades", async () => {
     await expectToEqualAsync({
-      source: {},
+      store: {},
       schema: {
         propiedades: {
           activated: {
@@ -951,10 +937,8 @@ describe("not", () => {
       expected: {
         activated: true
       },
-      options: {
-        sources: {
-          activated: false
-        }
+      sources: {
+        activated: false
       }
     })
   })
@@ -970,9 +954,9 @@ describe("not", () => {
     ]
 
     test.each(schemas)("schema: $schema", async (schema: Schema) => {
-      const source = { activated: false }
+      const store = { activated: false }
       const builder = new SchemaTaskResultBuilder()
-        .with({ store: source })
+        .with({ store })
 
       const results = [
         !builder.with({ schema }).build(),
@@ -990,7 +974,7 @@ describe("add schema", () => {
 
   test("multiple with max", async () => {
     await expectToEqualAsync({
-      source: {},
+      store: {},
       schema: {
         const: [
           1,
@@ -1014,7 +998,7 @@ describe("add schema", () => {
 
   test("multiple with value only", async () => {  
     await expectToEqualAsync({
-      source: {},
+      store: {},
       schema: {
         const: [
           1,
@@ -1035,7 +1019,6 @@ describe("add schema", () => {
   })
 
   test("with value only, already containing an item and then reduce", () => {
-    const source = {}
     const schema: Schema = {
       const: [4],
       select: {
@@ -1060,7 +1043,7 @@ describe("add schema", () => {
 
   test("with value only", async () => {  
     await expectToEqualAsync({
-      source: {},
+      store: {},
       schema: {
         const: [],
         select: {
@@ -1083,7 +1066,7 @@ describe("if schema", () => {
 
   test.each(cases)("if as string (path)", async (id: number, expected: string) => {
     await expectToEqualAsync({
-      source: {
+      store: {
         isValid: id % 2 == 0
       },
       schema: {
@@ -1107,7 +1090,7 @@ describe("if schema", () => {
 
   test.each(modCases)("if as schema", async (mod: number, expected: string) => {
     await expectToEqualAsync({
-      source: { mod },
+      store: { mod },
       schema: {
         if: {
           path: "mod",
@@ -1193,9 +1176,7 @@ test.skip("stopPropiedades", async () => {
   const [result] = await buildResultsAsync(caseArg)
   const [resultWithStop] = await buildResultsAsync({
     ...caseArg,
-    options: {
-      stopPropiedades: ["dos"]
-    }
+    stopPropiedades: ["dos"]
   })
 
   const expected = {
@@ -1326,7 +1307,7 @@ describe("use", () => {
 
   test.each(cases)("use %s", async ({ use, expected }) => {  
     await expectToEqualAsync({
-      source: {
+      store: {
         items: ["a", "b", "c"]
       },
       schema: {
@@ -1334,11 +1315,9 @@ describe("use", () => {
         use
       },
       expected,
-      options: {
-        functions: {
-          first: (array: any[]) => array[0],
-          last: (array: any[]) => array[array.length - 1]
-        }
+      functions: {
+        first: (array: any[]) => array[0],
+        last: (array: any[]) => array[array.length - 1]
       }
     })
   })
@@ -1352,7 +1331,7 @@ test("sibling nested", async () => {
   let id = 1
 
   await expectToEqualAsync({
-    source: {},
+    store: {},
     schema: {
       propiedades: {
         id: {
@@ -1396,7 +1375,7 @@ describe("sibling", () => {
 
   test("set value from a sibling property", async () => {
     await expectToEqualAsync({
-      source: {},
+      store: {},
       schema: {
         propiedades: {
           title: {
@@ -1461,7 +1440,7 @@ describe("spread", () => {
 
   test.each(cases)("spread $tipo", async ({ schema, expected }) => {
     await expectToEqualAsync({
-      source: {
+      store: {
         dos: {
           subDos: 2
         },
@@ -1471,10 +1450,8 @@ describe("spread", () => {
       },
       schema,
       expected,
-      options: {
-        target: {
-          subUno: 1
-        }
+      target: {
+        subUno: 1
       }
     })
   })
@@ -1486,12 +1463,10 @@ describe("entries", () => {
       schema: {
         entries: true
       },
-      options: {
-        target: {
-          nombre: "Melany",
-          cedula: "9-123-456",
-          fechaDeNacimiento: "18/09/2019"
-        }
+      target: {
+        nombre: "Melany",
+        cedula: "9-123-456",
+        fechaDeNacimiento: "18/09/2019"
       },
       expected: [
         {
@@ -1521,7 +1496,7 @@ describe("calc", () => {
   ])("%s 100, 10, 5 da: %s", async (calc, expected) => {
 
     await expectToEqualAsync({
-      source: {},
+      store: {},
       schema: {
         const: [100, 10, 5],
         calc
@@ -1533,7 +1508,7 @@ describe("calc", () => {
 
 test("nested propiedades", async () => {
 
-  const source = {
+  const store = {
     objOne: {
       id: 1
     },
@@ -1575,7 +1550,7 @@ test("nested propiedades", async () => {
   }
 
   await expectToEqualAsync({
-    source,
+    store,
     schema,
     expected
   })
@@ -1591,7 +1566,7 @@ describe("comparacion", () => {
     ])('es igual a %s => %s', async (nombre: string, expected: boolean) => {
       
       await expectToEqualAsync({
-        source: { nombre: "Melany" },
+        store: { nombre: "Melany" },
         schema: {
           path: "nombre",
           equals: {
@@ -1612,7 +1587,7 @@ describe("array", () => {
     const cases = [
       {
         name: "groupJoin",
-        source: {},
+        store: {},
         schema: {
           const: [
             {
@@ -1669,7 +1644,7 @@ describe("array", () => {
       },
       {
         name: "map join dos",
-        source: {},
+        store: {},
         schema: { // 36 lineas
           const: [
             {
@@ -1736,19 +1711,17 @@ describe("array", () => {
             }
           }
         },
-        options: {
-          target: [
-            1, 
-            "dos", 
-            { nombre: "Mari" }, 
-            { nombre: "Melany" }
-          ]
-        },
+        target: [
+          1, 
+          "dos", 
+          { nombre: "Mari" }, 
+          { nombre: "Melany" }
+        ],
         expected: { nombre: "Melany" }
       },
       {
         name: "some are true: from inner definition",
-        source: {},
+        store: {},
         schema: {
           const: {
             detalles: {
@@ -1783,7 +1756,7 @@ describe("array", () => {
       },
       {
         name: "filtrar por nombre de item es igual nombre en source",
-        source: { nombre: "Fernando" },
+        store: { nombre: "Fernando" },
         schema: {
           const: Array(3).fill({ nombre: "Melany" }).toSpliced(1, 0, { nombre: "Fernando" }),
           filter: {
@@ -1831,7 +1804,7 @@ describe("array", () => {
     const expected = [{ id: 1, nombre: "Melany" }, ...ids]
 
     await expectToEqualAsync({
-      source: {},
+      store: {},
       schema,
       expected
     })
@@ -1842,7 +1815,7 @@ describe("array", () => {
     const numbers = [1, 2, 3, 4]
 
     await expectToEqualAsync({
-      source: {},
+      store: {},
       schema: {
         const: numbers,
         map: {
@@ -1862,12 +1835,12 @@ describe("array", () => {
       "some"
     ])("%s equal -> true", async (method) => {
 
-      const source = { nombre: "Melany" }
+      const store = { nombre: "Melany" }
 
       await expectToEqualAsync({
-        source,
+        store,
         schema: {
-          const: Array(2).fill(source),
+          const: Array(2).fill(store),
           contains: {
             path: "current.nombre",
             equals: {
@@ -1889,7 +1862,7 @@ describe("array", () => {
     ])("con definition %s", async (tipo, schema: Schema) => {
 
       await expectToEqualAsync({
-        source: { 
+        store: { 
           store: { items: [] } 
         },
         schema: {
@@ -1947,7 +1920,7 @@ describe("array", () => {
         // }
       }
 
-      const resultados = await buildResultsAsync({ source: {}, schema })
+      const resultados = await buildResultsAsync({ store: {}, schema })
       const expected = [expectedItem, expectedItem]
 
       value 
@@ -1985,7 +1958,7 @@ describe("mixed", () => {
     }
 
     await expectToEqualAsync({
-      source: { nombre: "Melany" },
+      store: { nombre: "Melany" },
       schema,
       expected: [4, 10].map(id => ({ id, nombre: "Melany" }))
     })
@@ -1995,7 +1968,7 @@ describe("mixed", () => {
 
     test("path", async () => {
       await expectToEqualAsync({
-        source: { 
+        store: { 
           detalles: { 
             personal: { nombre: "Melany" } 
           } 
@@ -2020,7 +1993,7 @@ describe("mixed", () => {
 
     test("flat", async () => {
       await expectToEqualAsync({
-        source: {},
+        store: {},
         schema: {
           flat: true,
           propiedades: {
@@ -2035,7 +2008,7 @@ describe("mixed", () => {
 
     test("flat (path)", async () => {
       await expectToEqualAsync({
-        source: {
+        store: {
           usuario: {
             personal: { nombre: "Melany" },
             direccion: { provincia: "Santiago" }
@@ -2055,7 +2028,7 @@ describe("mixed", () => {
     const cases = [
       {
         name: "propiedades",
-        source: {},
+        store: {},
         schema: {
           propiedades: {
             nombre: {
@@ -2076,7 +2049,7 @@ describe("mixed", () => {
       },
       {
         name: "const",
-        source: {},
+        store: {},
         schema: {
           const: {
             nombre: "Fernando",
@@ -2089,7 +2062,7 @@ describe("mixed", () => {
       },
       {
         name: "path",
-        source: {
+        store: {
           usuario: { nombre: "Melany", id: 1, cedula: "9-123" }
         },
         schema: {
