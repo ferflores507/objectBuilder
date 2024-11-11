@@ -8,6 +8,92 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("map then filter from target", async () => {
+  await expectToEqualAsync({
+    schema: {
+      propiedades: {
+        search: {
+          const: 1
+        },
+        items: {
+          const: Array.from(Array(3).keys()),
+          map: {
+            propiedades: {
+              id: {
+                path: "current"
+              }
+            }
+          },
+        }
+      },
+      reduce: {
+        path: "current.items",
+        filter: {
+          source: {
+            path: "target.search",
+          },
+          match: {
+            path: "current.id",
+            equals: {
+              path: "source"
+            }
+          }
+        }
+      }
+    },
+    expected: [{ id: 1 }]
+  })
+})
+
+test("map then filter", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: Array.from(Array(3).keys()),
+      map: {
+        propiedades: {
+          id: {
+            path: "current"
+          }
+        }
+      },
+      reduce: {
+        filter: {
+          source: {
+            const: 1,
+          },
+          match: {
+            path: "current.id",
+            equals: {
+              path: "source"
+            }
+          }
+        }
+      }
+    },
+    expected: [{ id: 1 }]
+  })
+})
+
+test("filter with match", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: Array.from(Array(3).keys()),
+      filter: {
+        source: {
+          const: 1,
+        },
+        match: {
+          path: "current",
+          equals: {
+            path: "source"
+          }
+        }
+      }
+    },
+    expected: [1]
+  })
+})
+
 describe("schema with functions useFirst and useLast with source (a, b, c)", () => {
   
   const cases = [
