@@ -163,35 +163,16 @@ test("schema withStore", async () => {
 })
 
 describe("schema import", () => {
-  const exports = {
-    total: {
-      const: 7
-    }
-  }
   const cases = [
     {
       sourcePath: "empty",
       source: {
-        exports
+        total: {
+          const: 7
+        }
       },
       expected: 7,
     },
-    {
-      sourcePath: "null",
-      source: {
-        exports,
-        total: null 
-      },
-      expected: null
-    },
-    {
-      sourcePath: "undefined",
-      source: {
-        exports,
-        total: undefined 
-      },
-      expected: undefined
-    }
   ]
 
   test.each(cases)("expects 'total' with source path $sourcePath to equal $expected", async ({ source, expected }) => {
@@ -199,9 +180,6 @@ describe("schema import", () => {
       source,
       schema: {
         import: "total",
-        reduce: {
-          path: "total"
-        }
       },
       expected
     })

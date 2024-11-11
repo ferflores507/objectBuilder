@@ -183,23 +183,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withImport(path: string | undefined) {
-        return path == null 
-            ? this
-            : this.add(initial => {
-                const container = varios.getPathValueContainer(this.store.get(), path)
-
-                return "value" in container
-                    ? container.value
-                    : this.withUnshift({
-                        initial,
-                        schema: {
-                            set: path,
-                            schemaFrom: {
-                                path: ["exports", ...container.paths].join(".")
-                            }
-                        }
-                    })
-            })
+        return path ? this.withSchemaFrom({ path }) : this
     }
 
     withFunction(functionSchema: Schema | undefined) {
