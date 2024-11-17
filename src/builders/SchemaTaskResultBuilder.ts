@@ -449,7 +449,7 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withPath(this.target, targetPath)
                 .withPath(this.options.siblings, sibling)
                 .withPath(this.options.sources, source)
-                .build() ?? this.store.get(path)
+                .build() ?? (path ? this.store.get(path) : target)
         )
     }
 }
