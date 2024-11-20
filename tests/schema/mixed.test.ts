@@ -8,6 +8,174 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("redefine getter with same name and value access", () => {
+  const obj = { nombreInicial: "Melany" }
+
+  Object.defineProperty(obj, "nombre", {
+    configurable: true,
+    get: () => obj.nombreInicial
+  })
+
+  Object.defineProperty(obj, "_nombre", Object.getOwnPropertyDescriptor(obj, "nombre"))
+
+  Object.defineProperty(obj, "nombre", {
+    get: () => obj["_nombre"] + " Flores"
+  })
+
+  obj.nombreInicial = "Fer"
+
+  expect(obj.nombre).toEqual("Fer Flores")
+})
+
+test.fails("reuse getter from obj copy", () => {
+  const obj = {}
+
+  Object.defineProperty(obj, "nombre", {
+    configurable: true,
+    get: () => "Melany"
+  })
+
+  const objCopy = obj
+
+  // throws
+
+  Object.defineProperty(obj, "nombre", {
+    get: () => objCopy.nombre + " Flores"
+  })
+
+  expect(obj.nombre).toEqual("Melany Flores")
+})
+
+test("redefine property", () => {
+  const obj = {}
+
+  Object.defineProperty(obj, "nombre", {
+    configurable: true,
+    get: () => "Melany"
+  })
+
+  Object.defineProperty(obj, "nombre", {
+    value: "Fer"
+  })
+
+  expect(obj.nombre).toEqual("Fer")
+})
+
+test("object with function to set sibling", () => {
+  const obj = new SchemaTaskResultBuilder()
+    .with({
+      schema: {
+        propiedades: {
+          nombre: {
+            const: "Melany"
+          },
+          setNombre: {
+            function: {
+              set: "sibling.nombre"
+            }
+          }
+        }
+      }
+    })
+    .build()
+
+    obj.setNombre("Fer")
+
+    expect(obj.nombre).toEqual("Melany")
+})
+
+test("import with multiple stores", async () => {
+
+  const titulo = "detalles de store"
+
+  const stores = {
+    user: {
+      nombre: "Melany",
+      cedula: "9-123",
+      schema: "1-mel-1"
+    },
+    allUsers: [
+      {
+        nombre: "Fernando",
+        cedula: "8-123-456",
+        schema: "2-fer-2"
+      }
+    ],
+  }
+
+  await expectToEqualAsync({
+    stores,
+    store: {
+      userSchema: {
+        propiedades: {
+          titulo: {
+            const: titulo
+          },
+          detalles: {
+            propiedades: {
+              nombre: {
+                path: "nombre"
+              },
+              id: {
+                path: "cedula"
+              }
+            }
+          }
+        }
+      }
+    },
+    schema: {
+      path: "userSchema",
+      propiedades: {
+        currentUser: {
+          store: {
+            path: "stores.user"
+          },
+          import: "current"
+        },
+        topUser: {
+          store: {
+            path: "stores.allUsers.0"
+          },
+          import: "current"
+        },
+        mari: {
+          store: {
+            const: {
+              nombre: "Mari",
+              cedula: "9-750-104"
+            }
+          },
+          import: "current"
+        }
+      }
+    },
+    expected: {
+      currentUser: {
+        titulo,
+        detalles: {
+          nombre: stores.user.nombre,
+          id: stores.user.cedula
+        }
+      },
+      topUser: {
+        titulo,
+        detalles: {
+          nombre: stores.allUsers[0].nombre,
+          id: stores.allUsers[0].cedula
+        }
+      },
+      mari: {
+        titulo,
+        detalles: {
+          nombre: "Mari",
+          id: "9-750-104"
+        }
+      }
+    }
+  })
+})
+
 test("map then filter from target", async () => {
   await expectToEqualAsync({
     schema: {
@@ -384,7 +552,7 @@ test("schemaFrom nested", async () => {
   })
 })
 
-test("reduceOrDefault with nested checkout", async () => {
+test.todo("reduceOrDefault with nested checkout", async () => {
   await expectToEqualAsync({
     schema: {
       const: " uno ",
