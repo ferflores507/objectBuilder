@@ -94,7 +94,9 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     set(path: string, value: any) {
-        varios.setPathValue(this.store.get() ?? {}, path, value)
+        const store = path.startsWith("stores") ? this.options : this.store.get()
+
+        varios.setPathValue(store ?? {}, path, value)
 
         return value
     }
