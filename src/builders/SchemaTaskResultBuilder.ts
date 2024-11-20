@@ -442,11 +442,14 @@ export class SchemaTaskResultBuilder implements Builder {
 
         return this.add((target) =>
             new PlainResultBuilder(target)
-                .withPath(path ? { ...this.options, ...this.store.get(), target: this.target, current: target } : {}, path)
+                .withPath(path ? { 
+                    ...this.options, 
+                    // ...this.store.get(), 
+                    target: this.target, current: target } : {}, path)
                 .withPath(this.target, targetPath)
                 .withPath(this.options.siblings, sibling)
                 .withPath(this.options.sources, source)
-                .build()
+                .build() ?? (path ? this.store.get(path) : target)
         )
     }
 }
