@@ -8,6 +8,23 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("with bind arg", () => {
+  const func = new SchemaTaskResultBuilder()
+    .with({
+      schema: {
+        function: {
+          set: "nombre"
+        },
+        bindArg: {
+          const: "Melany"
+        }
+      },
+    })
+    .build()
+
+    expect(func()).toEqual("Melany")
+})
+
 test("redefine getter with same name and value access", () => {
   const obj = { nombreInicial: "Melany" }
 

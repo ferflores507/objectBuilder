@@ -103,6 +103,7 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withSchema(schema: Schema | undefined) : SchemaTaskResultBuilder {
         const {
+            bindArg,
             status,
             delay,
             propiedades, 
@@ -143,12 +144,27 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withPropiedades(propiedades)
                 .withSpread(spread)
                 .withFunction(functionSchema)
+                .withBindArg(bindArg)
                 .withEndSchema(schema)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
             : this
+    }
+
+    withBindArg(schema: Schema | undefined) {
+        if(schema) {
+            this.add(func => {
+                return (current: any) => {
+                    const arg = this.with({ initial: current, schema }).build()
+
+                    return func(arg)
+                }
+            })
+        }
+
+        return this
     }
 
     withUses(schema: Schema | undefined) {
