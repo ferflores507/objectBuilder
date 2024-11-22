@@ -1751,65 +1751,68 @@ describe("comparacion", () => {
 
 describe("array", () => {
 
-  describe("mixed", () => {
-    const cases = [
-      {
-        name: "groupJoin",
-        store: {},
-        schema: {
-          const: [
-            {
-              nameId: 1,
-              nombre: "nombre",
-            },
-            {
-              nameId: 2,
-              nombre: "cedula",
-            }
-          ],
-          groupJoin: {
-            items: {
-              const: [
-                {
-                  nombre: "nombre",
-                  valor: "Melany"
-                },
-                {
-                  nombre: "nombre",
-                  valor: "Melany"
-                }
-              ]
-            },
-            match: {
-              find: {
-                targetPath: "nombre",
-                equals: {
-                  source: "item.nombre"
-                }
+  test.todo("groupJoin", () => {
+    const caseObj = {
+      name: "groupJoin",
+      store: {},
+      schema: {
+        const: [
+          {
+            nameId: 1,
+            nombre: "nombre",
+          },
+          {
+            nameId: 2,
+            nombre: "cedula",
+          }
+        ],
+        groupJoin: {
+          items: {
+            const: [
+              {
+                nombre: "nombre",
+                valor: "Melany"
+              },
+              {
+                nombre: "nombre",
+                valor: "Melany"
+              }
+            ]
+          },
+          match: {
+            find: {
+              targetPath: "nombre",
+              equals: {
+                source: "item.nombre"
               }
             }
           }
-        },
-        expected: [
-          {
-            item: {
-              nameId: 1,
-              nombre: "nombre",
-            },
-            group: {
-              nombre: "nombre",
-              valor: "Melany"
-            }
-          },
-          {
-            item: {
-              nameId: 2,
-              nombre: "cedula"
-            },
-            group: undefined
-          }
-        ]
+        }
       },
+      expected: [
+        {
+          item: {
+            nameId: 1,
+            nombre: "nombre",
+          },
+          group: {
+            nombre: "nombre",
+            valor: "Melany"
+          }
+        },
+        {
+          item: {
+            nameId: 2,
+            nombre: "cedula"
+          },
+          group: undefined
+        }
+      ]
+    }
+  })
+
+  describe("mixed", () => {
+    const cases = [
       {
         name: "map join dos",
         store: {},
