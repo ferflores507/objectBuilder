@@ -1390,7 +1390,7 @@ describe("propiedades builder", () => {
           const: 1
         },
         dos: {
-          sibling: "uno"
+          path: "siblings.uno"
         },
         tres: {
           const: 3
@@ -1424,7 +1424,7 @@ describe("propiedades builder", () => {
           const: 1
         },
         dos: {
-          sibling: "uno"
+          path: "siblings.uno"
         },
         tres: {
           const: 3
@@ -1494,7 +1494,7 @@ describe("use", () => {
 
 test("sibling nested", async () => {
   const idCopy = {
-    sibling: "id"
+    path: "siblings.id"
   }
   let id = 1
 
@@ -1553,7 +1553,7 @@ describe("sibling", () => {
             const: 1
           },
           titleCopy: {
-            sibling: "title"
+            path: "siblings.title"
           }
         }
       },
