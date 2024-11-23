@@ -8,6 +8,29 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+describe.only("schema async function", async () => {
+  const store = new SchemaTaskResultBuilder()
+    .withSchema({
+      propiedades: {
+        getSeven: {
+          asyncFunction: {
+            delay: 1000,
+            const: 7
+          }
+        }
+      }
+    })
+    .build()
+
+  test("expect call to be instance of Promise", () => {
+    expect(store.getSeven()).toBeInstanceOf(Promise)
+  })
+
+  test("expect await call to be result: 7", async () => {
+    expect(await store.getSeven()).toBe(7)
+  })
+})
+
 test("with bind arg", () => {
   const func = new SchemaTaskResultBuilder()
     .with({
