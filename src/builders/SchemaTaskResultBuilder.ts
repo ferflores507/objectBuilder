@@ -461,7 +461,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withPaths(schema: Schema | undefined) {
-        const { path, targetPath, sibling, source } = schema ?? {}
+        const { path, targetPath } = schema ?? {}
 
         return this.add((target) =>
             new PlainResultBuilder(target)
@@ -470,8 +470,6 @@ export class SchemaTaskResultBuilder implements Builder {
                     // ...this.store.get(), 
                     target: this.target, current: target } : {}, path)
                 .withPath(this.target, targetPath)
-                .withPath(this.options.siblings, sibling)
-                .withPath(this.options.sources, source)
                 .build() ?? (path ? this.store.get(path) : target)
         )
     }
