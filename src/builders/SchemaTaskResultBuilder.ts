@@ -162,7 +162,10 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withCall(path: string | undefined) {
         return path 
-            ? this.add(current => (this.getStoreValue(path) as Function)(current))  
+            ? this
+                .addMerge()
+                .withPaths({ path })
+                .add((func, prev) => func(prev))
             : this
     }
 
