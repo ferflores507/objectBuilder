@@ -161,11 +161,13 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withCall(path: string | undefined) {
+        const throwError = () => { throw `La función ${path} no está definida.` }
+        
         return path 
             ? this
                 .addMerge()
                 .withPaths({ path })
-                .add((func, prev) => func(prev))
+                .add((func, prev) => (func ?? throwError)(prev))
             : this
     }
 
