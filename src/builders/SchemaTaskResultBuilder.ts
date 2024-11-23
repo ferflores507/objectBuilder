@@ -360,13 +360,12 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withIncrement(path: string | undefined, amount = 1) {
-        if(path) {
-            this.withPaths({ path })
+        return path
+            ? this
+                .withPaths({ path })
                 .add(value => (value ?? 0) + amount)
                 .withSet(path)
-        }
-
-        return this
+            : this
     }
 
     withDecrement(path: string | undefined) {
