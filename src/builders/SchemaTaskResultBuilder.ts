@@ -209,12 +209,12 @@ export class SchemaTaskResultBuilder implements Builder {
         return path ? this.withSchemaFrom({ path }) : this
     }
 
-    withFunction(functionSchema: Schema | undefined) {
+    withFunction(functionSchema: Schema | undefined, isAsync = false) {
         if(functionSchema) {
-            this.add(() => (initial: any) => this.with({ 
-                initial, 
-                schema: functionSchema 
-            }).build())
+            this.add(() => (initial: any) => this.with({
+                initial,
+                schema: functionSchema
+            })[isAsync ? "buildAsync" : "build"]())
         }
 
         return this
