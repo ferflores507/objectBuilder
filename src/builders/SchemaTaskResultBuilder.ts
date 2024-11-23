@@ -119,7 +119,6 @@ export class SchemaTaskResultBuilder implements Builder {
             increment,
             decrement,
             consulta,
-            function: functionSchema,
             import: importPath,
             store,
             ...rest
@@ -143,7 +142,7 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withDefinitions(definitions)
                 .withPropiedades(propiedades)
                 .withSpread(spread)
-                .withFunction(functionSchema)
+                .withFunction(schema)
                 .withBindArg(bindArg)
                 .withEndSchema(schema)
                 .withReduceOrDefault(reduceOrDefault)
@@ -209,15 +208,16 @@ export class SchemaTaskResultBuilder implements Builder {
         return path ? this.withSchemaFrom({ path }) : this
     }
 
-    withFunction(functionSchema: Schema | undefined, isAsync = false) {
-        if(functionSchema) {
-            this.add(() => (initial: any) => this.with({
-                initial,
-                schema: functionSchema
-            })[isAsync ? "buildAsync" : "build"]())
-        }
+    withFunction(schema: Schema | undefined) {
+        const { asyncFunction } = schema ?? {}
+        const targetSchema = asyncFunction ?? schema?.function
 
-        return this
+        return targetSchema
+            ? this.add(() => (initial: any) => this.with({
+                initial,
+                schema: targetSchema
+            })[asyncFunction ? "buildAsync" : "build"]())
+            : this
     }
 
     withStatus(path: string | undefined) {
