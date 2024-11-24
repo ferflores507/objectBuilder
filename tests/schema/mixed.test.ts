@@ -8,7 +8,7 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
-describe.only("schema async function", async () => {
+describe("schema async function", async () => {
   const store = new SchemaTaskResultBuilder()
     .withSchema({
       propiedades: {
