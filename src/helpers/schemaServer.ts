@@ -30,7 +30,6 @@ const useRouter = () => {
     }
     
     const route: HandlerMiddleWare = async (path, res, payload) => {
-        console.log({ path })
         await sleep()
         const handler = handlers[path]
 
@@ -65,7 +64,7 @@ const { route } = useRouter()
 export const setupServer = () => {
     const server = setUpServer(route)
     return {
-        listen: () => server.listen(port, () => console.log(`App running on port ${port}`)),
+        listen: () => server.listen(port, /* () => console.log(`App running on port ${port}`) */),
         close: () => server.close()
     }
 }
