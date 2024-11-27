@@ -817,7 +817,7 @@ test("target defined and const with undefined", async () => {
   })
 })
 
-test("map targetPath", async () => {
+test("map path target", async () => {
 
   await expectToEqualAsync({
     schema: {
@@ -894,7 +894,7 @@ test("not", () => {
       target: { activated: true }
     })
     .withSchema({
-      targetPath: "activated", 
+      path: "target.activated", 
       not: {
       }
     })
@@ -1342,7 +1342,7 @@ describe("select", () => {
     const resultado = builder
       .with({ 
         schema: {
-          targetPath: "id",
+          path: "target.id",
           selectSet: "selected",
           reduce: {
             path: "selected"
@@ -1436,10 +1436,10 @@ describe("propiedades builder", () => {
           const: 3
         },
         saludo: {
-          targetPath: "detalles.titulo",
+          path: "target.detalles.titulo",
         },
         saludoNested: {
-          targetPath: "detalles",
+          path: "target.detalles",
           propiedades: {
             titulo: {
               path: "current.titulo"
@@ -1821,7 +1821,7 @@ describe("array", () => {
           },
           match: {
             find: {
-              targetPath: "nombre",
+              path: "target.nombre",
               equals: {
                 source: "item.nombre"
               }
@@ -1883,7 +1883,7 @@ describe("array", () => {
                 find: {
                   path: "current.nombre",
                   equals: {
-                    targetPath: "nombre"
+                    path: "target.nombre"
                   }
                 }
               }
@@ -2004,7 +2004,7 @@ describe("array", () => {
             find: {
               path: "current.id",
               equals: {
-                targetPath: "id"
+                path: "target.id"
               }
             }
           }
@@ -2189,7 +2189,7 @@ describe("mixed", () => {
           checkout: {
             propiedades: {
               nombre: {
-                targetPath: "nombre"
+                path: "target.nombre"
               }
             }
           }
