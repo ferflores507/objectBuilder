@@ -154,9 +154,15 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withJoin(schema: Schema | undefined) {
+    withJoin(schema: Schema | true | undefined) {
         if(schema) {
-            this.add((items: any[]) => items.join(this.with({ initial: items, schema }).build()))
+            this.add((items: any[]) => {
+                const separator = schema === true 
+                    ? "" 
+                    : this.with({ initial: items, schema }).build()
+                
+                return items.join(separator)
+            })
         }
 
         return this
