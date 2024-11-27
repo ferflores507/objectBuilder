@@ -8,7 +8,7 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
-describe.only("schema string join", () => {
+describe("schema string join", () => {
 
   const values = [
     "Fernando",
