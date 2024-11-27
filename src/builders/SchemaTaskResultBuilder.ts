@@ -156,7 +156,7 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withJoin(schema: Schema | undefined) {
         if(schema) {
-            throw "Schema string join is not implemented yet..."
+            this.add((items: any[]) => items.join(this.with({ initial: items, schema }).build()))
         }
 
         return this
