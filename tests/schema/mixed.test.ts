@@ -8,6 +8,21 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test.only("schema string join", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: [
+        "Fernando",
+        "Flores"
+      ],
+      join: {
+        const: "-"
+      }
+    },
+    expected: "Fernando-Flores"
+  })
+})
+
 describe("schema async function", async () => {
   const store = new SchemaTaskResultBuilder()
     .withSchema({
