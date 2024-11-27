@@ -4,6 +4,66 @@ import * as varios from '../src/helpers/varios';
 import { SchemaTaskResultBuilder } from '../src/builders/SchemaTaskResultBuilder';
 
 describe("getObjPath works with custom separator or default: '.'", () => {
+
+    const source = {
+        user: {
+            address: {
+                country: "Panama",
+            },
+            description: null,
+            id: undefined
+        }
+    }
+
+    const cases = [
+        {
+            source,
+            path: "path.does.not.exists",
+            expected: {
+                paths: ["path", "does", "not", "exists"]
+            }
+        },
+        {
+            source,
+            path: "user.address.country",
+            expected: { 
+                value: "Panama", 
+                paths: ["user", "address", "country"] 
+            }
+        },
+        {
+            source,
+            path: "user.address.city",
+            expected: {
+                paths: ["user", "address", "city"]
+            }
+        },
+        {
+            source,
+            path: "user.description",
+            expected: { 
+                value: null,
+                paths: ["user", "description"]
+            }
+        },
+        {
+            source,
+            path: "user.id",
+            expected: { 
+                value: undefined,
+                paths: ["user", "id"]
+            }
+        },
+    ]
+
+    test.each(cases)("expects path $path to equal $expected", ({ source, path, expected }) => {
+        const container = varios.getPathValueContainer(source, path)
+
+        expect(container).toEqual(expected)
+    })
+})
+
+describe("getObjPath works with custom separator or default: '.'", () => {
     const cases = [
         {
             path: "user.address.country",

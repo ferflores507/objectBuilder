@@ -12,12 +12,18 @@ export type SelectSchema = {
     multiple?: true
 }
 
+export type FilterSchema = {
+    source?: Schema,
+    item?: Schema,
+    match: Schema
+}
+
 export type ArraySchema = Partial<{
     add: Schema
     select: {
         [P in keyof SelectSchema]: Schema;
     },
-    filter: Schema,
+    filter: FilterSchema,
     find: Schema,
     items: Schema,
     contains: Schema,
@@ -35,8 +41,11 @@ export type Consulta = { url: string } & Partial<{
 }>
 
 export type Schema = Partial<{
+    asyncFunction: Schema
+    bindArg: Schema
     consulta: Consulta
     calc: CalcMethod
+    call: string
     checkout: Schema
     const: any
     decrement: string
@@ -46,16 +55,19 @@ export type Schema = Partial<{
     entries: true
     equals: Schema
     flat: true
+    function: Schema
     if: Schema | string
     isComputed: true
     isNullOrWhiteSpace: true
     includes: Schema
     increment: string
+    import: string
     not: Schema
     path: string
     parse: true
     propiedades: Record<string, Schema>
     reduce: Schema
+    reduceOrDefault: Schema
     reduceMany: Schema[]
     required: string[]
     schemaFrom: Schema
@@ -66,6 +78,7 @@ export type Schema = Partial<{
     some: any
     source: string
     status: string
+    store: Schema
     stringify: true
     spread: Schema
     targetPath: string

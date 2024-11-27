@@ -114,7 +114,7 @@ export class PlainResultBuilder {
         return this
       }
     
-    withPath(source: {}, path: string | undefined) {
+    withPath(source: Record<string, any> | undefined, path: string | undefined) {
         if(path) {
             this.target = helpers.getPathValue(source, path)
         }

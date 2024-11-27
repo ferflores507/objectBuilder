@@ -1,6 +1,112 @@
 import { describe, expect, test } from "vitest"
 import { Schema } from "../.."
-import { buildResultsAsync, expectToEqualAsync } from "./buildResultsASync"
+import { buildResultsAsync, Case, expectToEqualAsync } from "./buildResultsASync"
+
+test.fails("in operator in primitive fails", () => {
+  const isIn = "id" in true
+  
+  expect(isIn).toBe(true)
+})
+
+test("destructure primitive does not throw", () => {
+  const { prueba } = true
+  
+  expect(prueba).toBe(undefined)
+})
+
+test("flatMap components", () => {
+  const obj = [
+    {
+      names: ["btn"],
+      loader: "provider/components/btn"
+    },
+    {
+      names: ["card", "cardTitle"],
+      loader: "provider/components/card"
+    }
+  ]
+  .flatMap(({ names, loader }) => names.map(name => ({ [name]: loader })))
+  .reduce((obj, curr) => ({ ...obj, ...curr }))
+
+  expect(obj).toEqual({
+    btn: "provider/components/btn",
+    card: "provider/components/card",
+    cardTitle: "provider/components/card"
+  })
+})
+
+test("flatMap with inner map", () => {
+  const result = [
+    {
+      numbers: [1, 2],
+      group: "digits"
+    },
+    {
+      numbers: [20, 30],
+      group: "ten"
+    }
+  ]
+  .flatMap(obj => obj.numbers.map(number => ({ number, group: obj.group })))
+
+  expect(result).toEqual([
+    {
+      number: 1,
+      group: "digits"
+    },
+    {
+      number: 2,
+      group: "digits"
+    },
+    {
+      number: 20,
+      group: "ten"
+    },
+    {
+      number: 30,
+      group: "ten"
+    }
+  ])
+})
+
+test("map with inner map then flat", () => {
+  const result = [
+    {
+      names: ["uno", "dos"]
+    },
+    {
+      names: ["tres"]
+    }
+  ]
+  .map(obj => obj.names.map(name => ({ name })))
+  .flat()
+
+  expect(result).toEqual([
+    {
+      name: "uno"
+    },
+    {
+      name: "dos"
+    },
+    {
+      name: "tres"
+    }
+  ])
+})
+
+test("map then flat", () => {
+  const names = [
+    {
+      names: ["uno", "dos"]
+    },
+    {
+      names: ["tres"]
+    }
+  ]
+  .map(obj => obj.names)
+  .flat()
+
+  expect(names).toEqual(["uno", "dos", "tres"])
+})
 
 describe("string includes", () => {
   test.each([null, undefined])("textual %s", value => {
@@ -17,12 +123,10 @@ test("abortcontroller onabort catch", async () => {
     return new Promise<any>((resolve, reject) => {
       
       signal.onabort = () => {
-        console.log("onbort executed")
         reject()
       };
 
       controller.abort()
-      console.log("abort called")
     })
   }
 
@@ -30,7 +134,7 @@ test("abortcontroller onabort catch", async () => {
     await waitForEvent()
   }
   catch {
-    console.log("Request aborted");
+    // Request aborted
   }
 })
 
@@ -39,11 +143,9 @@ test("abortcontroller abort", () => {
   const signal = controller.signal;
 
   signal.onabort = () => {
-    console.log("Request aborted");
   };
 
   controller.abort()
-  console.log("abort called")
 })
 
 test("abortcontroller onabort", async () => {
@@ -59,31 +161,20 @@ test("abortcontroller onabort", async () => {
       // };
 
       signal.addEventListener("abort", () => {
-        console.log("Request aborted");
         resolve(true)
       });
 
       controller.abort()
-      console.log("abort called")
     })
   }
 
   await waitForEvent()
 })
 
-type Case = {
-  name: string,
-  source: any,
-  schema: Schema,
-  expected: any
-}
-
-const cases: Case[] = [
+const cases: ({ name: string } & Case)[] = [
   {
     name: "stringify",
-    options: {
-      target: { id: 1 }
-    },
+    target: { id: 1 },
     schema: {
       stringify: true
     },
@@ -91,9 +182,7 @@ const cases: Case[] = [
   },
   {
     name: "parse",
-    options: {
-      target: JSON.stringify({ id: 1 })
-    },
+    target: JSON.stringify({ id: 1 }),
     schema: {
       parse: true
     },
@@ -101,7 +190,7 @@ const cases: Case[] = [
   },
   {
     name: "schemaFrom",
-    source: {
+    store: {
       info: {
         nombre: "Melany",
       },
@@ -130,7 +219,7 @@ const cases: Case[] = [
   },
   {
     name: "definitions",
-    source: {},
+    store: {},
     schema: {
       const: {
         detalles: {
@@ -164,7 +253,7 @@ const cases: Case[] = [
   },
   {
     name: "definitions con propiedades",
-    source: {
+    store: {
       detalles: {
         nombre: "Melany",
         activo: true
@@ -200,7 +289,7 @@ const cases: Case[] = [
   },
   {
     name: "definitions con varios paths",
-    source: {
+    store: {
       detalles: {
         nombre: "Melany",
         apellido: "Flores"
@@ -220,7 +309,7 @@ const cases: Case[] = [
   },
   {
     name: "spread",
-    source: {},
+    store: {},
     schema: {
       const: {
         nombre: "Melany"
@@ -238,7 +327,7 @@ const cases: Case[] = [
   },
   {
     name: "propiedades",
-    source: {},
+    store: {},
     schema: {
       propiedades: {
         nombre: {
@@ -256,7 +345,7 @@ const cases: Case[] = [
   },
   {
     name: "const",
-    source: {},
+    store: {},
     schema: {
       const: {
         nombre: "Fernando",
@@ -270,7 +359,7 @@ const cases: Case[] = [
   },
   {
     name: "path",
-    source: {
+    store: {
       usuario: { 
         nombre: "Melany", 
         id: 1 
@@ -298,7 +387,7 @@ describe("basico old", () => {
   
     test("set", async () => {
       const caseArg = {
-        source: {
+        store: {
           nombre: "Melany",
           apellido: "Flores"
         },
@@ -311,13 +400,13 @@ describe("basico old", () => {
       await buildResultsAsync(caseArg)
   
       const expected = {
-        ...caseArg.source,
+        ...caseArg.store,
         detalles: {
           id: 1
         }
       }
   
-      expect(caseArg.source).toEqual(expected)
+      expect(caseArg.store).toEqual(expected)
     })
   
     describe("equals", () => {
@@ -353,7 +442,7 @@ describe("basico old", () => {
   
       test.each(cases)("case", async (schema) => {
         await expectToEqualAsync({
-          source: {},
+          store: {},
           schema,
           expected: true
         })

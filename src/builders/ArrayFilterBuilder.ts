@@ -40,7 +40,7 @@ export class ArrayFilterBuilder extends ArrayBuilderBase {
                         reduce: this.schema
                     }
                 })
-                .build() === true
+                .build()
 
             if(isMatch) {
                 matches.push(item)
