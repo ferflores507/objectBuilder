@@ -103,6 +103,7 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withSchema(schema: Schema | undefined) : SchemaTaskResultBuilder {
         const {
+            join,
             bindArg,
             status,
             delay,
@@ -145,11 +146,20 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withFunction(schema)
                 .withBindArg(bindArg)
                 .withEndSchema(schema)
+                .withJoin(join)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
             : this
+    }
+
+    withJoin(schema: Schema | undefined) {
+        if(schema) {
+            throw "Schema string join is not implemented yet..."
+        }
+
+        return this
     }
 
     withBindArg(schema: Schema | undefined) {
