@@ -8,18 +8,41 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
-test.only("schema string join", async () => {
-  await expectToEqualAsync({
-    schema: {
-      const: [
-        "Fernando",
-        "Flores"
-      ],
-      join: {
-        const: "-"
-      }
-    },
-    expected: "Fernando-Flores"
+describe.only("schema string join", () => {
+
+  const values = [
+    "Fernando",
+    "Flores"
+  ]
+
+  test("with filled schema", async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: values,
+        join: {
+          const: "-"
+        }
+      },
+      expected: values.join("-")
+    })
+  })
+
+  describe("with empty schema fails", () => {
+    const cases = [",", " "].map(s => values.join(s))
+
+    test.fails.each(cases)("fails to expect '%s'", async (expected) => {
+      await expectToEqualAsync({
+        schema: {
+          const: [
+            "Fernando",
+            "Flores"
+          ],
+          join: {
+          }
+        },
+        expected
+      })
+    })
   })
 })
 
