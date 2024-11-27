@@ -15,25 +15,30 @@ describe.only("schema string join", () => {
     "Flores"
   ]
 
-  test("expects join with empty string when join value is 'true'", async () => {
-    await expectToEqualAsync({
-      schema: {
-        const: values,
-        join: true
+  describe("with filled schema", () => {
+    const cases = [
+      {
+        title: "empty string",
+        join: true,
+        separator: ""
       },
-      expected: values.join("")
-    })
-  })
-
-  test("with filled schema", async () => {
-    await expectToEqualAsync({
-      schema: {
-        const: values,
+      {
+        title: "dash",
         join: {
           const: "-"
-        }
-      },
-      expected: values.join("-")
+        },
+        separator: "-"
+      }
+    ]
+
+    test.each(cases)("expects $join as value of join to be joined with $title", async ({ join, separator }) => {
+      await expectToEqualAsync({
+        schema: {
+          const: values,
+          join
+        },
+        expected: values.join(separator)
+      })
     })
   })
 
