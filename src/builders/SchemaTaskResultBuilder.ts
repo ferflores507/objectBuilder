@@ -154,8 +154,8 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withBindArg(schema: Schema | undefined) {
         return schema 
-            ? this.add(func => (current: any) => {
-                const arg = this.with({ initial: current, schema }).build()
+            ? this.add(func => (initial: any) => {
+                const arg = this.with({ initial, schema }).build()
 
                 return func(arg)
             })
