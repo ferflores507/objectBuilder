@@ -41,6 +41,8 @@ export type Consulta = { url: string } & Partial<{
 }>
 
 export type Schema = Partial<{
+    asyncFunction: Schema
+    bindArg: Schema
     consulta: Consulta
     calc: CalcMethod
     call: string

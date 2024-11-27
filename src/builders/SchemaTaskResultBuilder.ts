@@ -94,13 +94,16 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     set(path: string, value: any) {
-        varios.setPathValue(this.store.get() ?? {}, path, value)
+        const store = path.startsWith("stores") ? this.options : this.store.get()
+
+        varios.setPathValue(store ?? {}, path, value)
 
         return value
     }
 
     withSchema(schema: Schema | undefined) : SchemaTaskResultBuilder {
         const {
+            bindArg,
             status,
             delay,
             propiedades, 
@@ -116,7 +119,6 @@ export class SchemaTaskResultBuilder implements Builder {
             increment,
             decrement,
             consulta,
-            function: functionSchema,
             import: importPath,
             store,
             ...rest
@@ -140,13 +142,28 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withDefinitions(definitions)
                 .withPropiedades(propiedades)
                 .withSpread(spread)
-                .withFunction(functionSchema)
+                .withFunction(schema)
+                .withBindArg(bindArg)
                 .withEndSchema(schema)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
             : this
+    }
+
+    withBindArg(schema: Schema | undefined) {
+        if(schema) {
+            this.add(func => {
+                return (current: any) => {
+                    const arg = this.with({ initial: current, schema }).build()
+
+                    return func(arg)
+                }
+            })
+        }
+
+        return this
     }
 
     withUses(schema: Schema | undefined) {
@@ -161,8 +178,13 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withCall(path: string | undefined) {
+        const throwError = () => { throw `La función ${path} no está definida.` }
+        
         return path 
-            ? this.add(current => (this.getStoreValue(path) as Function)(current))  
+            ? this
+                .addMerge()
+                .withPaths({ path })
+                .add((func, prev) => (func ?? throwError)(prev))
             : this
     }
 
@@ -186,15 +208,16 @@ export class SchemaTaskResultBuilder implements Builder {
         return path ? this.withSchemaFrom({ path }) : this
     }
 
-    withFunction(functionSchema: Schema | undefined) {
-        if(functionSchema) {
-            this.add(() => (initial: any) => this.with({ 
-                initial, 
-                schema: functionSchema 
-            }).build())
-        }
+    withFunction(schema: Schema | undefined) {
+        const { asyncFunction } = schema ?? {}
+        const targetSchema = asyncFunction ?? schema?.function
 
-        return this
+        return targetSchema
+            ? this.add(() => (initial: any) => this.with({
+                initial,
+                schema: targetSchema
+            })[asyncFunction ? "buildAsync" : "build"]())
+            : this
     }
 
     withStatus(path: string | undefined) {
@@ -337,15 +360,12 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withIncrement(path: string | undefined, amount = 1) {
-        if(path) {
-            this.add(() => {
-                const value = (this.getStoreValue(path) ?? 0) + amount
-
-                return this.set(path, value)
-            })
-        }
-
-        return this
+        return path
+            ? this
+                .withPaths({ path })
+                .add(value => (value ?? 0) + amount)
+                .withSet(path)
+            : this
     }
 
     withDecrement(path: string | undefined) {
@@ -438,15 +458,16 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withPaths(schema: Schema | undefined) {
-        const { path, targetPath, sibling, source } = schema ?? {}
+        const { path, targetPath } = schema ?? {}
 
         return this.add((target) =>
             new PlainResultBuilder(target)
-                .withPath(path ? { ...this.options, ...this.store.get(), target: this.target, current: target } : {}, path)
+                .withPath(path ? { 
+                    ...this.options, 
+                    // ...this.store.get(), 
+                    target: this.target, current: target } : {}, path)
                 .withPath(this.target, targetPath)
-                .withPath(this.options.siblings, sibling)
-                .withPath(this.options.sources, source)
-                .build()
+                .build() ?? (path ? this.store.get(path) : target)
         )
     }
 }

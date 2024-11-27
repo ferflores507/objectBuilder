@@ -18,8 +18,6 @@ const jsonOrString = (str: string) => {
 export default function useFetchData() {
     
     const fetchData = async (url: string, opciones: RequestInit | undefined, signal: AbortSignal) => {
-        
-        console.log("Haciendo fetch con:", { url, opciones })
 
         // if(opciones.method === "get"){
         //     opciones.body = undefined

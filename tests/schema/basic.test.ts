@@ -123,12 +123,10 @@ test("abortcontroller onabort catch", async () => {
     return new Promise<any>((resolve, reject) => {
       
       signal.onabort = () => {
-        console.log("onbort executed")
         reject()
       };
 
       controller.abort()
-      console.log("abort called")
     })
   }
 
@@ -136,7 +134,7 @@ test("abortcontroller onabort catch", async () => {
     await waitForEvent()
   }
   catch {
-    console.log("Request aborted");
+    // Request aborted
   }
 })
 
@@ -145,11 +143,9 @@ test("abortcontroller abort", () => {
   const signal = controller.signal;
 
   signal.onabort = () => {
-    console.log("Request aborted");
   };
 
   controller.abort()
-  console.log("abort called")
 })
 
 test("abortcontroller onabort", async () => {
@@ -165,12 +161,10 @@ test("abortcontroller onabort", async () => {
       // };
 
       signal.addEventListener("abort", () => {
-        console.log("Request aborted");
         resolve(true)
       });
 
       controller.abort()
-      console.log("abort called")
     })
   }
 
