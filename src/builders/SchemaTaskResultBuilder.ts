@@ -6,7 +6,6 @@ import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
-import { ObjectValueStore } from "./ObjectValueStore"
 
 export type BuilderOptions = {
     store: Record<string, any>
@@ -36,22 +35,14 @@ export class SchemaTaskResultBuilder implements Builder {
             sources: {}
         }
 
-        this.setStore(this.options.store)
-
         this.taskBuilder = new TaskBuilder().with({ target: "initial" in this.options ? this.options.initial : target })
     }
 
     readonly options: Partial<BuilderOptions>
     readonly taskBuilder: TaskBuilder
-    store: ObjectValueStore = new ObjectValueStore({})
 
-    setStore(store: ObjectValueStore | Record<string, any>) {
-        
-        const targetStore = store instanceof ObjectValueStore
-            ? store
-            : new ObjectValueStore(store)
-
-        return this.store = targetStore
+    setStore(store: Record<string, any> | undefined) {
+        return this.options.store = store
     }
 
     addMerge() {
@@ -82,7 +73,7 @@ export class SchemaTaskResultBuilder implements Builder {
 
     with(options: Partial<BuilderOptions>) : SchemaTaskResultBuilder {
         const { schema, target = this.target, ...rest } = options 
-        const newOptions = { ...this.options, store: this.store, ...rest }
+        const newOptions = { ...this.options, ...rest }
         const builder = new SchemaTaskResultBuilder(target, newOptions)
         
         return schema ? builder.withSchema(schema) : builder 
@@ -90,11 +81,11 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     getStoreValue(path: string) {
-        return this.store.get(path)
+        return varios.getPathValue(this.options.store, path)
     }
 
     set(path: string, value: any) {
-        const store = path.startsWith("stores") ? this.options : this.store.get()
+        const store = path.startsWith("stores") ? this.options : this.options.store
 
         varios.setPathValue(store ?? {}, path, value)
 
@@ -467,7 +458,7 @@ export class SchemaTaskResultBuilder implements Builder {
                     // ...this.store.get(), 
                     target: this.target, current: target } : {}, path)
                 .withPath(this.target, targetPath)
-                .build() ?? (path ? this.store.get(path) : target)
+                .build() ?? (path ? this.getStoreValue(path) : target)
         )
     }
 }
