@@ -65,11 +65,11 @@ export const getPathValue = (obj: Record<string, any> | undefined, path: string 
     return getValueFromPaths(obj, getPaths(path, separator))
 }
 
-const spreadArray = (target: any[], source: any) => {
+export const spreadArray = (target: any[], source: any) => {
     return Array.isArray(source) ? [...target, ...source] : [...target, source]
 }
 
-const spreadObject = (target: Record<string, any> | undefined, source: any) => {
+export const spreadObject = (target: Record<string, any> | undefined, source: any) => {
     return Array.isArray(source) 
         ? source.reduce((prev, curr) => ({ ...prev, ...curr }), target) 
         : { ...target, ...source }
