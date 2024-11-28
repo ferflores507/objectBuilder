@@ -1355,55 +1355,6 @@ describe("select", () => {
   })
 })
 
-test.skip("stopPropiedades", async () => {
-  const caseArg = {
-    source: { 
-      evaluatedTitle: "evaluated" 
-    },
-    schema: {
-      propiedades: {
-        uno: {
-          const: 1
-        },
-        dos: {
-          path: "not evaluated",
-        },
-        tres: {
-          propiedades: {
-            title: {
-              path: "evaluatedTitle"
-            },
-            dos: {
-              const: "not evaluated"
-            },
-          }
-        },
-      }
-    }
-  }
-  const [result] = await buildResultsAsync(caseArg)
-  const [resultWithStop] = await buildResultsAsync({
-    ...caseArg,
-    stopPropiedades: ["dos"]
-  })
-
-  const expected = {
-    uno: 1,
-    dos: {
-      path: "not evaluated"
-    },
-    tres: {
-      title: "evaluated",
-      dos: {
-        const: "not evaluated"
-      }
-    }
-  }
-
-  expect(result).not.toEqual(expected)
-  expect(resultWithStop).toEqual(expected)
-})
-
 describe("propiedades builder", () => {
 
   type CaseOptions = {

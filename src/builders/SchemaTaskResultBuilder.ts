@@ -13,7 +13,6 @@ export type BuilderOptions = {
     sources: Record<string, any>
 
     target: any
-    stopPropiedades: string[]
     functions: Record<string, Function>
     schema: Schema
     initial: any

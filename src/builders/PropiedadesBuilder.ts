@@ -1,10 +1,13 @@
 import { Schema } from "../..";
 import { partition } from "../helpers/varios";
-import { Builder, BuilderOptions } from "./SchemaTaskResultBuilder";
+import { Builder } from "./SchemaTaskResultBuilder";
 
 export class PropiedadesBuilder {
     constructor(propiedades: Record<string, Schema>, builder: Builder) {
-        const [computedEntries, entries] = this.filterEntries(propiedades, builder.options)
+        const [computedEntries, entries] = partition(
+            Object.entries(propiedades), 
+            ([k, v]: [string, Schema]) => v.isComputed
+        )
         
         this.entries = entries
         this.result = { ...propiedades }
@@ -15,15 +18,6 @@ export class PropiedadesBuilder {
     private readonly result: Record<string, any>
     private readonly entries: [string, Schema][]
     private readonly builder: Builder
-
-    filterEntries(propiedades: Record<string, Schema>, options: Partial<BuilderOptions>) {
-        const initialEntries = Object.entries(propiedades)
-            .filter(([k]) => !options.stopPropiedades?.includes(k))
-
-        const passPredicate = ([k, v]: [string, Schema]) => v.isComputed
-        
-        return partition(initialEntries, passPredicate)
-    }
 
     setComputed(obj: {}, entries: [string, Schema][]) {
         const builder = this.builder
