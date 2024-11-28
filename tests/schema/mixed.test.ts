@@ -593,7 +593,7 @@ test("equals with current properties", async () => {
 
 test("definitions async", async () => {
   await expectToEqualAsync({
-    schema: [1,2,3].map(n => ({ delay: 2000, reduce: { const: n } })),
+    schema: [1,2,3].map((n): Schema => ({ delay: 2000, reduce: { const: n } })),
     expected: [1,2,3]
   })
 })

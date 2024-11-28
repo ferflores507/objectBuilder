@@ -14,7 +14,7 @@ export type BuilderOptions = {
 
     target: any
     functions: Record<string, Function>
-    schema: Schema
+    schema: Schema | Schema[]
     initial: any
 }
 

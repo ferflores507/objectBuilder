@@ -2,7 +2,7 @@ import { expect } from "vitest"
 import { Schema } from "../.."
 import { BuilderOptions, SchemaTaskResultBuilder } from "../../src/builders/SchemaTaskResultBuilder"
 
-type CaseOptions = Partial<BuilderOptions> & { schema: Schema }
+type CaseOptions = Partial<BuilderOptions> & { schema: Schema | Schema[] }
 
 export const buildResultsAsync = async (options: CaseOptions) => {
 
