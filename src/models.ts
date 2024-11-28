@@ -81,7 +81,6 @@ export type Schema = Partial<{
     store: Schema
     stringify: true
     spread: Schema
-    targetPath: string
     then: Schema
     trim: true
     unpack: string[]
