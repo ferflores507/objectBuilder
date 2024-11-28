@@ -8,6 +8,59 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+describe("schema string join", () => {
+
+  const values = [
+    "Fernando",
+    "Flores"
+  ]
+
+  describe("with filled schema", () => {
+    const cases = [
+      {
+        title: "empty string",
+        join: true,
+        separator: ""
+      },
+      {
+        title: "dash",
+        join: {
+          const: "-"
+        },
+        separator: "-"
+      }
+    ]
+
+    test.each(cases)("expects $join as value of join to be joined with $title", async ({ join, separator }) => {
+      await expectToEqualAsync({
+        schema: {
+          const: values,
+          join
+        },
+        expected: values.join(separator)
+      })
+    })
+  })
+
+  describe("with empty schema fails", () => {
+    const cases = [",", ""].map(s => values.join(s))
+
+    test.fails.each(cases)("fails to expect '%s'", async (expected) => {
+      await expectToEqualAsync({
+        schema: {
+          const: [
+            "Fernando",
+            "Flores"
+          ],
+          join: {
+          }
+        },
+        expected
+      })
+    })
+  })
+})
+
 test("schema isComputed property", () => {
   const store = {
     nombre: "Fernando"

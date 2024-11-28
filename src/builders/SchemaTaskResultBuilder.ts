@@ -93,6 +93,7 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withSchema(schema: Schema | undefined) : SchemaTaskResultBuilder {
         const {
+            join,
             bindArg,
             status,
             delay,
@@ -135,11 +136,26 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withFunction(schema)
                 .withBindArg(bindArg)
                 .withEndSchema(schema)
+                .withJoin(join)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
                 .withReduceMany(reduceMany)
                 .withCheckout(checkout)
             : this
+    }
+
+    withJoin(schema: Schema | true | undefined) {
+        if(schema) {
+            this.add((items: any[]) => {
+                const separator = schema === true 
+                    ? "" 
+                    : this.with({ initial: items, schema }).build()
+                
+                return items.join(separator)
+            })
+        }
+
+        return this
     }
 
     withBindArg(schema: Schema | undefined) {
