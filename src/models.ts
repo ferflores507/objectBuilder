@@ -40,6 +40,8 @@ export type Consulta = { url: string } & Partial<{
     headers: Record<string, any>
 }>
 
+export type SchemaDefinition = Schema | Schema[]
+
 export type Schema = Partial<{
     asyncFunction: Schema
     bindArg: Schema
