@@ -43,7 +43,7 @@ describe("schema string join", () => {
   })
 
   describe("with empty schema fails", () => {
-    const cases = [",", " "].map(s => values.join(s))
+    const cases = [",", ""].map(s => values.join(s))
 
     test.fails.each(cases)("fails to expect '%s'", async (expected) => {
       await expectToEqualAsync({
