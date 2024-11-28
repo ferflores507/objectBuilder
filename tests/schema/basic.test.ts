@@ -1,6 +1,29 @@
 import { describe, expect, test } from "vitest"
 import { Schema } from "../.."
 import { buildResultsAsync, Case, expectToEqualAsync } from "./buildResultsASync"
+import { spreadObject, spreadArray } from "../../src/helpers/varios"
+
+describe("spread", () => {
+
+  describe("into object", () => {
+
+    const target = { nombre: "Melany" }
+    const expected = { id: 1, nombre: "Fernando" }
+
+    test("from object", () => {
+      expect(spreadObject(target, expected)).toEqual(expected)
+    })
+  
+    test("from array", () => {
+      const source = [
+        { id: 7 },
+        expected
+      ]
+
+      expect(spreadObject(target, source)).toEqual(expected)
+    })
+  })
+})
 
 test.fails("in operator in primitive fails", () => {
   const isIn = "id" in true
