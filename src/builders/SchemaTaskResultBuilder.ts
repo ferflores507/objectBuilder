@@ -91,7 +91,10 @@ export class SchemaTaskResultBuilder implements Builder {
         return value
     }
 
-    withSchema(schema: Schema | undefined) : SchemaTaskResultBuilder {
+    withSchema(schema: Schema | Schema[] | undefined) : SchemaTaskResultBuilder {
+
+        schema = Array.isArray(schema) ? { definitions: schema } : schema
+        
         const {
             join,
             bindArg,
