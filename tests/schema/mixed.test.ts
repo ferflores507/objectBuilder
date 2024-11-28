@@ -8,6 +8,32 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("schema isComputed property", () => {
+  const store = {
+    nombre: "Fernando"
+  }
+
+  const result = new SchemaTaskResultBuilder()
+    .with({
+      store,
+      schema: {
+        propiedades: {
+          titulo: {
+            isComputed: true,
+            path: "nombre"
+          }
+        },
+      },
+    })
+    .build()
+
+  expect(result.titulo).toEqual("Fernando")
+
+  store.nombre = "Melany"
+
+  expect(result.titulo).toEqual("Melany")
+})
+
 describe("schema async function", async () => {
   const store = new SchemaTaskResultBuilder()
     .withSchema({
