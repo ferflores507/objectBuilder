@@ -1,6 +1,37 @@
 import { describe, expect, test } from "vitest"
 import { Schema } from "../.."
 import { buildResultsAsync, Case, expectToEqualAsync } from "./buildResultsASync"
+import { spread } from "../../src/helpers/varios"
+
+describe("expects spread into", () => {
+  const cases = [
+    {
+      target: { id: 1, nombre: "Melany" },
+      source: { id: 2, apellido: "Flores" },
+      expected: { nombre: "Melany", id: 2, apellido: "Flores" }
+    },
+    {
+      target: { id: 1, nombre: "Melany" },
+      source: [{ id: 2 }, { apellido: "Flores" }],
+      expected: { nombre: "Melany", id: 2, apellido: "Flores" }
+    },
+    {
+      target: [1, 2],
+      source: 3,
+      expected: [1, 2, 3]
+    },
+    {
+      target: [1, 2],
+      source: [3],
+      expected: [1, 2, 3]
+    }
+  ]
+
+  test.each(cases)("$target from $source to equal: $expected", ({ target, source, expected }) => {
+    expect(spread(target, source)).toEqual(expected)
+  })
+
+})
 
 test.fails("in operator in primitive fails", () => {
   const isIn = "id" in true
