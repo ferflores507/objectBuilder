@@ -218,7 +218,7 @@ const cases: ({ name: string } & Case)[] = [
     }
   },
   {
-    name: "definitions",
+    name: "schema array as value of inner property",
     store: {},
     schema: {
       const: {
@@ -228,19 +228,17 @@ const cases: ({ name: string } & Case)[] = [
         }
       },
       propiedades: {
-        inner: {
-          definitions: [
-            {
-              const: false
-            },
-            {
-              path: "current.detalles.activo"
-            },
-            {
-              const: false
-            }
-          ]
-        }
+        inner: [
+          {
+            const: false
+          },
+          {
+            path: "current.detalles.activo"
+          },
+          {
+            const: false
+          }
+        ]
       }
     },
     expected: {
@@ -288,23 +286,21 @@ const cases: ({ name: string } & Case)[] = [
     ]
   },
   {
-    name: "definitions con varios paths",
+    name: "array schema definition",
     store: {
       detalles: {
         nombre: "Melany",
         apellido: "Flores"
       }
     },
-    schema: {
-      definitions: [
-        {
-          path: "detalles.nombre"
-        },
-        {
-          path: "detalles.apellido"
-        }
-      ]
-    },
+    schema: [
+      {
+        path: "detalles.nombre"
+      },
+      {
+        path: "detalles.apellido"
+      }
+    ],
     expected: ["Melany", "Flores"]
   },
   {
