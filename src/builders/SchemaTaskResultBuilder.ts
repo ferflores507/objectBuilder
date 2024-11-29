@@ -171,10 +171,10 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withUses(schema: Schema | undefined) {
+    withUses(uses: Record<string, SchemaDefinition> | undefined) {
         const { functions } = this.options
 
-        Object.entries(schema ?? {})
+        Object.entries(uses ?? {})
             .filter(([name]) => functions?.hasOwnProperty(name))
             .sort(([a], [b]) => a.localeCompare(b))
             .forEach(([name, val]) => functions?.[name]?.(val, this))
