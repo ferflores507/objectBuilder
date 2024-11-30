@@ -56,6 +56,10 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
+    unshiftOrDefault(task: Task) {
+        return this.add(task).add(result => this.unshift(result))
+    }
+
     add(task: Task) {
         this.taskBuilder.add(task)
 
@@ -445,9 +449,7 @@ export class SchemaTaskResultBuilder implements Builder {
             ? this
                 .addMerge()
                 .withSchema(source)
-                .add((current, prev) => {
-                    this.withUnshift({ initial: prev, schema: current })
-            }) 
+                .unshiftOrDefault((current, prev) => this.with({ initial: prev, schema: current }))
             : this
     }
 
