@@ -40,49 +40,51 @@ export type Consulta = { url: string } & Partial<{
     headers: Record<string, any>
 }>
 
+export type SchemaDefinition = Schema | Schema[]
+
 export type Schema = Partial<{
-    asyncFunction: Schema
-    bindArg: Schema
+    asyncFunction: SchemaDefinition
+    bindArg: SchemaDefinition
     consulta: Consulta
     calc: CalcMethod
     call: string
-    checkout: Schema
+    checkout: SchemaDefinition
     const: any
     decrement: string
     definitions: Schema[]
     delay: number
-    else: Schema
+    else: SchemaDefinition
     entries: true
-    equals: Schema
+    equals: SchemaDefinition
     flat: true
-    function: Schema
-    if: Schema | string
+    function: SchemaDefinition
+    if: SchemaDefinition | string
     isComputed: true
     isNullOrWhiteSpace: true
-    includes: Schema
+    includes: SchemaDefinition
     increment: string
     import: string
-    join: Schema
-    not: Schema
+    join: SchemaDefinition
+    not: SchemaDefinition
     path: string
     parse: true
-    propiedades: Record<string, Schema>
-    reduce: Schema
-    reduceOrDefault: Schema
+    propiedades: Record<string, SchemaDefinition>
+    reduce: SchemaDefinition
+    reduceOrDefault: SchemaDefinition
     reduceMany: Schema[]
     required: string[]
-    schemaFrom: Schema
+    schemaFrom: SchemaDefinition
     selectSet: string
     set: string
-    schema: Schema
+    schema: SchemaDefinition
     sibling: string
     some: any
     source: string
     status: string
     store: Schema
     stringify: true
-    spread: Schema
-    then: Schema
+    spread: SchemaDefinition
+    then: SchemaDefinition
     trim: true
     unpack: string[]
     use: string

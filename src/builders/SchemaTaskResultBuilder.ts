@@ -1,4 +1,4 @@
-import type { ArraySchema, Consulta, Schema } from "../models"
+import type { ArraySchema, Consulta, Schema, SchemaDefinition } from "../models"
 import * as varios from "../helpers/varios"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
 import { PlainResultBuilder } from "./PlainResultBuilder"
@@ -14,14 +14,14 @@ export type BuilderOptions = {
 
     target: any
     functions: Record<string, Function>
-    schema: Schema
+    schema: SchemaDefinition
     initial: any
 }
 
 export type Builder = {
     options: Partial<BuilderOptions>
     with: (options: Partial<BuilderOptions>) => Builder
-    withSchema: (schema: Schema | undefined) => Builder
+    withSchema: (schema: SchemaDefinition | undefined) => Builder
     build: () => any
     buildAsync: () => Promise<any>
 }
@@ -91,7 +91,10 @@ export class SchemaTaskResultBuilder implements Builder {
         return value
     }
 
-    withSchema(schema: Schema | undefined) : SchemaTaskResultBuilder {
+    withSchema(schema: SchemaDefinition | undefined) : SchemaTaskResultBuilder {
+
+        schema = Array.isArray(schema) ? { definitions: schema } : schema
+        
         const {
             join,
             bindArg,
@@ -144,7 +147,7 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withJoin(schema: Schema | true | undefined) {
+    withJoin(schema: SchemaDefinition | true | undefined) {
         if(schema) {
             this.add((items: any[]) => {
                 const separator = schema === true 
@@ -158,7 +161,7 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
-    withBindArg(schema: Schema | undefined) {
+    withBindArg(schema: SchemaDefinition | undefined) {
         return schema 
             ? this.add(func => (initial: any) => {
                 const arg = this.with({ initial, schema }).build()
@@ -168,10 +171,10 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withUses(schema: Schema | undefined) {
+    withUses(uses: Record<string, SchemaDefinition> | undefined) {
         const { functions } = this.options
 
-        Object.entries(schema ?? {})
+        Object.entries(uses ?? {})
             .filter(([name]) => functions?.hasOwnProperty(name))
             .sort(([a], [b]) => a.localeCompare(b))
             .forEach(([name, val]) => functions?.[name]?.(val, this))
@@ -268,7 +271,7 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withCheckout(schema: Schema | undefined) : SchemaTaskResultBuilder {
+    withCheckout(schema: SchemaDefinition | undefined) : SchemaTaskResultBuilder {
         if(schema) {
             this.add((target) => {
                 this.target = target
@@ -293,7 +296,7 @@ export class SchemaTaskResultBuilder implements Builder {
         return path ? this.add(task) : this
     }
 
-    withSpread(schema: Schema | undefined) {
+    withSpread(schema: SchemaDefinition | undefined) {
         if(schema) {
             this.addMerge()
                 .withSchema(schema)
@@ -338,7 +341,7 @@ export class SchemaTaskResultBuilder implements Builder {
             .withSet(set)
     }
 
-    withReduceOrDefault(schema: Schema | undefined) : SchemaTaskResultBuilder {
+    withReduceOrDefault(schema: SchemaDefinition | undefined) : SchemaTaskResultBuilder {
         return schema 
             ? this.add(current => {
                 if(current != null) {
@@ -351,7 +354,7 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withReduce(schema: Schema | undefined) : SchemaTaskResultBuilder {
+    withReduce(schema: SchemaDefinition | undefined) : SchemaTaskResultBuilder {
         return schema ? this.add(current => this.target = current).withSchema(schema) : this
     }
 
@@ -437,7 +440,7 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
-    withSchemaFrom(source: Schema | undefined) : SchemaTaskResultBuilder {
+    withSchemaFrom(source: SchemaDefinition | undefined) : SchemaTaskResultBuilder {
         return source 
             ? this
                 .addMerge()
