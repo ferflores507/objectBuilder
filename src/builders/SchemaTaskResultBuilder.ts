@@ -446,7 +446,7 @@ export class SchemaTaskResultBuilder implements Builder {
                 .addMerge()
                 .withSchema(source)
                 .add((current, prev) => {
-                    return this.with({ initial: prev, schema: current }).build()
+                    this.withUnshift({ initial: prev, schema: current })
             }) 
             : this
     }
