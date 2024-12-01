@@ -40,6 +40,25 @@ describe("schema string join", () => {
         expected: values.join(separator)
       })
     })
+
+    test("dash with async fails on buildAsync", async () => {
+      const separator = "-"
+      const result = await new SchemaTaskResultBuilder()
+        .with({
+          schema: {
+            const: values,
+            join: {
+              const: "-",
+              reduce: {
+                delay: 100,
+              }
+            },
+          }
+        })
+        .buildAsync()
+
+      expect(result).toEqual(values.join(separator))
+    })
   })
 
   describe("with empty schema fails", () => {
