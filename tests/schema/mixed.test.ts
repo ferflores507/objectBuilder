@@ -28,7 +28,7 @@ describe("schema from async", () => {
           msg: expected
         },
         reduce: {
-          delay: 10000,
+          delay: 100,
           path: "current.msg"
         }
       }
