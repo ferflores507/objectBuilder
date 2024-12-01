@@ -8,6 +8,48 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+describe("schema from async", () => {
+
+  const expected = "ok"
+  const cases = [
+    {
+      message: "works because awaits delay promise at the end",
+      schema: {
+        const: expected,
+        reduce: {
+          delay: 100
+        }
+      }
+    },
+    {
+      message: "doesnt works (delay is not awaited) and expects a nested property of current (promise) to be expected value",
+      schema: {
+        const: {
+          msg: expected
+        },
+        reduce: {
+          delay: 10000,
+          path: "current.msg"
+        }
+      }
+    },
+  ]
+
+  test.each(cases)("$message", async ({ schema }) => {
+    const result = await new SchemaTaskResultBuilder()
+      .with({
+        schema: {
+          schemaFrom: {
+            schema
+          }
+        },
+      })
+      .buildAsync()
+  
+      expect(result).toEqual(expected)
+  })
+})
+
 describe("schema string join", () => {
 
   const values = [
