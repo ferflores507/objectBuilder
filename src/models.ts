@@ -23,7 +23,7 @@ export type ArraySchema = Partial<{
     select: {
         [P in keyof SelectSchema]: Schema;
     },
-    filter: FilterSchema,
+    filter: Schema,
     find: Schema,
     items: Schema,
     contains: Schema,
