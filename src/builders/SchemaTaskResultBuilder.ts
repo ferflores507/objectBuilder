@@ -34,7 +34,7 @@ export class SchemaTaskResultBuilder implements Builder {
             sources: {}
         }
 
-        this.taskBuilder = new TaskBuilder().with({ target: "initial" in this.options ? this.options.initial : target })
+        this.taskBuilder = new TaskBuilder().with({ target: options?.initial })
     }
 
     readonly options: Partial<BuilderOptions>
