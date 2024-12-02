@@ -17,7 +17,7 @@ describe("schema from async", () => {
       schema: {
         const: expected,
         reduce: {
-          delay: 100
+          delay: 50
         }
       }
     },
@@ -28,7 +28,7 @@ describe("schema from async", () => {
           msg: expected
         },
         reduce: {
-          delay: 100,
+          delay: 50,
           path: "current.msg"
         }
       }
@@ -92,7 +92,7 @@ describe("schema string join", () => {
             join: {
               const: "-",
               reduce: {
-                delay: 100,
+                delay: 50,
               }
             },
           }
@@ -154,7 +154,7 @@ describe("schema async function", async () => {
       propiedades: {
         getSeven: {
           asyncFunction: {
-            delay: 1000,
+            delay: 50,
             const: 7
           }
         }
@@ -641,7 +641,7 @@ test("equals with current properties dos", async () => {
 
 test("schema array async", async () => {
   await expectToEqualAsync({
-    schema: [1, 2, 3].map((n): Schema => ({ delay: 2000, reduce: { const: n } })),
+    schema: [1, 2, 3].map((n): Schema => ({ delay: 50, reduce: { const: n } })),
     expected: [1, 2, 3]
   })
 })
