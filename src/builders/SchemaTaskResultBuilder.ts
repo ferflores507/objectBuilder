@@ -309,15 +309,20 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withConditional(schema: Schema | undefined) : SchemaTaskResultBuilder {
-        const withSchemaOrPath = (value: any) => this.with({ 
-            schema: typeof(value) == "string" ? { path: value } : value
-        })
+        const schemaOrPath = (value: string | SchemaDefinition) => {
+            return typeof(value) == "string" ? { path: value } : value
+        }
 
-        return schema?.if
+        const { if: condition, then: thenCondition, else: elseCondition } = schema ?? {}
+
+        return condition
             ? this
-                .withUnshift(initial => withSchemaOrPath(schema.if))
+                .withUnshift(initial => this.with({
+                    initial,
+                    schema: schemaOrPath(condition)
+                }))
                 .withUnshift(result => this.with({
-                    schema: result ? schema.then : schema.else
+                    schema: result ? thenCondition : elseCondition
                 }))
             : this
     }
