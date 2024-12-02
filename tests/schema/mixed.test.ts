@@ -351,7 +351,7 @@ test("map then filter", async () => {
   })
 })
 
-test("filter with match", async () => {
+test("filter simple case", async () => {
   await expectToEqualAsync({
     schema: {
       const: Array.from(Array(3).keys()),
