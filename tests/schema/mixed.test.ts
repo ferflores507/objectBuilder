@@ -895,7 +895,6 @@ test("map builder with undefined", async () => {
   const result = items.map(x => {
     return new SchemaTaskResultBuilder()
       .with({
-        target: 100,
         initial: x,
         schema: {
           propiedades: {
@@ -912,14 +911,13 @@ test("map builder with undefined", async () => {
   expect(result).toEqual(expected)
 })
 
-test("target defined and const with undefined", async () => {
+test("initial defined and const with undefined", async () => {
   await expectToEqualAsync({
     schema: {
       const: undefined,
     },
     expected: undefined,
-    // initial: undefined, // stops failing
-    target: 1
+    initial: 1,
   })
 })
 
@@ -927,13 +925,15 @@ test("map path target", async () => {
 
   await expectToEqualAsync({
     schema: {
-      const: [1, 2, 3, 4],
-      map: {
-        path: "target"
+      const: 1,
+      reduce: {
+        const: [1, 2, 3, 4],
+        map: {
+          path: "target"
+        }
       }
     },
     expected: [1, 1, 1, 1],
-    target: 1
   })
 
 })
@@ -956,9 +956,12 @@ describe("includes", () => {
 
   test("with array", async () => {
     const schema = {
-      path: "local.selectedItems",
-      includes: {
-        path: "target.id"
+      const: { id: 1 },
+      reduce: {
+        path: "local.selectedItems",
+        includes: {
+          path: "target.id"
+        }
       }
     }
 
@@ -970,7 +973,6 @@ describe("includes", () => {
       },
       schema,
       expected: true,
-      target: { id: 1 }
     })
   })
 })
@@ -996,12 +998,10 @@ test("path target", async () => {
 
 test("not", () => {
   const result = new SchemaTaskResultBuilder()
-    .with({
-      target: { activated: true }
-    })
     .withSchema({
-      path: "target.activated",
+      const: { activated: true },
       not: {
+        path: "current.activated",
       }
     })
     .build()
@@ -1009,7 +1009,7 @@ test("not", () => {
   expect(result).toBe(false)
 })
 
-test("array builder with undefined schema", () => {
+test("array builder with schema with find", () => {
   const schema = {
     find: {
       path: "current.nombre",
@@ -1027,21 +1027,9 @@ test("array builder with undefined schema", () => {
   ]
 
   const builder = new SchemaTaskResultBuilder()
-    .with({
-      target: [
-        1,
-        "dos",
-        { nombre: "Mari" },
-        { nombre: "Melany" }
-      ]
-    })
-    .withSchema(schema)
-  // .build()
-
   const result = new ArrayBuilder(target, builder).build(schema)
 
   expect(result).toEqual({ nombre: "Melany" })
-
 })
 
 describe("array filter property 'keywords' contains string", () => {
@@ -1218,21 +1206,14 @@ describe("not", () => {
       true
     ]
 
-    const expected = source.map(x => !x)
-
     await expectToEqualAsync({
       schema: {
         map: {
           not: {}
         }
       },
-      target: [
-        true,
-        false,
-        false,
-        true
-      ],
-      expected
+      initial: source,
+      expected: source.map(x => !x)
     })
   })
 
@@ -1436,7 +1417,6 @@ describe("select", () => {
       store: {
         selected: [2]
       },
-      target: { id: 3 }
     })
 
   const cases = [
@@ -1448,10 +1428,13 @@ describe("select", () => {
     const resultado = builder
       .with({
         schema: {
-          path: "target.id",
-          selectSet: "selected",
+          const: { id: 3 },
           reduce: {
-            path: "selected"
+            path: "target.id",
+            selectSet: "selected",
+            reduce: {
+              path: "selected"
+            }
           }
         }
       })
@@ -1715,7 +1698,7 @@ describe("spread", () => {
       },
       schema,
       expected,
-      target: {
+      initial: {
         subUno: 1
       }
     })
@@ -1728,7 +1711,7 @@ describe("entries", () => {
       schema: {
         entries: true
       },
-      target: {
+      initial: {
         nombre: "Melany",
         cedula: "9-123-456",
         fechaDeNacimiento: "18/09/2019"
@@ -1979,7 +1962,7 @@ describe("array", () => {
             }
           }
         },
-        target: [
+        initial: [
           1,
           "dos",
           { nombre: "Mari" },
