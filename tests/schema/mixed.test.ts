@@ -606,9 +606,11 @@ describe("schema import", () => {
 test("equals with current properties", async () => {
   await expectToEqualAsync({
     schema: {
-      path: "current.uno",
-      equals: {
-        path: "target.one"
+      reduce: {
+        path: "current.uno",
+        equals: {
+          path: "target.one"
+        }
       }
     },
     initial: {
@@ -619,7 +621,7 @@ test("equals with current properties", async () => {
   })
 })
 
-test("equals with current properties", async () => {
+test("equals with current properties dos", async () => {
   await expectToEqualAsync({
     schema: {
       const: {
