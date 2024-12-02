@@ -316,14 +316,9 @@ test("map then filter from target", async () => {
       reduce: {
         path: "current.items",
         filter: {
-          source: {
-            path: "target.search",
-          },
-          match: {
-            path: "current.id",
-            equals: {
-              path: "source"
-            }
+          path: "current.id",
+          equals: {
+            path: "target.search"
           }
         }
       }
@@ -345,14 +340,9 @@ test("map then filter", async () => {
       },
       reduce: {
         filter: {
-          source: {
+          path: "current.id",
+          equals: {
             const: 1,
-          },
-          match: {
-            path: "current.id",
-            equals: {
-              path: "source"
-            }
           }
         }
       }
@@ -366,14 +356,9 @@ test("filter with match", async () => {
     schema: {
       const: Array.from(Array(3).keys()),
       filter: {
-        source: {
+        path: "current",
+        equals: {
           const: 1,
-        },
-        match: {
-          path: "current",
-          equals: {
-            path: "source"
-          }
         }
       }
     },
@@ -785,25 +770,11 @@ test("filter with source tres", async () => {
     {
       schema: {
         const: ["tres", "dos", "cuatro"],
-        filter: {
-          source: {
-            propiedades: {
-              length: {
-                path: "current.length"
-              },
-              sourceSchema: {
-                schema: {
-                  path: "current.length",
-                  equals: {
-                    path: "source.length"
-                  }
-                }
-              }
-            }
-          },
-          match: {
-            schemaFrom: {
-              path: "source.sourceSchema"
+        reduce: {
+          filter: {
+            path: "current.length",
+            equals: {
+              path: "target.length"
             }
           }
         }
@@ -820,16 +791,14 @@ test("filter with source dos", async () => {
         search: "  in  "
       },
       schema: {
-        const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
-        filter: {
-          source: {
-            path: "search",
-            trim: true
-          },
-          match: {
+        path: "search",
+        trim: true,
+        reduce: {
+          const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
+          filter: {
             path: "current",
             includes: {
-              path: "source"
+              path: "target"
             }
           }
         }
@@ -844,14 +813,11 @@ test("filter with source", async () => {
     {
       schema: {
         const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
-        filter: {
-          source: {
-            path: "current.length"
-          },
-          match: {
+        reduce: {
+          filter: {
             path: "current.length",
             equals: {
-              path: "source"
+              path: "target.length"
             }
           }
         }
