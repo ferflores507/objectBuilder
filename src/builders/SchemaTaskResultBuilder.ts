@@ -56,6 +56,14 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
+    withUnshift(task: Task) {
+        const isBuilder = (value: any) => value instanceof SchemaTaskResultBuilder
+        
+        return this
+            .add(task)
+            .add(result => isBuilder(result) ? this.unshift(result) : result)
+    }
+
     add(task: Task) {
         this.taskBuilder.add(task)
 
@@ -149,13 +157,11 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withJoin(schema: SchemaDefinition | true | undefined) {
         if(schema) {
-            this.add((items: any[]) => {
-                const separator = schema === true 
-                    ? "" 
-                    : this.with({ initial: items, schema }).build()
-                
-                return items.join(separator)
-            })
+            this.addMerge()
+                .withUnshift(initial =>
+                    schema === true ? "" : this.with({ initial, schema })
+                )
+                .add((separator, prev: []) => prev.join(separator))
         }
 
         return this
@@ -203,10 +209,6 @@ export class SchemaTaskResultBuilder implements Builder {
         }
 
         return this
-    }
-
-    withUnshift(options: Partial<BuilderOptions>) {
-        return this.unshift(this.with(options))
     }
 
     withImport(path: string | undefined) {
@@ -445,9 +447,7 @@ export class SchemaTaskResultBuilder implements Builder {
             ? this
                 .addMerge()
                 .withSchema(source)
-                .add((current, prev) => {
-                    return this.with({ initial: prev, schema: current }).build()
-            }) 
+                .withUnshift((schema, initial) => this.with({ initial, schema }))
             : this
     }
 
