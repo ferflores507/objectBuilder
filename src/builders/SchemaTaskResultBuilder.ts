@@ -470,11 +470,14 @@ export class SchemaTaskResultBuilder implements Builder {
                     target: this.target, 
                     current
                 }
+
+                const proxy = new Proxy(sharedSource, {
+                    get: (target: Record<string, any>, prop: string) => {
+                        return prop in target ? target[prop] : target.store[prop]
+                    }
+                })
                 
-                return new PlainResultBuilder(current)
-                    .withPath(sharedSource, path)
-                    .build()
-                    ?? this.getStoreValue(path)
+                return varios.getPathValue(proxy, path)
             }) 
             : this
     }
