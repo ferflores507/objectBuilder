@@ -463,13 +463,19 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withPath(path: string | undefined) {
-        return this.add((target) =>
-            new PlainResultBuilder(target)
-                .withPath(path ? { 
+        return path 
+            ? this.add((target) => {
+                const sharedSource = { 
                     ...this.options, 
-                    // ...this.store.get(), 
-                    target: this.target, current: target } : {}, path)
-                .build() ?? (path ? this.getStoreValue(path) : target)
-        )
+                    target: this.target, 
+                    current: target 
+                }
+                
+                return new PlainResultBuilder(target)
+                    .withPath(path ? sharedSource : {}, path)
+                    .build() 
+                    ?? (path ? this.getStoreValue(path) : target)
+            }) 
+            : this
     }
 }
