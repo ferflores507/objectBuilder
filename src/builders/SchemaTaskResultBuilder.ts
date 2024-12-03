@@ -132,7 +132,7 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withUses(rest)
                 .withStore(store)
                 .withDelay(delay)
-                .withPaths(schema)
+                .withPath(schema)
                 .withImport(importPath)
                 .withInitialSchema(schema)
                 .withSchemaFrom(schemaFrom)
@@ -194,7 +194,7 @@ export class SchemaTaskResultBuilder implements Builder {
         return path 
             ? this
                 .addMerge()
-                .withPaths({ path })
+                .withPath({ path })
                 .add((func, prev) => (func ?? throwError)(prev))
             : this
     }
@@ -369,7 +369,7 @@ export class SchemaTaskResultBuilder implements Builder {
     withIncrement(path: string | undefined, amount = 1) {
         return path
             ? this
-                .withPaths({ path })
+                .withPath({ path })
                 .add(value => (value ?? 0) + amount)
                 .withSet(path)
             : this
@@ -461,7 +461,7 @@ export class SchemaTaskResultBuilder implements Builder {
         })
     }
 
-    withPaths(schema: Schema | undefined) {
+    withPath(schema: Schema | undefined) {
         const { path } = schema ?? {}
 
         return this.add((target) =>
