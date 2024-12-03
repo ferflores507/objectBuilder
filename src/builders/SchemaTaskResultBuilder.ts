@@ -472,9 +472,9 @@ export class SchemaTaskResultBuilder implements Builder {
                 }
                 
                 return new PlainResultBuilder(target)
-                    .withPath(path ? sharedSource : {}, path)
-                    .build() 
-                    ?? (path ? this.getStoreValue(path) : target)
+                    .withPath(sharedSource, path)
+                    .build()
+                    ?? this.getStoreValue(path)
             }) 
             : this
     }
