@@ -35,27 +35,6 @@ export const getFormData = (source: {}) => {
     return data
 }
 
-type PathProperties = {
-    container: Record<string, any> | undefined,
-    value: any
-}
-
-export const getValueFromPaths = (obj: Record<string, any> | undefined, path: string | string[], separator = ".") : PathProperties => {
-
-    obj = obj ?? (() => { throw "source object is null or undefined" })()
-
-    const paths = getPaths(path, separator)
-
-    const properties = paths.reduce(({ value }, path) => {
-        return { 
-            container: value, 
-            value: value?.[path],
-        }
-    }, { container: obj, value: obj })
-
-    return Object.assign(properties, { paths })
-}
-
 const getPaths = (path: string | string[], separator = ".") => {
     return Array.isArray(path) ? path : path.split(separator)
 }
@@ -106,12 +85,6 @@ export const entry = (obj: Record<string, any>) => {
             return Object.assign(value, { paths: reducer.paths })
         }
     }
-}
-
-export const getPathValue = (obj: Record<string, any> | undefined, path: string | string[], separator = ".") => {
-    obj = obj ?? (() => { throw "source object is null or undefined" })()
-
-    return getPaths(path, separator).reduce((p, c) => p?.[c], obj as Record<string, any> | undefined);
 }
 
 export const spreadArray = (target: any[], source: any) => {
