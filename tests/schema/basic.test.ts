@@ -1,7 +1,23 @@
 import { describe, expect, test } from "vitest"
 import { Schema } from "../.."
 import { buildResultsAsync, Case, expectToEqualAsync } from "./buildResultsASync"
-import { spread } from "../../src/helpers/varios"
+import { spread, entry } from "../../src/helpers/varios"
+
+test("get value from paths (with container)", () => {
+  const paths = ["user", "account", "details"]
+  const obj = {
+    user: {
+      account: {
+        details: {
+          id: 1
+        }
+      }
+    }
+  }
+  const { container, value } = entry(obj).getWithProperties(paths)
+  expect(value).toEqual({ id: 1 })
+  expect(container).toEqual({ details: { id: 1 }})
+})
 
 describe("expects spread into", () => {
   const cases = [

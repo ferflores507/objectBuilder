@@ -57,7 +57,7 @@ describe("getObjPath works with custom separator or default: '.'", () => {
     ]
 
     test.each(cases)("expects path $path to equal $expected", ({ source, path, expected }) => {
-        const { value, paths } = varios.getValueFromPaths(source, path)
+        const { value, paths } = varios.entry(source).getWithProperties(path)
 
         expect({ value, paths }).toStrictEqual(expected)
     })

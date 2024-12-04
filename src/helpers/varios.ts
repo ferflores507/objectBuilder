@@ -60,6 +60,54 @@ const getPaths = (path: string | string[], separator = ".") => {
     return Array.isArray(path) ? path : path.split(separator)
 }
 
+class PathReducer {
+    constructor(private source: Record<string, any>) {
+        source ?? (() => { throw "source object is null or undefined" })()
+    }
+
+    paths: string[] = []
+    private separator = "."
+
+    with(path: string | string[]) {
+        this.paths = getPaths(path, this.separator)
+
+        return this
+    }
+
+    withSeparator(separator: string) {
+        this.separator = separator
+    }
+
+    get(callback = (prev: any, curr: any) => prev?.[curr], initial = this.source) {
+        return this.paths.reduce(callback, initial)
+    }
+}
+
+export const entry = (obj: Record<string, any>) => {
+    const reducer = new PathReducer(obj)
+
+    return {
+        withPathSeparator(separator: string){
+            reducer.withSeparator(separator)
+
+            return this
+        },
+        get(path: string | string[]) {
+            return reducer.with(path).get()
+        },
+        getWithProperties(path: string | string[]){
+            const value = reducer.with(path).get(({ value }, path) => {
+                return {
+                    container: value,
+                    value: value?.[path],
+                }
+            }, { container: obj, value: obj })
+
+            return Object.assign(value, { paths: reducer.paths })
+        }
+    }
+}
+
 export const getPathValue = (obj: Record<string, any> | undefined, path: string | string[], separator = ".") => {
     obj = obj ?? (() => { throw "source object is null or undefined" })()
 
