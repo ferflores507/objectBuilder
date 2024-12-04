@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
-import { getPathValue } from '../../src/helpers/varios'
+import { entry } from '../../src/helpers/varios'
 import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuilder'
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
@@ -1408,7 +1408,7 @@ describe("if schema", () => {
 test("getPathValue throws on null source", () => {
   const source = null
 
-  expect(() => getPathValue(source, "test")).toThrow()
+  expect(() => entry(source).get("test")).toThrow()
 })
 
 describe("select", () => {

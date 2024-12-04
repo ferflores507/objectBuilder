@@ -88,7 +88,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     getStoreValue(path: string) {
-        return varios.getPathValue(this.options.store, path)
+        return varios.entry(this.options.store).get(path)
     }
 
     set(path: string, value: any) {

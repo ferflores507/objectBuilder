@@ -145,8 +145,8 @@ export const comparar = (a: any, b: any, method = "equal") => {
 }
 
 export const ordenar = (objs: any[], orderBy: string) => objs.sort((a, b) => {
-    a = getPathValue(a, orderBy)
-    b = getPathValue(b, orderBy)
+    a = entry(a).get(orderBy)
+    b = entry(b).get(orderBy)
 
     return (a > b) ? 1 : ((b > a) ? -1 : 0)
 })
