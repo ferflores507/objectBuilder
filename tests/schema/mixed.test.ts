@@ -2109,12 +2109,12 @@ describe("array", () => {
 
     test.each([
       ["const", { const: ["Melany", "Melany", "Melany"] }],
-      ["path", { path: "store.items" }]
+      ["path", { path: "items" }]
     ])("con definition %s", async (tipo, schema: Schema) => {
 
       await expectToEqualAsync({
         store: {
-          store: { items: [] }
+          items: []
         },
         schema: {
           ...schema,
