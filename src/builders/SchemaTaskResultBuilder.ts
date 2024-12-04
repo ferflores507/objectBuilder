@@ -477,7 +477,7 @@ export class SchemaTaskResultBuilder implements Builder {
                     }
                 })
                 
-                return varios.getPathValue(proxy, path)
+                return varios.entry(proxy).get(path)
             }) 
             : this
     }
