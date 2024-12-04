@@ -44,12 +44,16 @@ export const getValueFromPaths = (obj: Record<string, any> | undefined, path: st
 
     obj = obj ?? (() => { throw "source object is null or undefined" })()
 
-    return getPaths(path, separator).reduce(({ value }, path) => {
+    const paths = getPaths(path, separator)
+
+    const properties = paths.reduce(({ value }, path) => {
         return { 
             container: value, 
             value: value?.[path],
         }
     }, { container: obj, value: obj })
+
+    return Object.assign(properties, { paths })
 }
 
 const getPaths = (path: string | string[], separator = ".") => {
