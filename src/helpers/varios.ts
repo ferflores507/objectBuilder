@@ -94,7 +94,9 @@ export const entry = (obj: Record<string, any>) => {
             return this
         },
         get(path: Path) {
-            return entry.with(path).get()
+            const { container, value } = this.getWithProperties(path)
+            
+            return typeof(value) == "function" ? value.bind(container) : value
         },
         getWithProperties(path: Path){
             const value = entry.with(path).get(({ value }, path) => {

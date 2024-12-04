@@ -3,6 +3,23 @@ import { Schema } from "../";
 import * as varios from '../src/helpers/varios';
 import { SchemaTaskResultBuilder } from '../src/builders/SchemaTaskResultBuilder';
 
+test("expect get function from path is bind to container", () => {
+    const source = {
+        user: {
+            details: {
+                name: "Melany",
+                getName() {
+                    return this.name
+                }
+            }
+        }
+    }
+
+    const func = varios.entry(source).get("user.details.getName")
+
+    expect(func()).toBe("Melany")
+})
+
 describe("getObjPath works with custom separator or default: '.'", () => {
 
     const source = {
