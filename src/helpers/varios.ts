@@ -178,12 +178,6 @@ const toArray = (value: any) => Array.isArray(value) ? value : [value]
 
 export const toArrayOrNull = (value: any) => value != null ? toArray(value) : null
 
-export const setPathValue = (obj: Record<string, any>, path: string | string[], value: any, separator = ".") => {
-    const paths = Array.isArray(path) ? path : path.split(separator)
-
-    return setPathValueFromPaths(obj, paths, value)
-};
-
 export const removeNullOrUndefined = (source: {}) => {
     return Object.fromEntries(entriesWithValues(source));
 }
