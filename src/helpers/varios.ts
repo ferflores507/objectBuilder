@@ -39,7 +39,25 @@ const getPaths = (path: string | string[], separator = ".") => {
     return Array.isArray(path) ? path : path.split(separator)
 }
 
-class PathReducer {
+const setPathValueFromPaths = (obj: Record<string, any>, path: string[], value: any) => {
+    const first = path[0]
+
+    if (path.length === 1) {
+        obj[first] = value;
+    }
+    else if (path.length === 0) {
+        throw "No hay paths para actualizar el objeto";
+    }
+    else {
+        obj[first] = obj[first] ?? {}
+
+        return setPathValueFromPaths(obj[first], path.slice(1), value);
+    }
+};
+
+type Path = string | string[]
+
+class Entry {
     constructor(private source: Record<string, any>) {
         source ?? (() => { throw "source object is null or undefined" })()
     }
@@ -47,7 +65,7 @@ class PathReducer {
     paths: string[] = []
     private separator = "."
 
-    with(path: string | string[]) {
+    with(path: Path) {
         this.paths = getPaths(path, this.separator)
 
         return this
@@ -60,30 +78,37 @@ class PathReducer {
     get(callback = (prev: any, curr: any) => prev?.[curr], initial = this.source) {
         return this.paths.reduce(callback, initial)
     }
+
+    set(value: any) {
+        return setPathValueFromPaths(this.source, this.paths, value)
+    }
 }
 
 export const entry = (obj: Record<string, any>) => {
-    const reducer = new PathReducer(obj)
+    const entry = new Entry(obj)
 
     return {
         withPathSeparator(separator: string){
-            reducer.withSeparator(separator)
+            entry.withSeparator(separator)
 
             return this
         },
-        get(path: string | string[]) {
-            return reducer.with(path).get()
+        get(path: Path) {
+            return entry.with(path).get()
         },
-        getWithProperties(path: string | string[]){
-            const value = reducer.with(path).get(({ value }, path) => {
+        getWithProperties(path: Path){
+            const value = entry.with(path).get(({ value }, path) => {
                 return {
                     container: value,
                     value: value?.[path],
                 }
             }, { container: obj, value: obj })
 
-            return Object.assign(value, { paths: reducer.paths })
-        }
+            return Object.assign(value, { paths: entry.paths })
+        },
+        set(path: Path, value: any) {
+            return entry.with(path).set(value)
+        },
     }
 }
 
@@ -152,22 +177,6 @@ export const tryCopy = (obj: {}) => {
 const toArray = (value: any) => Array.isArray(value) ? value : [value]
 
 export const toArrayOrNull = (value: any) => value != null ? toArray(value) : null
-
-const setPathValueFromPaths = (obj: Record<string, any>, path: string[], value: any) => {
-    const first = path[0]
-
-    if (path.length === 1) {
-        obj[first] = value;
-    }
-    else if (path.length === 0) {
-        throw "No hay paths para actualizar el objeto";
-    }
-    else {
-        obj[first] = obj[first] ?? {}
-
-        return setPathValueFromPaths(obj[first], path.slice(1), value);
-    }
-};
 
 export const setPathValue = (obj: Record<string, any>, path: string | string[], value: any, separator = ".") => {
     const paths = Array.isArray(path) ? path : path.split(separator)

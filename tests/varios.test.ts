@@ -194,7 +194,7 @@ describe("varios", () => {
             apellido: "Flores"
         }
 
-        varios.setPathValue(usuario, "detalles.id", 1)
+        varios.entry(usuario).set("detalles.id", 1)
         const expected = {
             ...usuario,
             detalles: {
