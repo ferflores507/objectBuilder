@@ -1,7 +1,6 @@
 import { expect, describe, test } from 'vitest';
-import { Schema } from "../";
 import * as varios from '../src/helpers/varios';
-import { SchemaTaskResultBuilder } from '../src/builders/SchemaTaskResultBuilder';
+import { expectToEqualAsync } from './schema/buildResultsASync';
 
 test("expect get function from path is bind to container", () => {
     const source = {
@@ -179,27 +178,23 @@ test("function destructure with new", () => {
 
 describe("spread", () => {
     test("en result builder solamente", async () => {
-        const source = { uno: 1, dos: 2 }
-        
-        const schema: Schema = {
-            const: {
-                tres: 3,
+        await expectToEqualAsync({
+            schema: {
+                spread: {
+                    const: {
+                        tres: 3,
+                        cuatro: 4
+                    }
+                }
+            },
+            initial: { uno: 1, dos: 2 },
+            expected: { 
+                uno: 1, 
+                dos: 2, 
+                tres: 3, 
                 cuatro: 4
             }
-        }
-
-        const resultBuilder = new SchemaTaskResultBuilder()
-            .with({ target: source })
-            .withSpread(schema)
-        const resultado = resultBuilder.build()
-        const expected = { 
-            uno: 1, 
-            dos: 2, 
-            tres: 3, 
-            cuatro: 4
-        }
-
-        expect(resultado).toEqual(expected)
+        })
     })
   })
 
@@ -230,20 +225,7 @@ describe("varios", () => {
         }
 
         const resultado = varios.entries(source)
-        const expected = [
-            {
-                key: "nombre",
-                value: "Melany"
-            },
-            {
-                key: "cedula",
-                value: "9-123-456"
-            },
-            {
-                key: "fechaDeNacimiento",
-                value: "18/09/2019"
-            }
-        ]
+        const expected = Object.entries(source).map(([key, value]) => ({ key, value }))
 
         expect(resultado).toEqual(expected)
     })
