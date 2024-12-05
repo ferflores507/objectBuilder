@@ -87,7 +87,9 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     with(options: Partial<BuilderOptions>) : SchemaTaskResultBuilder {
-        const newOptions = { ...this.options, ...options }
+        const newOptions = assign({}, this.options)
+        assign(newOptions, options)
+        
         const builder = new SchemaTaskResultBuilder(this.target, newOptions)
         const { schema } = options
         
