@@ -26,6 +26,14 @@ export type Builder = {
     buildAsync: () => Promise<any>
 }
 
+const assign = (target, ...source) => {
+    source.filter(obj => typeof obj !== "undefined")
+      .forEach(obj => {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(obj));
+      }) 
+    return target;
+  };
+
 export class SchemaTaskResultBuilder implements Builder {
     constructor(private target?: any, options?: BuilderOptions) {
         this.options = options ?? {
