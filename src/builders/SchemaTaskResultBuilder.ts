@@ -34,7 +34,7 @@ export class SchemaTaskResultBuilder implements Builder {
             sources: {}
         }
 
-        this.taskBuilder = new TaskBuilder().with({ target: "initial" in this.options ? this.options.initial : target })
+        this.taskBuilder = new TaskBuilder().with({ target: options?.initial })
     }
 
     readonly options: Partial<BuilderOptions>
@@ -79,9 +79,9 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     with(options: Partial<BuilderOptions>) : SchemaTaskResultBuilder {
-        const { schema, target = this.target, ...rest } = options 
+        const { schema, ...rest } = options 
         const newOptions = { ...this.options, ...rest }
-        const builder = new SchemaTaskResultBuilder(target, newOptions)
+        const builder = new SchemaTaskResultBuilder(this.target, newOptions)
         
         return schema ? builder.withSchema(schema) : builder 
 
