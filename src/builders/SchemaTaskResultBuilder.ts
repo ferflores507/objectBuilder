@@ -475,11 +475,12 @@ export class SchemaTaskResultBuilder implements Builder {
     withPath(path: string | undefined) {
         return path 
             ? this.add(current => {
-                const sharedSource = { 
-                    ...this.options, 
+                const sharedSource = assign({}, this.options)
+                
+                assign(sharedSource, { 
                     target: this.target, 
-                    current
-                }
+                    current 
+                })
 
                 const proxy = new Proxy(sharedSource, {
                     get: (target: Record<string, any>, prop: string) => {
