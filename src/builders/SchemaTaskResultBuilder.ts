@@ -80,7 +80,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     with(options: Partial<BuilderOptions>): SchemaTaskResultBuilder {
-        const newOptions = assign(assign({}, this.options), options)
+        const newOptions = assign({}, this.options, options)
 
         const builder = new SchemaTaskResultBuilder(this.target, newOptions)
         const { schema } = options
@@ -476,7 +476,7 @@ export class SchemaTaskResultBuilder implements Builder {
     withPath(path: string | undefined) {
         return path
             ? this.add(current => {
-                const sharedSource = assign(assign({}, this.options), {
+                const sharedSource = assign({}, this.options, {
                     target: this.target,
                     current
                 })
