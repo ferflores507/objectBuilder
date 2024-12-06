@@ -1387,8 +1387,8 @@ describe("if schema", () => {
     await expectToEqualAsync({
       store: { mod },
       schema: {
+        const: mod,
         if: {
-          path: "mod",
           equals: {
             const: 0
           }
