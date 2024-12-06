@@ -6,7 +6,7 @@ import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
-import { assign } from "../helpers/varios"
+import { assignAll } from "../helpers/varios"
 
 export type BuilderOptions = {
     store: Record<string, any>
@@ -80,7 +80,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     with(options: Partial<BuilderOptions>): SchemaTaskResultBuilder {
-        const newOptions = assign({}, this.options, options)
+        const newOptions = assignAll({}, this.options, options)
 
         const builder = new SchemaTaskResultBuilder(this.target, newOptions)
         const { schema } = options
@@ -476,7 +476,7 @@ export class SchemaTaskResultBuilder implements Builder {
     withPath(path: string | undefined) {
         return path
             ? this.add(current => {
-                const sharedSource = assign({}, this.options, {
+                const sharedSource = assignAll({}, this.options, {
                     target: this.target,
                     current
                 })

@@ -114,7 +114,7 @@ export const entry = (obj: Record<string, any>) => {
     }
 }
 
-export const assign = (target: any, ...source: any[]) => {
+export const assignAll = (target: any, ...source: any[]) => {
     source.filter(obj => typeof obj !== "undefined")
         .forEach(obj => {
             Object.defineProperties(target, Object.getOwnPropertyDescriptors(obj));
