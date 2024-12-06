@@ -114,6 +114,14 @@ export const entry = (obj: Record<string, any>) => {
     }
 }
 
+export const assign = (target: any, ...source: any[]) => {
+    source.filter(obj => typeof obj !== "undefined")
+        .forEach(obj => {
+            Object.defineProperties(target, Object.getOwnPropertyDescriptors(obj));
+        })
+    return target;
+};
+
 export const spreadArray = (target: any[], source: any) => {
     return Array.isArray(source) ? [...target, ...source] : [...target, source]
 }

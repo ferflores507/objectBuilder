@@ -6,6 +6,7 @@ import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
+import { assign } from "../helpers/varios"
 
 export type BuilderOptions = {
     store: Record<string, any>
@@ -25,14 +26,6 @@ export type Builder = {
     build: () => any
     buildAsync: () => Promise<any>
 }
-
-const assign = (target, ...source) => {
-    source.filter(obj => typeof obj !== "undefined")
-        .forEach(obj => {
-            Object.defineProperties(target, Object.getOwnPropertyDescriptors(obj));
-        })
-    return target;
-};
 
 export class SchemaTaskResultBuilder implements Builder {
     constructor(private target?: any, options?: BuilderOptions) {
