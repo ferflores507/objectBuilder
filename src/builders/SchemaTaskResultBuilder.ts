@@ -6,7 +6,7 @@ import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
-import { assignAll } from "../helpers/varios"
+import { assignAll, getterTrap } from "../helpers/varios"
 
 export type BuilderOptions = {
     store: Record<string, any>
@@ -474,17 +474,6 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withPath(path: string | undefined) {
-
-        const getterTrap = <T extends Record<string, any>>(defaultSource: T, ...sources: T[]) => {
-            return new Proxy({} as T, {
-                get: (target, prop: string) => {
-                    const source = sources.find(s => prop in s) ?? defaultSource
-
-                    return source[prop]
-                }
-            })
-        }
-
         return path
             ? this.add(current => {
                 const sources = [{ current, target: this.target }, this.options]

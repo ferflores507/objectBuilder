@@ -122,6 +122,16 @@ export const assignAll = (target: any, ...source: any[]) => {
     return target;
 };
 
+export const getterTrap = <T extends Record<string, any>>(defaultSource: T, ...sources: T[]) => {
+    return new Proxy({} as T, {
+        get: (target, prop: string) => {
+            const source = sources.find(s => prop in s) ?? defaultSource
+
+            return source[prop]
+        }
+    })
+}
+
 export const spreadArray = (target: any[], source: any) => {
     return Array.isArray(source) ? [...target, ...source] : [...target, source]
 }
