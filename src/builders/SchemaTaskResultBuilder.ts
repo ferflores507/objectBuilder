@@ -474,18 +474,21 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withPath(path: string | undefined) {
+
+        const getterTrap = <T extends Record<string, any>>(defaultSource: T, ...sources: T[]) => {
+            return new Proxy({} as T, {
+                get: (target, prop: string) => {
+                    const source = sources.find(s => prop in s) ?? defaultSource
+
+                    return source[prop]
+                }
+            })
+        }
+
         return path
             ? this.add(current => {
-                const sharedSource = assignAll({}, this.options, {
-                    target: this.target,
-                    current
-                })
-
-                const proxy = new Proxy(sharedSource, {
-                    get: (target: Record<string, any>, prop: string) => {
-                        return prop in target ? target[prop] : target.store[prop]
-                    }
-                })
+                const sources = [{ current, target: this.target }, this.options]
+                const proxy = getterTrap(this.options.store, ...sources)
 
                 return varios.entry(proxy).get(path)
             })
