@@ -1665,7 +1665,7 @@ describe("spread", () => {
     {
       tipo: "con reduce",
       schema: {
-        reduceMany: [
+        reduce: [
           {
             spread: {
               path: "dos"
