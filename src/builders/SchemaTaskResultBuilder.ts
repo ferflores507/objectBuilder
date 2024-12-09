@@ -277,13 +277,8 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withCheckout(schema: SchemaDefinition | undefined): SchemaTaskResultBuilder {
         if (schema) {
-            this.add((target) => {
-                this.target = target
-
-                return target
-            })
-
-            this.withSchema(schema)
+            this.add((target) => this.target = target)
+                .withSchema(schema)
         }
 
         return this
