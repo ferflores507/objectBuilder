@@ -368,7 +368,13 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withReduce(schema: SchemaDefinition | undefined): SchemaTaskResultBuilder {
-        return schema ? this.add(current => this.target = current).withSchema(schema) : this
+        return schema ? this.add(current => this.target = current).withManySchemas(schema) : this
+    }
+
+    withManySchemas(definition: SchemaDefinition) {
+        Array.isArray(definition) ? definition.map(schema => this.withSchema(schema)) : this.withSchema(definition)
+
+        return this
     }
 
     withReduceMany(schemas: Schema[] | undefined) {
