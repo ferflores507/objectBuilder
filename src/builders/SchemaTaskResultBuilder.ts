@@ -185,7 +185,6 @@ export class SchemaTaskResultBuilder implements Builder {
 
         Object.entries(uses ?? {})
             .filter(([name]) => functions?.hasOwnProperty(name))
-            .sort(([a], [b]) => a.localeCompare(b))
             .forEach(([name, val]) => functions?.[name]?.(val, this))
 
         return this
