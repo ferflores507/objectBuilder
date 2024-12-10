@@ -201,10 +201,10 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withStore(schema: Schema | undefined) {
         if (schema) {
-            this.add(current => {
-                this.setStore(this.with({ initial: current, schema }).build())
+            this.add(initial => {
+                this.setStore(this.with({ initial, schema }).build())
 
-                return current
+                return initial
             })
         }
 
@@ -349,13 +349,13 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withReduceOrDefault(schema: SchemaDefinition | undefined): SchemaTaskResultBuilder {
         return schema
-            ? this.add(current => {
-                if (current != null) {
-                    const builder = this.with({ initial: current, schema })
+            ? this.add(initial => {
+                if (initial != null) {
+                    const builder = this.with({ initial, schema })
                     this.unshift(builder)
                 }
 
-                return current
+                return initial
             })
             : this
     }
@@ -414,16 +414,14 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withPropiedades(propiedades: Record<string, SchemaDefinition> | undefined) {
         return propiedades
-            ? this.add((target) => new PropiedadesBuilder(propiedades, this.with({ initial: target })).build())
+            ? this.add(initial => new PropiedadesBuilder(propiedades, this.with({ initial })).build())
             : this
     }
 
     withDefinitions(schemas: Schema[] | undefined) {
-        const task = (target) => schemas?.map(schema => this.with({ initial: target, schema }))
-
         return schemas
             ? this
-                .add(task)
+                .add(initial => schemas?.map(schema => this.with({ initial, schema })))
                 .add(builders => this.taskBuilder.unshiftArray(builders))
             : this
     }
