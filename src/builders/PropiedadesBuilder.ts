@@ -1,4 +1,4 @@
-import { partition } from "../helpers/varios";
+import { isNotPrimitive, partition } from "../helpers/varios";
 import { Schema, SchemaDefinition } from "../models";
 import { Builder } from "./SchemaTaskResultBuilder";
 
@@ -9,7 +9,7 @@ export class PropiedadesBuilder {
             ([k, v]: [string, SchemaDefinition]) => (v as Schema).isComputed
         )
         
-        this.entries = entries.map(([k,v]) => [k, typeof v === "object" ? v : { const: v }])
+        this.entries = entries.map(([k,v]) => [k, isNotPrimitive(v) ? v : { const: v }])
         this.result = { ...propiedades }
         this.builder = builder.with({ ...builder.options, siblings: this.result })
         this.setComputed(this.result, computedEntries)   
