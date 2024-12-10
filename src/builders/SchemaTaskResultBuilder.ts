@@ -349,14 +349,7 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withReduceOrDefault(schema: SchemaDefinition | undefined): SchemaTaskResultBuilder {
         return schema
-            ? this.add(initial => {
-                if (initial != null) {
-                    const builder = this.with({ initial, schema })
-                    this.unshift(builder)
-                }
-
-                return initial
-            })
+            ? this.withUnshift(initial => initial != null ? this.with({ initial, schema }) : initial)
             : this
     }
 
