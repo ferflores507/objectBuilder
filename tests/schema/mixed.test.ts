@@ -246,9 +246,7 @@ test("object with function to set sibling", () => {
     .with({
       schema: {
         propiedades: {
-          nombre: {
-            const: "Melany"
-          },
+          nombre: "Melany",
           setNombre: {
             function: {
               set: "sibling.nombre"
@@ -288,9 +286,7 @@ test("import with multiple stores", async () => {
     store: {
       userSchema: {
         propiedades: {
-          titulo: {
-            const: titulo
-          },
+          titulo,
           detalles: {
             propiedades: {
               nombre: {
@@ -360,9 +356,7 @@ test("map then filter from target", async () => {
   await expectToEqualAsync({
     schema: {
       propiedades: {
-        search: {
-          const: 1
-        },
+        search: 1,
         items: {
           const: Array.from(Array(3).keys()),
           map: {
@@ -474,9 +468,7 @@ test("nested stores with call to root store", async () => {
           child: {
             store: {
               propiedades: {
-                nombre: {
-                  const: "Melany"
-                },
+                nombre: "Melany",
                 setName: {
                   path: "setName"
                 }
@@ -568,9 +560,7 @@ test("schema withStore", async () => {
     schema: {
       store: {
         propiedades: {
-          nombre: {
-            const: "Melany"
-          }
+          nombre: "Melany"
         }
       },
       path: "nombre"
@@ -1090,9 +1080,7 @@ test("schema as value", async () => {
         value: {
           path: "id"
         },
-        nombre: {
-          const: "Melany"
-        }
+        nombre: "Melany"
       }
     }
   }
@@ -1466,15 +1454,11 @@ describe("propiedades builder", () => {
     await expectResultsAsync({
       target: { detalles: { titulo: "Hola" } },
       propiedades: {
-        uno: {
-          const: 1
-        },
+        uno: 1,
         dos: {
           path: "siblings.uno"
         },
-        tres: {
-          const: 3
-        },
+        tres: 3,
         saludo: {
           path: "target.detalles.titulo",
         },
@@ -1500,15 +1484,11 @@ describe("propiedades builder", () => {
   test("sibling", async () => {
     await expectResultsAsync({
       propiedades: {
-        uno: {
-          const: 1
-        },
+        uno: 1,
         dos: {
           path: "siblings.uno"
         },
-        tres: {
-          const: 3
-        }
+        tres: 3
       },
       expected: {
         uno: 1,
@@ -1521,15 +1501,9 @@ describe("propiedades builder", () => {
   test("basico", async () => {
     await expectResultsAsync({
       propiedades: {
-        uno: {
-          const: 1
-        },
-        dos: {
-          const: 2
-        },
-        tres: {
-          const: 3
-        }
+        uno: 1,
+        dos: 2,
+        tres: 3
       },
       expected: {
         uno: 1,
@@ -1582,21 +1556,15 @@ test("sibling nested", async () => {
     store: {},
     schema: {
       propiedades: {
-        id: {
-          const: id++
-        },
+        id: id++,
         idCopy,
         children: {
           propiedades: {
-            id: {
-              const: id++
-            },
+            id: id++,
             idCopy,
             children: {
               propiedades: {
-                id: {
-                  const: id++
-                },
+                id: id++,
                 idCopy
               }
             }
@@ -1626,12 +1594,8 @@ describe("sibling", () => {
       store: {},
       schema: {
         propiedades: {
-          title: {
-            const: "One"
-          },
-          value: {
-            const: 1
-          },
+          title: "One",
+          value: 1,
           titleCopy: {
             path: "siblings.title"
           }
@@ -2282,15 +2246,9 @@ describe("mixed", () => {
         store: {},
         schema: {
           propiedades: {
-            nombre: {
-              const: "Melany",
-            },
-            cedula: {
-              const: "9-123",
-            },
-            id: {
-              const: 7
-            }
+            nombre: "Melany",
+            cedula: "9-123",
+            id: 7
           },
           reduce: {
             unpack: ["nombre", "id"],

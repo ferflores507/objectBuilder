@@ -42,6 +42,8 @@ export type Consulta = { url: string } & Partial<{
 
 export type SchemaDefinition = Schema | Schema[]
 
+export type SchemaPrimitive = string | number | bigint | boolean | null
+
 export type Schema = Partial<{
     asyncFunction: SchemaDefinition
     bindArg: SchemaDefinition
@@ -68,7 +70,7 @@ export type Schema = Partial<{
     not: SchemaDefinition
     path: string
     parse: true
-    propiedades: Record<string, SchemaDefinition>
+    propiedades: Record<string, SchemaDefinition | SchemaPrimitive>
     reduce: SchemaDefinition
     reduceOrDefault: SchemaDefinition
     required: string[]
