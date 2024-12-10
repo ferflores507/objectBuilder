@@ -9,7 +9,7 @@ export class PropiedadesBuilder {
             ([k, v]: [string, SchemaDefinition]) => (v as Schema).isComputed
         )
         
-        this.entries = entries
+        this.entries = entries.map(([k,v]) => [k, typeof v === "object" ? v : { const: v }])
         this.result = { ...propiedades }
         this.builder = builder.with({ ...builder.options, siblings: this.result })
         this.setComputed(this.result, computedEntries)   
