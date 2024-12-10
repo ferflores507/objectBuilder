@@ -275,10 +275,10 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withCheckout(schema: SchemaDefinition | undefined): SchemaTaskResultBuilder {
+    withCheckout(schema: SchemaDefinition | true | undefined): SchemaTaskResultBuilder {
         if (schema) {
             this.add((target) => this.target = target)
-                .withSchema(schema)
+                .withUnshift(initial => schema === true ? initial : this.with({ initial, schema }))
         }
 
         return this

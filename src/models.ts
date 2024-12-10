@@ -48,7 +48,7 @@ export type Schema = Partial<{
     consulta: Consulta
     calc: CalcMethod
     call: string
-    checkout: SchemaDefinition
+    checkout: SchemaDefinition | true
     const: any
     decrement: string
     definitions: Schema[]
