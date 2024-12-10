@@ -1,4 +1,4 @@
-import type { ArraySchema, Consulta, Schema, SchemaDefinition } from "../models"
+import type { ArraySchema, Consulta, Propiedades, Schema, SchemaDefinition } from "../models"
 import * as varios from "../helpers/varios"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
 import { PlainResultBuilder } from "./PlainResultBuilder"
@@ -405,7 +405,7 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
-    withPropiedades(propiedades: Record<string, SchemaDefinition> | undefined) {
+    withPropiedades(propiedades: Propiedades | undefined) {
         return propiedades
             ? this.add(initial => new PropiedadesBuilder(propiedades, this.with({ initial })).build())
             : this
