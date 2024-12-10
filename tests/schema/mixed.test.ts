@@ -2186,7 +2186,7 @@ describe("mixed", () => {
   test.todo("reduce, orderBy and filter", async () => {
     const schema: Schema = {
       const: [3, 10, 2, 4, 1].map(id => ({ id, nombre: [4, 10].includes(id) ? "Melany" : "Fernando" })),
-      reduceMany: [
+      reduce: [
         {
           // array: {
           //   orderBy: "id"

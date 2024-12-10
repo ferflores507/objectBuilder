@@ -115,7 +115,6 @@ export class SchemaTaskResultBuilder implements Builder {
             spread,
             reduceOrDefault,
             reduce,
-            reduceMany,
             definitions,
             checkout,
             schemaFrom,
@@ -153,7 +152,6 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withJoin(join)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
-                .withReduceMany(reduceMany)
                 .withCheckout(checkout)
             : this
     }
@@ -368,12 +366,6 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withManySchemas(definition: SchemaDefinition) {
         Array.isArray(definition) ? definition.map(schema => this.withSchema(schema)) : this.withSchema(definition)
-
-        return this
-    }
-
-    withReduceMany(schemas: Schema[] | undefined) {
-        schemas?.map(s => this.withReduce(s))
 
         return this
     }

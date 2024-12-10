@@ -71,7 +71,6 @@ export type Schema = Partial<{
     propiedades: Record<string, SchemaDefinition>
     reduce: SchemaDefinition
     reduceOrDefault: SchemaDefinition
-    reduceMany: Schema[]
     required: string[]
     schemaFrom: SchemaDefinition
     selectSet: string
