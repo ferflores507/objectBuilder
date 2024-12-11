@@ -395,13 +395,11 @@ export class SchemaTaskResultBuilder implements Builder {
                     return this.with({
                         initial,
                         schema: v
-                    })
-                        .add(result => comparison[k](initial, result))
+                    }).add(result => comparison[k](initial, result))
                 })
 
                 this.taskBuilder.unshiftArray(builders)
-            })
-                .add((results: []) => results.every(Boolean))
+            }).add((results: []) => results.every(Boolean))
         }
 
         return this
