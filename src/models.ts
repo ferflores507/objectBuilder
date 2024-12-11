@@ -68,6 +68,7 @@ export type Schema = Partial<{
     increment: string
     import: string
     join: SchemaDefinition
+    log: SchemaDefinition
     not: SchemaDefinition
     path: string
     parse: true
