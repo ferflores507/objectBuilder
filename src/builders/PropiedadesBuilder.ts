@@ -3,7 +3,7 @@ import { Propiedades, Schema, SchemaDefinition } from "../models";
 import { Builder } from "./SchemaTaskResultBuilder";
 
 export class PropiedadesBuilder {
-    constructor(propiedades: Propiedades, builder: Builder) {
+    constructor(propiedades: Propiedades, private readonly builder: Builder) {
         const allEntries = Object.entries(propiedades)
             .map(([k,v]) => [k, isNotPrimitive(v) ? v : { const: v }])
         
@@ -18,7 +18,6 @@ export class PropiedadesBuilder {
 
     private readonly result: Record<string, any>
     private readonly entries: [string, SchemaDefinition][]
-    private readonly builder: Builder
 
     getInitialResult(entries: [string, SchemaDefinition][]) {        
         const getters = entries.map(([key, schema]) => Object.defineProperty({}, key, {
