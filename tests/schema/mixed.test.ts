@@ -8,6 +8,30 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("greater than", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: 2,
+      greaterThan: {
+        const: 1
+      }
+    },
+    expected: true
+  })
+})
+
+test("less than", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: 0,
+      lessThan: {
+        const: 1
+      }
+    },
+    expected: true
+  })
+})
+
 describe("schema from async", () => {
 
   const expected = "ok"

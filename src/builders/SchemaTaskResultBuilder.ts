@@ -383,7 +383,9 @@ export class SchemaTaskResultBuilder implements Builder {
         const comparison: Record<string, any> = {
             equals: varios.esIgual,
             includes: (target: any[] | string, result: any) => target.includes(result),
-            not: (target: any) => !target
+            not: (target: any) => !target,
+            greaterThan: (target: any, result: any) => target > result,
+            lessThan: (target: any, result: any) => target < result
         }
 
         const entries = Object.entries(schema ?? {})
