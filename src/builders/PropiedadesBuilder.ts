@@ -20,16 +20,10 @@ export class PropiedadesBuilder {
     private readonly entries: [string, SchemaDefinition][]
     private readonly builder: Builder
 
-    setComputed(obj: {}, entries: [string, SchemaDefinition][]) {
-        const builder = this.builder
-        
-        return entries.reduce((obj, [key, schema]) => {
-            return Object.defineProperty(obj, key, {
-                get() {
-                    return builder.with({ schema }).build()
-                }
-            })
-        }, obj)
+    setComputed(obj: {}, entries: [string, SchemaDefinition][]) {        
+        entries.map(([key, schema]) => Object.defineProperty(obj, key, {
+            get: () => this.builder.with({ schema }).build()
+        }))
     }
 
     getResult() {
