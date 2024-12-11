@@ -12,12 +12,11 @@ export class PropiedadesBuilder {
         })
 
         this.entries = entries
-        this.result = { ...propiedades }
         this.builder = builder.with({ ...builder.options, siblings: this.result })
         this.setComputed(this.result, computedEntries)   
     }
 
-    private readonly result: Record<string, any>
+    private readonly result: Record<string, any> = {}
     private readonly entries: [string, SchemaDefinition][]
     private readonly builder: Builder
 
