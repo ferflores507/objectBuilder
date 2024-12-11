@@ -303,9 +303,9 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
-    withConditional(schema: Schema | undefined) : SchemaTaskResultBuilder {
+    withConditional(schema: Schema | undefined): SchemaTaskResultBuilder {
         const schemaOrPath = (value: string | SchemaDefinition) => {
-            return typeof(value) == "string" ? { path: value } : value
+            return typeof (value) == "string" ? { path: value } : value
         }
 
         const { if: condition, then: thenCondition, else: elseCondition } = schema ?? {}
