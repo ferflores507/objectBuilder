@@ -4,27 +4,32 @@ import { Builder } from "./SchemaTaskResultBuilder";
 
 export class PropiedadesBuilder {
     constructor(propiedades: Propiedades, private readonly builder: Builder) {
-        const allEntries = Object.entries(propiedades)
-            .map(([k,v]) => [k, isNotPrimitive(v) ? v : { const: v }])
-        
-        const { entries = [], computedEntries = [] } = Object.groupBy(allEntries, ([k, v]) => {
-            return (v as Schema)?.isComputed ? "computedEntries" : "entries"
-        })
+        const allEntries = this.getWithDefault(propiedades)
+        const { entries = [], computedEntries = [] } = this.groupByComputed(allEntries)
 
         this.entries = entries
-        this.result = this.getInitialResult(computedEntries)
+        this.result = assignAll({}, ...this.getGetters(computedEntries))
         this.builder = builder.with({ siblings: this.result })
     }
 
     private readonly result: Record<string, any>
     private readonly entries: [string, SchemaDefinition][]
 
-    getInitialResult(entries: [string, SchemaDefinition][]) {        
-        const getters = entries.map(([key, schema]) => Object.defineProperty({}, key, {
+    getWithDefault(propiedades: Propiedades): [string, SchemaDefinition][] {
+        return Object.entries(propiedades)
+            .map(([k,v]) => [k as string, isNotPrimitive(v) ? v as SchemaDefinition : { const: v } ])
+    }
+
+    groupByComputed(entries: [string, SchemaDefinition][]) {
+        return Object.groupBy(entries, ([k, v]) => {
+            return (v as Schema)?.isComputed ? "computedEntries" : "entries"
+        })
+    }
+
+    getGetters(entries: [string, SchemaDefinition][]) {        
+        return entries.map(([key, schema]) => Object.defineProperty({}, key, {
             get: () => this.builder.with({ schema }).build()
         }))
-
-        return assignAll({}, ...getters)
     }
 
     getResult() {
