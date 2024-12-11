@@ -1,4 +1,4 @@
-import { isNotPrimitive } from "../helpers/varios";
+import { assignAll, isNotPrimitive } from "../helpers/varios";
 import { Propiedades, Schema, SchemaDefinition } from "../models";
 import { Builder } from "./SchemaTaskResultBuilder";
 
@@ -12,18 +12,20 @@ export class PropiedadesBuilder {
         })
 
         this.entries = entries
+        this.result = this.getInitialResult(computedEntries)
         this.builder = builder.with({ siblings: this.result })
-        this.setComputed(this.result, computedEntries)   
     }
 
-    private readonly result: Record<string, any> = {}
+    private readonly result: Record<string, any>
     private readonly entries: [string, SchemaDefinition][]
     private readonly builder: Builder
 
-    setComputed(obj: {}, entries: [string, SchemaDefinition][]) {        
-        entries.map(([key, schema]) => Object.defineProperty(obj, key, {
+    getInitialResult(entries: [string, SchemaDefinition][]) {        
+        const getters = entries.map(([key, schema]) => Object.defineProperty({}, key, {
             get: () => this.builder.with({ schema }).build()
         }))
+
+        return assignAll({}, ...getters)
     }
 
     getResult() {
