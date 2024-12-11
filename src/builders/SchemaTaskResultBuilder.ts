@@ -312,11 +312,13 @@ export class SchemaTaskResultBuilder implements Builder {
 
         return condition
             ? this
+                .addMerge()
                 .withUnshift(initial => this.with({
                     initial,
                     schema: schemaOrPath(condition)
                 }))
-                .withUnshift(result => this.with({
+                .withUnshift((result, prev) => this.with({
+                    initial: prev,
                     schema: result ? thenCondition : elseCondition
                 }))
             : this
