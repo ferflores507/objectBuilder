@@ -1,15 +1,17 @@
-import { isNotPrimitive, partition } from "../helpers/varios";
-import { Schema, SchemaDefinition } from "../models";
+import { isNotPrimitive } from "../helpers/varios";
+import { Propiedades, Schema, SchemaDefinition } from "../models";
 import { Builder } from "./SchemaTaskResultBuilder";
 
 export class PropiedadesBuilder {
-    constructor(propiedades: Record<string, SchemaDefinition>, builder: Builder) {
-        const [computedEntries, entries] = partition(
-            Object.entries(propiedades), 
-            ([k, v]: [string, SchemaDefinition]) => (v as Schema).isComputed
-        )
+    constructor(propiedades: Propiedades, builder: Builder) {
+        const allEntries = Object.entries(propiedades)
+            .map(([k,v]) => [k, isNotPrimitive(v) ? v : { const: v }])
         
-        this.entries = entries.map(([k,v]) => [k, isNotPrimitive(v) ? v : { const: v }])
+        const { entries = [], computedEntries = [] } = Object.groupBy(allEntries, ([k, v]) => {
+            return (v as Schema)?.isComputed ? "computedEntries" : "entries"
+        })
+
+        this.entries = entries
         this.result = { ...propiedades }
         this.builder = builder.with({ ...builder.options, siblings: this.result })
         this.setComputed(this.result, computedEntries)   
