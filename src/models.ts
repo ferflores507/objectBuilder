@@ -61,6 +61,8 @@ export type Schema = Partial<{
     equals: SchemaDefinition
     flat: true
     function: SchemaDefinition
+    greaterThan: SchemaDefinition
+    lessThan: SchemaDefinition
     if: SchemaDefinition | string
     isComputed: true
     isNullOrWhiteSpace: true
