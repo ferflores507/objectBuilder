@@ -8,6 +8,28 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+describe("arithmetic", () => {
+  
+  const cases = Object.entries({
+    plus: 10,
+    minus: 6,
+    times: 16,
+    dividedBy: 4
+  })
+
+  test.each(cases)("expect 8 $method 2 to equal: $expected", async (method, expected) => {
+    await expectToEqualAsync({
+      schema: {
+        const: 8,
+        [method]: {
+          const: 2
+        }
+      },
+      expected
+    })
+  })
+})
+
 describe("schema from async", () => {
 
   const expected = "ok"

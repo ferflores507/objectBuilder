@@ -46,6 +46,10 @@ export type SchemaPrimitive = string | number | bigint | boolean | null
 export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive>
 
 export type Schema = Partial<{
+    plus: SchemaDefinition | number
+    minus: SchemaDefinition | number
+    times: SchemaDefinition | number
+    dividedBy: SchemaDefinition | number
     asyncFunction: SchemaDefinition
     bindArg: SchemaDefinition
     consulta: Consulta
