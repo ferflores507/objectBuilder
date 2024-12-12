@@ -159,7 +159,7 @@ export class SchemaTaskResultBuilder implements Builder {
         const operators = {
             spread: (a: any, b: any) => varios.spread(a, b),
             join: {
-                task: (separator: any, source: []) => source.join(separator),
+                task: (source: [], separator: any) => source.join(separator),
                 transform: (schema: any) => schema === true ? "" : schema
             },
             plus: (a: number, b: number) => a + b,
@@ -185,7 +185,7 @@ export class SchemaTaskResultBuilder implements Builder {
                     .withUnshift(initial => isNotPrimitive(definition)
                         ? this.with({ initial, schema: definition })
                         : definition)
-                    .add(task)
+                    .add((current, prev) => task(prev, current))
             })
 
         return this
