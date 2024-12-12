@@ -9,15 +9,15 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
 describe("arithmetic", () => {
-  
-  const cases = Object.entries({
+
+  const schema = {
     plus: 10,
     minus: 6,
     times: 16,
     dividedBy: 4
-  })
-
-  test.each(cases)("expect 8 $method 2 to equal: $expected", async (method, expected) => {
+  }
+  
+  test.each(Object.entries(schema))("expect 8 %s 2 to equal: %d", async (method, expected) => {
     await expectToEqualAsync({
       schema: {
         const: 8,
@@ -26,6 +26,18 @@ describe("arithmetic", () => {
         }
       },
       expected
+    })
+  })
+
+  const total = 16
+
+  test(`expect all operators to equal ${total}`, async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: 0,
+        ...schema
+      },
+      expected: total
     })
   })
 })
