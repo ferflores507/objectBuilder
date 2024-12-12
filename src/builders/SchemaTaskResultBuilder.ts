@@ -6,7 +6,7 @@ import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
-import { assignAll, getterTrap } from "../helpers/varios"
+import { assignAll, getterTrap, isNotPrimitive } from "../helpers/varios"
 
 export type BuilderOptions = {
     store: Record<string, any>
@@ -154,6 +154,42 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withReduce(reduce)
                 .withCheckout(checkout)
             : this
+    }
+
+    withBinary(schema: Schema | undefined) {
+        const operators = {
+            spread: (a: any, b: any) => varios.spread(a, b),
+            join: {
+                task: (separator: any, source: []) => source.join(separator),
+                transform: (schema: any) => schema === true ? "" : schema
+            },
+            plus: (a: number, b: number) => a + b,
+            minus: (a: number, b: number) => a - b,
+            times: (a: number, b: number) => a * b,
+            dividedBy: (a: number, b: number) => a / b,
+        };
+
+        Object.entries(operators)
+            .map(([key, options]) => ({
+                options,
+                definition: schema?.hasOwnProperty(key) ? schema[key] : null
+            }))
+            .filter(({ definition }) => definition != null)
+            .map(({ options, definition }) => typeof options == "function"
+                ? { definition, task: options }
+                : {
+                    ...options,
+                    definition: options.transform(definition),
+                })
+            .forEach(({ definition, task }) => {
+                this.addMerge()
+                    .withUnshift(initial => isNotPrimitive(definition)
+                        ? this.with({ initial, schema: definition })
+                        : definition)
+                    .add(task)
+            })
+
+        return this
     }
 
     withJoin(schema: SchemaDefinition | true | undefined) {
