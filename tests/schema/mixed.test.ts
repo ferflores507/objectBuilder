@@ -8,6 +8,40 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+describe("arithmetic", () => {
+
+  const schema = {
+    plus: 10,
+    minus: 6,
+    times: 16,
+    dividedBy: 4
+  }
+  
+  test.each(Object.entries(schema))("expect 8 %s 2 to equal: %d", async (method, expected) => {
+    await expectToEqualAsync({
+      schema: {
+        const: 8,
+        [method]: {
+          const: 2
+        }
+      },
+      expected
+    })
+  })
+
+  const total = 16
+
+  test(`expect all operators to equal ${total}`, async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: 0,
+        ...schema
+      },
+      expected: total
+    })
+  })
+})
+
 test("greater than", async () => {
   await expectToEqualAsync({
     schema: {
