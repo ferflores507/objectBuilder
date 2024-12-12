@@ -125,6 +125,7 @@ export class SchemaTaskResultBuilder implements Builder {
             consulta,
             import: importPath,
             store,
+            log,
             ...rest
         } = schema ?? {}
 
@@ -153,6 +154,15 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
                 .withCheckout(checkout)
+                .withLog(log)
+            : this
+    }
+
+    withLog(schema: SchemaDefinition | undefined){
+        return schema
+            ? this
+                .withSchema(schema)
+                .add(logValue => console.log(logValue))
             : this
     }
 
