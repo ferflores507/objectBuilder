@@ -145,11 +145,10 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withConsulta(consulta)
                 .withDefinitions(definitions)
                 .withPropiedades(propiedades)
-                .withSpread(spread)
                 .withFunction(schema)
                 .withBindArg(bindArg)
                 .withEndSchema(schema)
-                .withJoin(join)
+                .withBinary(schema)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
                 .withCheckout(checkout)
@@ -188,18 +187,6 @@ export class SchemaTaskResultBuilder implements Builder {
                         : definition)
                     .add(task)
             })
-
-        return this
-    }
-
-    withJoin(schema: SchemaDefinition | true | undefined) {
-        if (schema) {
-            this.addMerge()
-                .withUnshift(initial =>
-                    schema === true ? "" : this.with({ initial, schema })
-                )
-                .add((separator, prev: []) => prev.join(separator))
-        }
 
         return this
     }
@@ -327,16 +314,6 @@ export class SchemaTaskResultBuilder implements Builder {
         }
 
         return path ? this.add(task) : this
-    }
-
-    withSpread(schema: SchemaDefinition | undefined) {
-        if (schema) {
-            this.addMerge()
-                .withSchema(schema)
-                .add((current, prev) => varios.spread(prev, current))
-        }
-
-        return this
     }
 
     withConditional(schema: Schema | undefined): SchemaTaskResultBuilder {
