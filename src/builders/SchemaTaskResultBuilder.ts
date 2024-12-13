@@ -409,15 +409,15 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withComparison(schema: Schema | undefined) {
 
-        const comparison: Record<string, any> = {
+        const tasks = {
             equals: varios.esIgual,
-            includes: (target: any[] | string, result: any) => target.includes(result),
-            not: (target: any) => !target,
-            greaterThan: (target: any, result: any) => target > result,
-            lessThan: (target: any, result: any) => target < result
+            includes: (a: any[] | string, b: any) => a.includes(b),
+            not: (a: any) => !a,
+            greaterThan: (a: any, b: any) => a > b,
+            lessThan: (a: any, b: any) => a < b
         }
 
-        const entries = this.filterTasks(comparison, schema)
+        const entries = this.filterTasks(tasks, schema)
 
         if (entries.length) {
             this.add(initial => {
