@@ -191,6 +191,12 @@ export class SchemaTaskResultBuilder implements Builder {
                 })
     }
 
+    withSchemaOrDefault(value: any) {
+        return this.withUnshift((initial: any) => isNotPrimitive(value)
+            ? this.with({ initial, schema: value })
+            : value)
+    }
+
     withBinary(schema: Schema | undefined) {
         const tasks = {
             spread: (a: any, b: any) => varios.spread(a, b),
