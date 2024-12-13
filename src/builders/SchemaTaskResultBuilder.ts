@@ -419,20 +419,16 @@ export class SchemaTaskResultBuilder implements Builder {
 
         const entries = this.filterTasks(tasks, schema)
 
-        if (entries.length) {
-            this.add(initial => {
-                const builders = entries.map(({ definition, task }) => {
-                    return this.with({
-                        initial,
-                        schema: definition
-                    }).add((current, prev) => task(prev, current))
-                })
+        return entries.length
+            ? this.add(initial => {
+                const builders = entries.map(({ definition, task }) => this.with({
+                    initial,
+                    schema: definition
+                }).add((current, prev) => task(prev, current)))
 
                 this.taskBuilder.unshiftArray(builders)
             }).add((results: []) => results.every(Boolean))
-        }
-
-        return this
+            : this
     }
 
     withPropiedades(propiedades: Propiedades | undefined) {
