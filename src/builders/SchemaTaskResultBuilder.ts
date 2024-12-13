@@ -8,6 +8,11 @@ import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
 import { assignAll, getterTrap, isNotPrimitive } from "../helpers/varios"
 
+type TaskOptions = Task | {
+    task: Task,
+    transform: (schema: Schema) => any
+}
+
 export type BuilderOptions = {
     store: Record<string, any>
     siblings: Record<string, any>
@@ -163,6 +168,21 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withSchema(schema)
                 .add(logValue => console.log(logValue))
             : this
+    }
+
+    filterTasks(tasks: Record<string, TaskOptions>, schema: Schema | undefined) {
+        return Object.entries(tasks)
+            .map(([key, options]) => ({
+                options,
+                definition: schema?.hasOwnProperty(key) ? schema[key] : null
+            }))
+            .filter(({ definition }) => definition != null)
+            .map(({ options, definition }) => typeof options == "function"
+                ? { definition, task: options }
+                : {
+                    ...options,
+                    definition: options.transform(definition),
+                })
     }
 
     withBinary(schema: Schema | undefined) {
