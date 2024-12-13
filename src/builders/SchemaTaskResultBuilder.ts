@@ -417,16 +417,15 @@ export class SchemaTaskResultBuilder implements Builder {
             lessThan: (target: any, result: any) => target < result
         }
 
-        const entries = Object.entries(schema ?? {})
-            .filter(([k]) => comparison.hasOwnProperty(k))
+        const entries = this.filterTasks(comparison, schema)
 
         if (entries.length) {
             this.add(initial => {
-                const builders = entries.map(([k, v]) => {
+                const builders = entries.map(({ definition, task }) => {
                     return this.with({
                         initial,
-                        schema: v
-                    }).add(result => comparison[k](initial, result))
+                        schema: definition
+                    }).add((current, prev) => task(prev, current))
                 })
 
                 this.taskBuilder.unshiftArray(builders)
