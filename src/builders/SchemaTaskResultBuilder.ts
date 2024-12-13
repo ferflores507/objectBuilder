@@ -186,7 +186,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withBinary(schema: Schema | undefined) {
-        const operators = {
+        const tasks = {
             spread: (a: any, b: any) => varios.spread(a, b),
             join: {
                 task: (source: [], separator: any) => source.join(separator),
@@ -198,18 +198,7 @@ export class SchemaTaskResultBuilder implements Builder {
             dividedBy: (a: number, b: number) => a / b,
         };
 
-        Object.entries(operators)
-            .map(([key, options]) => ({
-                options,
-                definition: schema?.hasOwnProperty(key) ? schema[key] : null
-            }))
-            .filter(({ definition }) => definition != null)
-            .map(({ options, definition }) => typeof options == "function"
-                ? { definition, task: options }
-                : {
-                    ...options,
-                    definition: options.transform(definition),
-                })
+        this.filterTasks(tasks, schema)
             .forEach(({ definition, task }) => {
                 this.addMerge()
                     .withUnshift(initial => isNotPrimitive(definition)
