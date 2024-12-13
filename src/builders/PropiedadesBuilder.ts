@@ -1,10 +1,10 @@
-import { assignAll, isNotPrimitive } from "../helpers/varios";
+import { assignAll } from "../helpers/varios";
 import { Propiedades, Schema, SchemaDefinition } from "../models";
 import { Builder } from "./SchemaTaskResultBuilder";
 
 export class PropiedadesBuilder {
     constructor(propiedades: Propiedades, private readonly builder: Builder) {
-        const allEntries = this.getWithDefault(propiedades)
+        const allEntries = Object.entries(propiedades)
         const { entries = [], computedEntries = [] } = this.groupByComputed(allEntries)
 
         this.entries = entries
@@ -14,11 +14,6 @@ export class PropiedadesBuilder {
 
     private readonly result: Record<string, any>
     private readonly entries: [string, SchemaDefinition][]
-
-    getWithDefault(propiedades: Propiedades): [string, SchemaDefinition][] {
-        return Object.entries(propiedades)
-            .map(([k,v]) => [k as string, isNotPrimitive(v) ? v as SchemaDefinition : { const: v } ])
-    }
 
     groupByComputed(entries: [string, SchemaDefinition][]) {
         return Object.groupBy(entries, ([k, v]) => {
@@ -38,7 +33,7 @@ export class PropiedadesBuilder {
      
     build() {
         for (const [k, v] of this.entries) {
-            this.result[k] = this.builder.with({ schema: v }).build()
+            this.result[k] = this.builder.withSchemaOrDefault(v).build()
         }
 
         return this.getResult()
@@ -46,7 +41,7 @@ export class PropiedadesBuilder {
 
     async buildAsync() {        
         for (const [k, v] of this.entries) {
-            this.result[k] = await this.builder.with({ schema: v }).buildAsync()
+            this.result[k] = await this.builder.withSchemaOrDefault(v).buildAsync()
         }
 
         return this.getResult()
