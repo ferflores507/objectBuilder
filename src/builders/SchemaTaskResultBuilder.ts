@@ -70,6 +70,12 @@ export class SchemaTaskResultBuilder implements Builder {
             .add(result => isBuilder(result) ? this.unshift(result) : result)
     }
 
+    withUnshiftArray(task: (a: any, b: any) => SchemaTaskResultBuilder[]) {
+        return this
+            .add(task)
+            .add(result => this.taskBuilder.unshiftArray(result))
+    }
+
     add(task: Task) {
         this.taskBuilder.add(task)
 
@@ -420,13 +426,12 @@ export class SchemaTaskResultBuilder implements Builder {
         const entries = this.filterTasks(tasks, schema)
 
         return entries.length
-            ? this.add(initial => {
-                const builders = entries.map(({ definition, task }) => this.with({
+            ? this.withUnshiftArray(initial => {
+                return entries.map(({ definition, task }) => this.with({
                     initial,
                     schema: definition
                 }).add((current, prev) => task(prev, current)))
-
-                this.taskBuilder.unshiftArray(builders)
+                
             }).add((results: []) => results.every(Boolean))
             : this
     }
@@ -439,9 +444,7 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withDefinitions(schemas: Schema[] | undefined) {
         return schemas
-            ? this
-                .add(initial => schemas?.map(schema => this.with({ initial, schema })))
-                .add(builders => this.taskBuilder.unshiftArray(builders))
+            ? this.withUnshiftArray(initial => schemas?.map(schema => this.with({ initial, schema })))
             : this
     }
 
