@@ -213,9 +213,7 @@ export class SchemaTaskResultBuilder implements Builder {
         this.filterTasks(tasks, schema)
             .forEach(({ definition, task }) => {
                 this.addMerge()
-                    .withUnshift(initial => isNotPrimitive(definition)
-                        ? this.with({ initial, schema: definition })
-                        : definition)
+                    .withSchemaOrDefault(definition)
                     .add((current, prev) => task(prev, current))
             })
 
