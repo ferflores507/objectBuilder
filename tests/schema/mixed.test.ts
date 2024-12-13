@@ -46,9 +46,7 @@ test("greater than", async () => {
   await expectToEqualAsync({
     schema: {
       const: 2,
-      greaterThan: {
-        const: 1
-      }
+      greaterThan: 1
     },
     expected: true
   })
@@ -58,9 +56,7 @@ test("less than", async () => {
   await expectToEqualAsync({
     schema: {
       const: 0,
-      lessThan: {
-        const: 1
-      }
+      lessThan: 1
     },
     expected: true
   })
@@ -454,9 +450,7 @@ test("map then filter", async () => {
       reduce: {
         filter: {
           path: "current.id",
-          equals: {
-            const: 1,
-          }
+          equals: 1
         }
       }
     },
@@ -470,9 +464,7 @@ test("filter simple case", async () => {
       const: Array.from(Array(3).keys()),
       filter: {
         path: "current",
-        equals: {
-          const: 1,
-        }
+        equals: 1
       }
     },
     expected: [1]
@@ -994,9 +986,7 @@ describe("includes", () => {
     await expectToEqualAsync({
       schema: {
         const: "hola",
-        includes: {
-          const: keyword
-        }
+        includes: keyword
       },
       expected: true,
     })
@@ -1061,9 +1051,7 @@ test("array builder with schema with find", () => {
   const schema = {
     find: {
       path: "current.nombre",
-      equals: {
-        const: "Melany"
-      }
+      equals: "Melany"
     }
   }
 
@@ -1120,9 +1108,7 @@ describe("array filter property 'keywords' contains string", () => {
         const: items,
         filter: {
           path: "current.keywords",
-          includes: {
-            const: "Melany"
-          }
+          includes: "Melany"
         }
       },
       expected
@@ -1435,9 +1421,7 @@ describe("if schema", () => {
       schema: {
         const: mod,
         if: {
-          equals: {
-            const: 0
-          }
+          equals: 0
         },
         then: {
           const: ok
@@ -1839,9 +1823,7 @@ describe("comparacion", () => {
         store: { nombre: "Melany" },
         schema: {
           path: "nombre",
-          equals: {
-            const: nombre
-          }
+          equals: nombre,
         },
         expected
       })
@@ -1979,9 +1961,7 @@ describe("array", () => {
         schema: {
           find: {
             path: "current.nombre",
-            equals: {
-              const: "Melany"
-            }
+            equals: "Melany"
           }
         },
         initial: [
@@ -2016,9 +1996,7 @@ describe("array", () => {
                 }
               ],
               contains: {
-                equals: {
-                  const: true
-                }
+                equals: true
               }
             }
           }
@@ -2116,9 +2094,7 @@ describe("array", () => {
           const: Array(2).fill(store),
           contains: {
             path: "current.nombre",
-            equals: {
-              const: "Melany"
-            }
+            equals: "Melany"
           }
         },
         expected: true
@@ -2141,9 +2117,7 @@ describe("array", () => {
         schema: {
           ...schema,
           items: {
-            equals: {
-              const: "Melany"
-            }
+            equals: "Melany"
           }
         },
         expected: true
@@ -2162,9 +2136,7 @@ describe("array", () => {
         const: source,
         filter: {
           path: "current.nombre",
-          equals: {
-            const: "Melany"
-          }
+          equals: "Melany"
         },
         reduce: {
           propiedades: {

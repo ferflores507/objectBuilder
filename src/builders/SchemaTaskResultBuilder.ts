@@ -433,8 +433,9 @@ export class SchemaTaskResultBuilder implements Builder {
             ? this.withUnshiftArray(initial => {
                 return entries.map(({ definition, task }) => this.with({
                     initial,
-                    schema: definition
-                }).add((current, prev) => task(prev, current)))
+                })
+                .withSchemaOrDefault(definition)
+                .add((current, prev) => task(prev, current)))
                 
             }).add((results: []) => results.every(Boolean))
             : this

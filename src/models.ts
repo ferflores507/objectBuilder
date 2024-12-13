@@ -62,15 +62,15 @@ export type Schema = Partial<{
     delay: number
     else: SchemaDefinition
     entries: true
-    equals: SchemaDefinition
+    equals: SchemaDefinition | SchemaPrimitive
     flat: true
     function: SchemaDefinition
-    greaterThan: SchemaDefinition
-    lessThan: SchemaDefinition
+    greaterThan: SchemaDefinition | SchemaPrimitive
+    lessThan: SchemaDefinition | SchemaPrimitive
     if: SchemaDefinition | string
     isComputed: true
     isNullOrWhiteSpace: true
-    includes: SchemaDefinition
+    includes: SchemaDefinition | SchemaPrimitive
     increment: string
     import: string
     join: SchemaDefinition
