@@ -209,6 +209,7 @@ export class SchemaTaskResultBuilder implements Builder {
             minus: (a: number, b: number) => a - b,
             times: (a: number, b: number) => a * b,
             dividedBy: (a: number, b: number) => a / b,
+            ...this.options.operators
         };
 
         this.filterTasks(tasks, schema)

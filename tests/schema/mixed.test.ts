@@ -8,6 +8,21 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("delete operator: expect to equal items toSpliced with 1 deleted element", async () => {
+  await expectToEqualAsync({
+    operators: {
+      delete: (initial: [], index: any) => {
+        return initial.toSpliced(index, 1)
+      }
+    },
+    schema: {
+      const: [1, 2, 3],
+      delete: 1
+    },
+    expected: [1, 3]
+  })
+})
+
 describe("arithmetic", () => {
 
   const schema = {
