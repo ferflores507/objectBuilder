@@ -201,6 +201,7 @@ export class SchemaTaskResultBuilder implements Builder {
     withBinary(schema: Schema | undefined) {
         const tasks = {
             spread: (a: any, b: any) => varios.spread(a, b),
+            spreadFlat: (a: any, b: any[]) => varios.spread(a, b.flat()),
             join: {
                 task: (source: [], separator: any) => source.join(separator),
                 transform: (schema: any) => schema === true ? "" : schema

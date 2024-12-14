@@ -8,6 +8,32 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("spread flat", async() => {
+  await expectToEqualAsync({
+    schema: {
+      const: [
+        1,
+        2
+      ],
+      spreadFlat: [
+        {
+          const: 3
+        },
+        {
+          const: [4, 5]
+        },
+        {
+          const: 6
+        },
+        {
+          const: 7
+        }
+      ]
+    },
+    expected: Array.from(Array(7).keys()).map(i => i +1)
+  })
+})
+
 test("delete operator: expect to equal items toSpliced with 1 deleted element", async () => {
   await expectToEqualAsync({
     operators: {
