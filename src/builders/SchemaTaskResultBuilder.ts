@@ -22,6 +22,7 @@ export type BuilderOptions = {
     functions: Record<string, Function>
     schema: SchemaDefinition
     initial: any
+    operators: Record<string, TaskOptions>
 }
 
 export type Builder = {
