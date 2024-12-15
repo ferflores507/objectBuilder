@@ -58,6 +58,7 @@ export type Schema = Partial<{
     checkout: SchemaDefinition | true
     const: any
     decrement: string
+    default: SchemaDefinition | SchemaPrimitive
     definitions: Schema[]
     delay: number
     else: SchemaDefinition
