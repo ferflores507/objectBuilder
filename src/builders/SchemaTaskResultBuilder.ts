@@ -171,8 +171,10 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withDefault(schema: SchemaDefinition | SchemaPrimitive) {
-        return schema ? this.withSchemaOrDefault(schema) : this
+    withDefault(schema: SchemaDefinition | SchemaPrimitive | undefined) {
+        return schema != null 
+            ? this.withUnshift(initial => initial ?? this.with({ initial }).withSchemaOrDefault(schema))
+            : this
     }
 
     withLog(schema: SchemaDefinition | undefined){

@@ -11,6 +11,29 @@ import { TaskBuilder } from '../../src/builders/TaskBuilder'
 test("default schema", async () => {
   await expectToEqualAsync({
     schema: {
+      trim: true,
+      default: ""
+    },
+    expected: ""
+  })
+})
+
+test("default schema", async () => {
+  await expectToEqualAsync({
+    store: {
+      nombre: "Fernando"
+    },
+    schema: {
+      path: "nombre",
+      default: "Melany"
+    },
+    expected: "Fernando"
+  })
+})
+
+test("default schema", async () => {
+  await expectToEqualAsync({
+    schema: {
       path: "nombre",
       default: "Melany"
     },
