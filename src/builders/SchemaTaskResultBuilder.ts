@@ -1,4 +1,4 @@
-import type { ArraySchema, Consulta, Propiedades, Schema, SchemaDefinition } from "../models"
+import type { ArraySchema, Consulta, Propiedades, Schema, SchemaDefinition, SchemaPrimitive } from "../models"
 import * as varios from "../helpers/varios"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
 import { PlainResultBuilder } from "./PlainResultBuilder"
@@ -138,6 +138,7 @@ export class SchemaTaskResultBuilder implements Builder {
             import: importPath,
             store,
             log,
+            default: defaultSchema,
             ...rest
         } = schema ?? {}
 
@@ -149,6 +150,7 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withDelay(delay)
                 .withPath(path)
                 .withImport(importPath)
+                .withDefault(defaultSchema)
                 .withInitialSchema(schema)
                 .withSchemaFrom(schemaFrom)
                 .withSelectSet(selectSet)
@@ -167,6 +169,10 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withCheckout(checkout)
                 .withLog(log)
             : this
+    }
+
+    withDefault(schema: SchemaDefinition | SchemaPrimitive) {
+        return schema ? this.withSchemaOrDefault(schema) : this
     }
 
     withLog(schema: SchemaDefinition | undefined){
