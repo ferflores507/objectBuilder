@@ -12,9 +12,7 @@ test("default schema", async () => {
   await expectToEqualAsync({
     schema: {
       path: "nombre",
-      default: {
-        const: "Melany"
-      }
+      default: "Melany"
     },
     expected: "Melany"
   })
