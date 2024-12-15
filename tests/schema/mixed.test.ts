@@ -8,6 +8,18 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("default schema", async () => {
+  await expectToEqualAsync({
+    schema: {
+      path: "nombre",
+      default: {
+        const: "Melany"
+      }
+    },
+    expected: "Melany"
+  })
+})
+
 test("spread flat", async() => {
   await expectToEqualAsync({
     schema: {
