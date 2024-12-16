@@ -111,6 +111,9 @@ export const entry = (obj: Record<string, any>) => {
         set(path: Path, value: any) {
             return entry.with(path).set(value)
         },
+        unpackAsGetters(keys: string[] = Object.getOwnPropertyNames(obj)) {
+            return assignAll({}, ...keys.map(key => ({ get [key]() { return obj[key] } })))
+        }
     }
 }
 
