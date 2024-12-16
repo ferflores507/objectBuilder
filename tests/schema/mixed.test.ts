@@ -146,24 +146,63 @@ describe("arithmetic", () => {
   })
 })
 
-test("greater than", async () => {
-  await expectToEqualAsync({
-    schema: {
-      const: 2,
-      greaterThan: 1
-    },
-    expected: true
-  })
-})
+describe("comparison", () => {
 
-test("less than", async () => {
-  await expectToEqualAsync({
-    schema: {
-      const: 0,
-      lessThan: 1
-    },
-    expected: true
+  test("not equals but includes", async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: "not just Melany",
+        not: {
+          equals: "Melany",
+        },
+        includes: "Melany"
+      },
+      expected: true
+    })
   })
+
+  test("equals and includes", async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: "Melany",
+        equals: "Melany",
+        includes: "Melany"
+      },
+      expected: true
+    })
+  })
+  
+  test("greater than", async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: 2,
+        greaterThan: 1
+      },
+      expected: true
+    })
+  })
+  
+  test("less than", async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: 0,
+        lessThan: 1
+      },
+      expected: true
+    })
+  })
+
+  test("greater than and less than (between)", async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: 7,
+        greaterThan: 6,
+        lessThan: 8
+      },
+      expected: true
+    })
+  })
+
 })
 
 describe("schema from async", () => {
