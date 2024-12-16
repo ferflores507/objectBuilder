@@ -70,7 +70,7 @@ export type Schema = Partial<{
     lessThan: SchemaDefinition | SchemaPrimitive
     if: SchemaDefinition | string
     isComputed: true
-    isNullOrWhiteSpace: true
+    isNullOrWhiteSpace: boolean
     includes: SchemaDefinition | SchemaPrimitive
     increment: string
     import: string
