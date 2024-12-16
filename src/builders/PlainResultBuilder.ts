@@ -59,9 +59,9 @@ export class PlainResultBuilder {
         return this
     }
 
-    withIsNullOrWhiteSpace(isNullOrWhiteSpace: true | undefined) {
-        if(isNullOrWhiteSpace) {
-            this.target = ((this.target ?? "").toString()).trim() === ""
+    withIsNullOrWhiteSpace(isNullOrWhiteSpace: boolean | undefined) {
+        if(typeof(isNullOrWhiteSpace) == "boolean") {
+            this.target = ((this.target as string ?? "").toString().trim() === "") === isNullOrWhiteSpace
         }
 
         return this
