@@ -1,6 +1,5 @@
-import { Calc } from "../helpers/calc"
 import * as helpers from "../helpers/varios"
-import { CalcMethod, Schema } from "../models"
+import { Schema } from "../models"
 
 export class PlainResultBuilder {
     constructor(private target: any) {}
@@ -11,8 +10,7 @@ export class PlainResultBuilder {
 
     withSchema(schema: Schema | undefined) {
         const {
-            entries, 
-            calc, 
+            entries,
             unpack,
             stringify,
             parse,
@@ -23,7 +21,6 @@ export class PlainResultBuilder {
 
         this.target = this
             .withEntries(entries)
-            .withCalc(calc)
             .withUnpack(unpack)
             .withStringify(stringify)
             .withParse(parse)
@@ -82,25 +79,6 @@ export class PlainResultBuilder {
             this.target = keys.reduce((obj, key) => {
                 return { ...obj, [key]: target[key] }
             }, {})
-        }
-
-        return this
-    }
-
-    withCalc(method: CalcMethod | undefined) {
-
-        if (method) {
-
-            const calc = new Calc(...this.target as [])
-
-            const metodos: Record<CalcMethod, () => number> = {
-                "sumar": () => calc.sumar(),
-                "restar": () => calc.restar(),
-                "multiplicar": () => calc.multiplicar(),
-                "dividir": () => calc.dividir()
-            }
-
-            this.target = metodos[method]()
         }
 
         return this

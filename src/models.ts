@@ -53,7 +53,6 @@ export type Schema = Partial<{
     asyncFunction: SchemaDefinition
     bindArg: SchemaDefinition
     consulta: Consulta
-    calc: CalcMethod
     call: string
     checkout: SchemaDefinition | true
     const: any

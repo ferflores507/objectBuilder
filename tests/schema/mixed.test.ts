@@ -1842,26 +1842,6 @@ describe("entries", () => {
   })
 })
 
-describe("calc", () => {
-
-  test.each([
-    ["sumar", 115],
-    ["restar", 85],
-    ["multiplicar", 5000],
-    ["dividir", 2]
-  ])("%s 100, 10, 5 da: %s", async (calc, expected) => {
-
-    await expectToEqualAsync({
-      store: {},
-      schema: {
-        const: [100, 10, 5],
-        calc
-      },
-      expected
-    })
-  })
-})
-
 test("nested propiedades", async () => {
 
   const store = {
