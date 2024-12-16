@@ -1,5 +1,3 @@
-export type CalcMethod = "sumar" | "restar" | "multiplicar" | "dividir"
-
 export type Join = {
     items: Schema
     match: Schema
