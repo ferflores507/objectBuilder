@@ -22,7 +22,7 @@ test("unpack as getters", () => {
       schema: {
         path: "user",
         unpackAsGetters: {
-          const: ["nombre", "id"]
+          const: ["nombre", "id", "nombre", "id"]
         }
       }
     })
