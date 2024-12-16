@@ -224,12 +224,10 @@ describe("schema string join", () => {
       },
       {
         title: "dash",
-        join: {
-          const: "-"
-        },
+        join: "-",
         separator: "-"
       }
-    ]
+    ] as const
 
     test.each(cases)("expects $join as value of join to be joined with $title", async ({ join, separator }) => {
       await expectToEqualAsync({
