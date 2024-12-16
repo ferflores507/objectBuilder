@@ -8,6 +8,36 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 
+test("unpack as getters", () => {
+  const user = {
+    nombre: "Melany",
+    id: 1
+  }
+
+  const obj = new SchemaTaskResultBuilder()
+    .with({
+      store: {
+        user
+      },
+      schema: {
+        path: "user",
+        unpackAsGetters: {
+          const: ["nombre", "id"]
+        }
+      }
+    })
+    .build()
+
+    expect(obj.nombre).toBe("Melany")
+    expect(obj.id).toBe(1)
+
+    user.nombre = "Fernando"
+    user.id = 2
+
+    expect(obj.nombre).toBe("Fernando")
+    expect(obj.id).toBe(2)
+})
+
 test("default schema", async () => {
   await expectToEqualAsync({
     schema: {
