@@ -16,8 +16,6 @@ type TaskOptions = Task | {
 export type BuilderOptions = {
     store: Record<string, any>
     siblings: Record<string, any>
-    sources: Record<string, any>
-
     target: any
     functions: Record<string, Function>
     schema: SchemaDefinition
@@ -38,7 +36,6 @@ export class SchemaTaskResultBuilder implements Builder {
         this.options = options ?? {
             store: {},
             siblings: {},
-            sources: {}
         }
 
         this.taskBuilder = new TaskBuilder().with({ target: options?.initial })
