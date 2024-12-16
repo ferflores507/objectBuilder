@@ -1392,22 +1392,18 @@ describe("not", () => {
 
   test("propiedades", async () => {
     await expectToEqualAsync({
-      store: {},
       schema: {
         propiedades: {
-          activated: {
+          active: {
             not: {
-              source: "activated"
+              path: "active"
             }
           }
         }
       },
       expected: {
-        activated: true
+        active: true
       },
-      sources: {
-        activated: false
-      }
     })
   })
 
