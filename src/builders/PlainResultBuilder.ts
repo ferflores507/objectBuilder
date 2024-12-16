@@ -91,12 +91,4 @@ export class PlainResultBuilder {
   
         return this
       }
-    
-    withPath(source: Record<string, any> | undefined, path: string | undefined) {
-        if(path) {
-            this.target = helpers.entry(source).get(path)
-        }
-
-        return this
-    }
 }
