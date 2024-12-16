@@ -434,7 +434,7 @@ export class SchemaTaskResultBuilder implements Builder {
         const tasks = {
             equals: varios.esIgual,
             includes: (a: any[] | string, b: any) => a.includes(b),
-            not: (a: any) => !a,
+            not: (a: any, b: any) => !b,
             greaterThan: (a: any, b: any) => a > b,
             lessThan: (a: any, b: any) => a < b
         }
