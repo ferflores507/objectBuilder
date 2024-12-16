@@ -208,9 +208,7 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withBinary(schema: Schema | undefined) {
         const tasks = {
-            unpackAsGetters: (obj: Record<string, any>, b: string[]) => {
-                return assignAll({}, ...b.map(key => ({ get [key]() { return obj[key] } })))
-            },
+            unpackAsGetters: (obj: {}, b: string[]) => varios.entry(obj).unpackAsGetters(b),
             spread: (a: any, b: any) => varios.spread(a, b),
             spreadFlat: (a: any, b: any[]) => varios.spread(a, b.flat()),
             join: {
