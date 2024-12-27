@@ -115,20 +115,17 @@ export class SchemaTaskResultBuilder implements Builder {
         schema = Array.isArray(schema) ? { definitions: schema } : schema
 
         const {
-            join,
             bindArg,
             status,
             delay,
             path,
             propiedades,
-            spread,
             reduceOrDefault,
             reduce,
             definitions,
             checkout,
             schemaFrom,
             selectSet,
-            not,
             increment,
             decrement,
             consulta,
