@@ -464,16 +464,13 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withSelectSet(path: string | undefined) {
         if (path) {
-            const task = (target) => {
-                const items = this.getStoreValue(path) as any[]
-                const newItems = new ArrayMapBuilder(items, this)
-                    .withSelect({ value: target })
+            this.addMerge()
+                .withPath(path)
+                .add((items, prev) => new ArrayMapBuilder(items, this)
+                    .withSelect({ value: prev })
                     .build()
-
-                return this.set(path, newItems)
-            }
-
-            this.add(task)
+                )
+                .withSet(path)
         }
 
         return this
