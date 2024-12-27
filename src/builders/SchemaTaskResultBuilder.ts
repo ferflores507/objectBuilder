@@ -92,9 +92,10 @@ export class SchemaTaskResultBuilder implements Builder {
         const newOptions = assignAll({}, this.options, options)
 
         const builder = new SchemaTaskResultBuilder(this.target, newOptions)
-        const { schema } = options
 
-        return schema ? builder.withSchema(schema) : builder
+        return options.schema 
+            ? builder.withSchema(options.schema) 
+            : builder
 
     }
 
