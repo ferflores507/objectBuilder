@@ -269,15 +269,13 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withStore(schema: Schema | undefined) {
-        if (schema) {
-            this.add(initial => {
+        return schema 
+            ? this.add(initial => {
                 this.setStore(this.with({ initial, schema }).build())
 
                 return initial
-            })
-        }
-
-        return this
+                })
+            : this
     }
 
     withImport(path: string | undefined) {
@@ -285,14 +283,18 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withFunction(schema: Schema | undefined) {
-        const { asyncFunction } = schema ?? {}
-        const targetSchema = asyncFunction ?? schema?.function
+        const { asyncFunction, function: functionSchema } = schema ?? {}
+        const targetSchema = asyncFunction ?? functionSchema
 
         return targetSchema
-            ? this.add(() => (initial: any) => this.with({
-                initial,
-                schema: targetSchema
-            })[asyncFunction ? "buildAsync" : "build"]())
+            ? this.add(() => (initial: any) => {
+                const builder = this.with({
+                    initial,
+                    schema: targetSchema
+                })
+
+                return asyncFunction ? builder.buildAsync() : builder.build()
+            })
             : this
     }
 
@@ -314,18 +316,15 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withConsulta(consulta: Consulta | undefined) {
-        if (consulta) {
-            const { cargar } = useConsulta()
-
-            this.add(async (target: any) => {
+        return consulta
+            ? this.add(async () => {
+                const { cargar } = useConsulta()
                 const response = await cargar(consulta, new AbortController().signal)
                 const { ok, data } = response
 
                 return ok ? data : (() => { throw response })
-            })
-        }
-
-        return this
+                })
+            : this
     }
 
     withDelay(ms: number | undefined) {
@@ -343,12 +342,11 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withCheckout(schema: SchemaDefinition | true | undefined): SchemaTaskResultBuilder {
-        if (schema) {
-            this.add((target) => this.target = target)
+        return schema
+            ? this
+                .add((target) => this.target = target)
                 .withUnshift(initial => schema === true ? initial : this.with({ initial, schema }))
-        }
-
-        return this
+            : this
     }
 
     withUse(path: string | undefined) {
@@ -471,17 +469,16 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withSelectSet(path: string | undefined) {
-        if (path) {
-            this.addMerge()
+        return path
+            ? this
+                .addMerge()
                 .withPath(path)
                 .add((items, prev) => new ArrayMapBuilder(items, this)
                     .withSelect({ value: prev })
                     .build()
                 )
                 .withSet(path)
-        }
-
-        return this
+            : this
     }
 
     withSchemaFrom(source: SchemaDefinition | undefined): SchemaTaskResultBuilder {
