@@ -1586,7 +1586,7 @@ describe("if schema", () => {
 test("getPathValue throws on null source", () => {
   const source = null
 
-  expect(() => entry(source).get("test")).toThrow()
+  expect(() => entry(source!).get("test")).toThrow()
 })
 
 describe("select", () => {
