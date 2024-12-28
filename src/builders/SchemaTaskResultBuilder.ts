@@ -354,10 +354,10 @@ export class SchemaTaskResultBuilder implements Builder {
     withUse(path: string | undefined) {
         return path 
             ? this.add((target) => {
-                const { functions } = this.options
-                const func = functions?.[path] ?? (() => { throw `La función ${path} no está definida.` })()
+                const func = this.options.functions?.[path]
+                const throwMsg = () => { throw `La función ${path} no está definida.` }
 
-                return func(target, this)
+                return (func ?? throwMsg)(target, this)
             }) 
             : this
     }
