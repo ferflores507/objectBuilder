@@ -172,7 +172,7 @@ export const ordenar = (objs: any[], orderBy: string) => objs.sort((a, b) => {
     return (a > b) ? 1 : ((b > a) ? -1 : 0)
 })
 
-export const isNotPrimitive = (value: any) => {
+export const isNotPrimitive = <T>(value: T) => {
     return typeof value === "object" && value != null
 }
 
@@ -180,8 +180,8 @@ export const isObject = (value: any) => {
     return isNotPrimitive(value) && !Array.isArray(value)
 }
 
-export const flat = (obj: {}) => Object.entries(obj).reduce((p, [k, v]) => {
-    const valor: any = isObject(v) ? v : { [k]: v }
+export const flat = (obj: Record<string, any>) => Object.entries(obj).reduce((p, [k, v]) => {
+    const valor = isObject(v) ? v : { [k]: v }
     return { ...p, ...valor }
 }, {})
 
