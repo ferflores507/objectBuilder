@@ -31,6 +31,20 @@ export type Builder = {
     buildAsync: () => Promise<any>
 }
 
+const defaultOperators = {
+    unpackAsGetters: (obj: {}, b: string[]) => varios.entry(obj).unpackAsGetters(b),
+    spread: (a: any, b: any) => varios.spread(a, b),
+    spreadFlat: (a: any, b: any[]) => varios.spread(a, b.flat()),
+    join: {
+        task: (source: [], separator: any) => source.join(separator),
+        transform: (schema: any) => schema === true ? "" : schema
+    },
+    plus: (a: number, b: number) => a + b,
+    minus: (a: number, b: number) => a - b,
+    times: (a: number, b: number) => a * b,
+    dividedBy: (a: number, b: number) => a / b,
+};
+
 export class SchemaTaskResultBuilder implements Builder {
     constructor(private target?: any, options?: BuilderOptions) {
         this.options = options ?? {
@@ -88,13 +102,25 @@ export class SchemaTaskResultBuilder implements Builder {
         return this.taskBuilder.buildAsync()
     }
 
+    getOperators(newOperators: Record<string, TaskOptions> | undefined) {
+        const { operators } = this.options
+
+        return newOperators 
+            ? { ...operators, ...newOperators }
+            : operators
+    }
+
     with(options: Partial<BuilderOptions>): SchemaTaskResultBuilder {
-        const newOptions = assignAll({}, this.options, options)
+        const operators = this.getOperators(options.operators)
 
-        const builder = new SchemaTaskResultBuilder(this.target, newOptions)
-        const { schema } = options
+        const builder = new SchemaTaskResultBuilder(
+            this.target, 
+            assignAll({}, this.options, options, { operators })
+        )
 
-        return schema ? builder.withSchema(schema) : builder
+        return options.schema 
+            ? builder.withSchema(options.schema) 
+            : builder
 
     }
 
@@ -201,22 +227,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withBinary(schema: Schema | undefined) {
-        const tasks = {
-            unpackAsGetters: (obj: {}, b: string[]) => varios.entry(obj).unpackAsGetters(b),
-            spread: (a: any, b: any) => varios.spread(a, b),
-            spreadFlat: (a: any, b: any[]) => varios.spread(a, b.flat()),
-            join: {
-                task: (source: [], separator: any) => source.join(separator),
-                transform: (schema: any) => schema === true ? "" : schema
-            },
-            plus: (a: number, b: number) => a + b,
-            minus: (a: number, b: number) => a - b,
-            times: (a: number, b: number) => a * b,
-            dividedBy: (a: number, b: number) => a / b,
-            ...this.options.operators
-        };
-
-        this.filterTasks(tasks, schema)
+        this.filterTasks(this.options.operators ?? defaultOperators, schema)
             .forEach(({ definition, task }) => {
                 this.addMerge()
                     .withSchemaOrDefault(definition)
