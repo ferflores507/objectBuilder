@@ -46,7 +46,7 @@ const defaultOperators = {
 };
 
 export class SchemaTaskResultBuilder implements Builder {
-    constructor(private target?: any, options?: BuilderOptions) {
+    constructor(private target?: any, options?: Partial<BuilderOptions>) {
         this.options = options ?? {
             store: {},
             siblings: {},
