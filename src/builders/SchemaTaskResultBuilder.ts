@@ -105,7 +105,7 @@ export class SchemaTaskResultBuilder implements Builder {
     getOperators(newOperators: Record<string, TaskOptions> | undefined) {
         const { operators } = this.options
 
-        return newOperators 
+        return newOperators
             ? { ...operators, ...newOperators }
             : operators
     }
@@ -114,12 +114,12 @@ export class SchemaTaskResultBuilder implements Builder {
         const operators = this.getOperators(options.operators)
 
         const builder = new SchemaTaskResultBuilder(
-            this.target, 
+            this.target,
             assignAll({}, this.options, options, { operators })
         )
 
-        return options.schema 
-            ? builder.withSchema(options.schema) 
+        return options.schema
+            ? builder.withSchema(options.schema)
             : builder
 
     }
@@ -192,12 +192,12 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withDefault(schema: SchemaDefinition | SchemaPrimitive | undefined) {
-        return schema != null 
+        return schema != null
             ? this.withUnshift(initial => initial ?? this.with({ initial }).withSchemaOrDefault(schema))
             : this
     }
 
-    withLog(schema: SchemaDefinition | undefined){
+    withLog(schema: SchemaDefinition | undefined) {
         return schema
             ? this
                 .withSchema(schema)
@@ -352,13 +352,13 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withUse(path: string | undefined) {
-        return path 
+        return path
             ? this.add((target) => {
                 const func = this.options.functions?.[path]
                 const throwMsg = () => { throw `La función ${path} no está definida.` }
 
                 return (func ?? throwMsg)(target, this)
-            }) 
+            })
             : this
     }
 
@@ -451,9 +451,9 @@ export class SchemaTaskResultBuilder implements Builder {
                 return entries.map(({ definition, task }) => this.with({
                     initial,
                 })
-                .withSchemaOrDefault(definition)
-                .add((current, prev) => task(prev, current)))
-                
+                    .withSchemaOrDefault(definition)
+                    .add((current, prev) => task(prev, current))
+                )
             }).add((results: []) => results.every(Boolean))
             : this
     }
