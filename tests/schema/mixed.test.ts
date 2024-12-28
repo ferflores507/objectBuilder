@@ -7,6 +7,7 @@ import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
+import { Propiedades } from '../../src/models'
 
 test("unpack as getters", () => {
   const user = {
@@ -1627,7 +1628,7 @@ describe("propiedades builder", () => {
   type CaseOptions = {
     target?: any,
     source?: any,
-    propiedades: Record<string, Schema>
+    propiedades: Propiedades
     expected: Record<string, any>
   }
 
