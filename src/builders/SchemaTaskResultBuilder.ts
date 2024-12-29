@@ -47,10 +47,14 @@ const defaultOperators = {
 
 export class SchemaTaskResultBuilder implements Builder {
     constructor(private target?: any, options?: BuilderOptions) {
-        this.options = options ?? {
-            store: {},
-            siblings: {},
-        }
+        this.options = assignAll(
+            {
+                store: {},
+                siblings: {},
+                operators: defaultOperators
+            },
+            options
+        )
 
         this.taskBuilder = new TaskBuilder().with({ target: options?.initial })
     }
@@ -230,7 +234,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withBinary(schema: Schema | undefined) {
-        this.filterTasks(this.options.operators ?? defaultOperators, schema)
+        this.filterTasks(this.options.operators, schema)
             .forEach(({ definition, task }) => {
                 this.addMerge()
                     .withSchemaOrDefault(definition)
