@@ -1634,7 +1634,9 @@ describe("propiedades builder", () => {
 
   const expectResultsAsync = async (options: CaseOptions) => {
     const { source, target, propiedades, expected } = options
-    const builder = new SchemaTaskResultBuilder(target, { store: source })
+    const builder = new SchemaTaskResultBuilder(target)
+      .with({ store: source })
+      
     const propiedadesBuilder = new PropiedadesBuilder(propiedades, builder)
     const results = [propiedadesBuilder.build(), await propiedadesBuilder.buildAsync()]
 
