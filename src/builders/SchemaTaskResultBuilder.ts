@@ -47,14 +47,11 @@ const defaultOperators = {
 
 export class SchemaTaskResultBuilder implements Builder {
     constructor(private target?: any, options?: Partial<BuilderOptions>) {
-        this.options = assignAll(
-            {
-                store: {},
-                siblings: {},
-                operators: defaultOperators
-            },
-            options
-        )
+        this.options = options ?? {
+            store: {},
+            siblings: {},
+            operators: defaultOperators
+        }
 
         this.taskBuilder = new TaskBuilder().with({ target: options?.initial })
     }
