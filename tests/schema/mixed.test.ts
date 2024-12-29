@@ -7,6 +7,7 @@ import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
+import { Propiedades } from '../../src/models'
 
 test("unpack as getters", () => {
   const user = {
@@ -383,57 +384,68 @@ test("with bind arg", () => {
   expect(func()).toEqual("Melany")
 })
 
-test("redefine getter with same name and value access", () => {
-  const obj = { nombreInicial: "Melany" }
+describe("define property", () => {
 
-  Object.defineProperty(obj, "nombre", {
-    configurable: true,
-    get: () => obj.nombreInicial
+  type Obj = Partial<{
+    nombreInicial: string,
+    nombre: string,
+    _nombre: string
+  }>
+
+  test("redefine getter with same name and value access", () => {
+  
+    const obj: Obj = { nombreInicial: "Melany" }
+  
+    Object.defineProperty(obj, "nombre", {
+      configurable: true,
+      get: () => obj.nombreInicial
+    })
+  
+    Object.defineProperty(obj, "_nombre", Object.getOwnPropertyDescriptor(obj, "nombre"))
+  
+    Object.defineProperty(obj, "nombre", {
+      get: () => obj["_nombre"] + " Flores"
+    })
+  
+    obj.nombreInicial = "Fer"
+  
+    expect(obj.nombre).toEqual("Fer Flores")
   })
 
-  Object.defineProperty(obj, "_nombre", Object.getOwnPropertyDescriptor(obj, "nombre"))
-
-  Object.defineProperty(obj, "nombre", {
-    get: () => obj["_nombre"] + " Flores"
+  test.fails("reuse getter from obj copy", () => {
+    const obj: Obj = {}
+  
+    Object.defineProperty(obj, "nombre", {
+      configurable: true,
+      get: () => "Melany"
+    })
+  
+    const objCopy = obj
+  
+    // throws
+  
+    Object.defineProperty(obj, "nombre", {
+      get: () => objCopy.nombre + " Flores"
+    })
+  
+    expect(obj.nombre).toEqual("Melany Flores")
   })
 
-  obj.nombreInicial = "Fer"
-
-  expect(obj.nombre).toEqual("Fer Flores")
-})
-
-test.fails("reuse getter from obj copy", () => {
-  const obj = {}
-
-  Object.defineProperty(obj, "nombre", {
-    configurable: true,
-    get: () => "Melany"
+  test("redefine property", () => {
+    const obj: Obj = {}
+  
+    Object.defineProperty(obj, "nombre", {
+      configurable: true,
+      get: () => "Melany"
+    })
+  
+    Object.defineProperty(obj, "nombre", {
+      value: "Fer"
+    })
+  
+    expect(obj.nombre).toEqual("Fer")
   })
 
-  const objCopy = obj
-
-  // throws
-
-  Object.defineProperty(obj, "nombre", {
-    get: () => objCopy.nombre + " Flores"
-  })
-
-  expect(obj.nombre).toEqual("Melany Flores")
-})
-
-test("redefine property", () => {
-  const obj = {}
-
-  Object.defineProperty(obj, "nombre", {
-    configurable: true,
-    get: () => "Melany"
-  })
-
-  Object.defineProperty(obj, "nombre", {
-    value: "Fer"
-  })
-
-  expect(obj.nombre).toEqual("Fer")
 })
 
 test("object with function to set sibling", () => {
@@ -1575,7 +1587,7 @@ describe("if schema", () => {
 test("getPathValue throws on null source", () => {
   const source = null
 
-  expect(() => entry(source).get("test")).toThrow()
+  expect(() => entry(source!).get("test")).toThrow()
 })
 
 describe("select", () => {
@@ -1616,7 +1628,7 @@ describe("propiedades builder", () => {
   type CaseOptions = {
     target?: any,
     source?: any,
-    propiedades: Record<string, Schema>
+    propiedades: Propiedades
     expected: Record<string, any>
   }
 
