@@ -1,5 +1,5 @@
 import { assignAll } from "../helpers/varios";
-import { Propiedades, Schema, SchemaDefinition } from "../models";
+import { Propiedades, Schema, SchemaDefinition, SchemaPrimitive } from "../models";
 import { Builder } from "./SchemaTaskResultBuilder";
 
 export class PropiedadesBuilder {
@@ -13,17 +13,17 @@ export class PropiedadesBuilder {
     }
 
     private readonly result: Record<string, any>
-    private readonly entries: [string, SchemaDefinition][]
+    private readonly entries: [string, SchemaDefinition | SchemaPrimitive][]
 
-    groupByComputed(entries: [string, SchemaDefinition][]) {
+    groupByComputed(entries: [string, SchemaDefinition | SchemaPrimitive][]) {
         return Object.groupBy(entries, ([k, v]) => {
             return (v as Schema)?.isComputed ? "computedEntries" : "entries"
         })
     }
 
-    getGetters(entries: [string, SchemaDefinition][]) {        
+    getGetters(entries: [string, SchemaDefinition | SchemaPrimitive][]) {        
         return entries.map(([key, schema]) => Object.defineProperty({}, key, {
-            get: () => this.builder.with({ schema }).build()
+            get: () => this.builder.withSchemaOrDefault(schema).build()
         }))
     }
 

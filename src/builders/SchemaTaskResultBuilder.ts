@@ -216,7 +216,7 @@ export class SchemaTaskResultBuilder implements Builder {
                 })
     }
 
-    withSchemaOrDefault(value: any) {
+    withSchemaOrDefault(value: SchemaDefinition | SchemaPrimitive | undefined) {
         return this.withUnshift((initial: any) => isNotPrimitive(value)
             ? this.with({ initial, schema: value })
             : value)
