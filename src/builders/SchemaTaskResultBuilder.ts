@@ -27,6 +27,7 @@ export type Builder = {
     options: Partial<BuilderOptions>
     with: (options: Partial<BuilderOptions>) => Builder
     withSchema: (schema: SchemaDefinition | undefined) => Builder
+    withSchemaOrDefault(value: SchemaDefinition | SchemaPrimitive | undefined): Builder
     build: () => any
     buildAsync: () => Promise<any>
 }
