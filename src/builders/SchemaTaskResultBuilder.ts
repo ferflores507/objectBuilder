@@ -279,7 +279,13 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withImport(path: string | undefined) {
-        return path ? this.withSchemaFrom({ path }) : this
+        return path 
+            ? this
+                .withPath(path)
+                .addMerge()
+                .withUnshift(schema => imported.has(schema) ? imported.get(schema) : this.with({ schema }))
+                .add((result, schema) => (imported.set(schema, result), result))
+            : this
     }
 
     withFunction(schema: Schema | undefined) {
