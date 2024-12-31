@@ -514,13 +514,17 @@ test("import with multiple stores", async () => {
           store: {
             path: "stores.user"
           },
-          import: "current"
+          schemaFrom: {
+            path: "current"
+          }
         },
         topUser: {
           store: {
             path: "stores.allUsers.0"
           },
-          import: "current"
+          schemaFrom: {
+            path: "current"
+          }
         },
         mari: {
           store: {
@@ -529,7 +533,9 @@ test("import with multiple stores", async () => {
               cedula: "9-750-104"
             }
           },
-          import: "current"
+          schemaFrom: {
+            path: "current"
+          }
         }
       }
     },
