@@ -35,10 +35,8 @@ export class ArrayFilterBuilder extends ArrayBuilderBase {
 
             const isMatch = this.builder
                 .with({
-                    schema: {
-                        const: item,
-                        reduce: this.schema
-                    }
+                    initial: item,
+                    schema: this.schema
                 })
                 .build()
 

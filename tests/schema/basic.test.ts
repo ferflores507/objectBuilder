@@ -1,7 +1,23 @@
 import { describe, expect, test } from "vitest"
 import { Schema } from "../.."
 import { buildResultsAsync, Case, expectToEqualAsync } from "./buildResultsASync"
-import { spread } from "../../src/helpers/varios"
+import { spread, entry } from "../../src/helpers/varios"
+
+test("get value from paths (with container)", () => {
+  const paths = ["user", "account", "details"]
+  const obj = {
+    user: {
+      account: {
+        details: {
+          id: 1
+        }
+      }
+    }
+  }
+  const { container, value } = entry(obj).getWithProperties(paths)
+  expect(value).toEqual({ id: 1 })
+  expect(container).toEqual({ details: { id: 1 }})
+})
 
 describe("expects spread into", () => {
   const cases = [
@@ -205,7 +221,7 @@ test("abortcontroller onabort", async () => {
 const cases: ({ name: string } & Case)[] = [
   {
     name: "stringify",
-    target: { id: 1 },
+    initial: { id: 1 },
     schema: {
       stringify: true
     },
@@ -213,7 +229,7 @@ const cases: ({ name: string } & Case)[] = [
   },
   {
     name: "parse",
-    target: JSON.stringify({ id: 1 }),
+    initial: JSON.stringify({ id: 1 }),
     schema: {
       parse: true
     },

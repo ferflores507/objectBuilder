@@ -1,34 +1,30 @@
-import { partition } from "../helpers/varios";
-import { Schema, SchemaDefinition } from "../models";
+import { assignAll } from "../helpers/varios";
+import { Propiedades, Schema, SchemaDefinition, SchemaPrimitive } from "../models";
 import { Builder } from "./SchemaTaskResultBuilder";
 
 export class PropiedadesBuilder {
-    constructor(propiedades: Record<string, SchemaDefinition>, builder: Builder) {
-        const [computedEntries, entries] = partition(
-            Object.entries(propiedades), 
-            ([k, v]: [string, SchemaDefinition]) => (v as Schema).isComputed
-        )
-        
+    constructor(propiedades: Propiedades, private readonly builder: Builder) {
+        const allEntries = Object.entries(propiedades)
+        const { entries = [], computedEntries = [] } = this.groupByComputed(allEntries)
+
         this.entries = entries
-        this.result = { ...propiedades }
-        this.builder = builder.with({ ...builder.options, siblings: this.result })
-        this.setComputed(this.result, computedEntries)   
+        this.result = assignAll({}, ...this.getGetters(computedEntries))
+        this.builder = builder.with({ siblings: this.result })
     }
 
     private readonly result: Record<string, any>
-    private readonly entries: [string, SchemaDefinition][]
-    private readonly builder: Builder
+    private readonly entries: [string, SchemaDefinition | SchemaPrimitive][]
 
-    setComputed(obj: {}, entries: [string, SchemaDefinition][]) {
-        const builder = this.builder
-        
-        return entries.reduce((obj, [key, schema]) => {
-            return Object.defineProperty(obj, key, {
-                get() {
-                    return builder.with({ schema }).build()
-                }
-            })
-        }, obj)
+    groupByComputed(entries: [string, SchemaDefinition | SchemaPrimitive][]) {
+        return Object.groupBy(entries, ([k, v]) => {
+            return (v as Schema)?.isComputed ? "computedEntries" : "entries"
+        })
+    }
+
+    getGetters(entries: [string, SchemaDefinition | SchemaPrimitive][]) {        
+        return entries.map(([key, schema]) => Object.defineProperty({}, key, {
+            get: () => this.builder.withSchemaOrDefault(schema).build()
+        }))
     }
 
     getResult() {
@@ -37,7 +33,7 @@ export class PropiedadesBuilder {
      
     build() {
         for (const [k, v] of this.entries) {
-            this.result[k] = this.builder.with({ schema: v }).build()
+            this.result[k] = this.builder.withSchemaOrDefault(v).build()
         }
 
         return this.getResult()
@@ -45,7 +41,7 @@ export class PropiedadesBuilder {
 
     async buildAsync() {        
         for (const [k, v] of this.entries) {
-            this.result[k] = await this.builder.with({ schema: v }).buildAsync()
+            this.result[k] = await this.builder.withSchemaOrDefault(v).buildAsync()
         }
 
         return this.getResult()

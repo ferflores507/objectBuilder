@@ -1,12 +1,252 @@
 import { describe, expect, test } from 'vitest'
 import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
-import { getPathValue } from '../../src/helpers/varios'
+import { entry } from '../../src/helpers/varios'
 import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuilder'
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
+import { Propiedades } from '../../src/models'
+
+test("unpack as getters", () => {
+  const user = {
+    nombre: "Melany",
+    id: 1
+  }
+
+  const obj = new SchemaTaskResultBuilder()
+    .with({
+      store: {
+        user
+      },
+      schema: {
+        path: "user",
+        unpackAsGetters: {
+          const: ["nombre", "id", "nombre", "id"]
+        }
+      }
+    })
+    .build()
+
+    expect(obj.nombre).toBe("Melany")
+    expect(obj.id).toBe(1)
+
+    user.nombre = "Fernando"
+    user.id = 2
+
+    expect(obj.nombre).toBe("Fernando")
+    expect(obj.id).toBe(2)
+})
+
+test("default schema", async () => {
+  await expectToEqualAsync({
+    schema: {
+      trim: true,
+      default: ""
+    },
+    expected: ""
+  })
+})
+
+test("default schema", async () => {
+  await expectToEqualAsync({
+    store: {
+      nombre: "Fernando"
+    },
+    schema: {
+      path: "nombre",
+      default: "Melany"
+    },
+    expected: "Fernando"
+  })
+})
+
+test("default schema", async () => {
+  await expectToEqualAsync({
+    schema: {
+      path: "nombre",
+      default: "Melany"
+    },
+    expected: "Melany"
+  })
+})
+
+test("spread flat", async() => {
+  await expectToEqualAsync({
+    schema: {
+      const: [
+        1,
+        2
+      ],
+      spreadFlat: [
+        {
+          const: 3
+        },
+        {
+          const: [4, 5]
+        },
+        {
+          const: 6
+        },
+        {
+          const: 7
+        }
+      ]
+    },
+    expected: Array.from(Array(7).keys()).map(i => i +1)
+  })
+})
+
+test("delete operator: expect to equal items toSpliced with 1 deleted element", async () => {
+  await expectToEqualAsync({
+    operators: {
+      delete: (initial: [], index: any) => {
+        return initial.toSpliced(index, 1)
+      }
+    },
+    schema: {
+      const: [1, 2, 3],
+      delete: 1
+    },
+    expected: [1, 3]
+  })
+})
+
+describe("arithmetic", () => {
+
+  const schema = {
+    plus: 10,
+    minus: 6,
+    times: 16,
+    dividedBy: 4
+  }
+  
+  test.each(Object.entries(schema))("expect 8 %s 2 to equal: %d", async (method, expected) => {
+    await expectToEqualAsync({
+      schema: {
+        const: 8,
+        [method]: {
+          const: 2
+        }
+      },
+      expected
+    })
+  })
+
+  const total = 16
+
+  test(`expect all operators to equal ${total}`, async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: 0,
+        ...schema
+      },
+      expected: total
+    })
+  })
+})
+
+describe("comparison", () => {
+
+  test("not equals but includes", async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: "not just Melany",
+        not: {
+          equals: "Melany",
+        },
+        includes: "Melany"
+      },
+      expected: true
+    })
+  })
+
+  test("equals and includes", async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: "Melany",
+        equals: "Melany",
+        includes: "Melany"
+      },
+      expected: true
+    })
+  })
+  
+  test("greater than", async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: 2,
+        greaterThan: 1
+      },
+      expected: true
+    })
+  })
+  
+  test("less than", async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: 0,
+        lessThan: 1
+      },
+      expected: true
+    })
+  })
+
+  test("greater than and less than (between)", async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: 7,
+        greaterThan: 6,
+        lessThan: 8
+      },
+      expected: true
+    })
+  })
+
+})
+
+describe("schema from async", () => {
+
+  const expected = "ok"
+  const cases = [
+    {
+      message: "works because awaits delay promise at the end",
+      schema: {
+        const: expected,
+        reduce: {
+          delay: 50
+        }
+      }
+    },
+    {
+      message: "doesnt works (delay is not awaited) and expects a nested property of current (promise) to be expected value",
+      schema: {
+        const: {
+          msg: expected
+        },
+        reduce: {
+          delay: 50,
+          path: "current.msg"
+        }
+      }
+    },
+  ]
+
+  test.each(cases)("$message", async ({ schema }) => {
+    const result = await new SchemaTaskResultBuilder()
+      .with({
+        schema: {
+          schemaFrom: {
+            schema
+          }
+        },
+      })
+      .buildAsync()
+  
+      expect(result).toEqual(expected)
+  })
+})
 
 describe("schema string join", () => {
 
@@ -24,12 +264,10 @@ describe("schema string join", () => {
       },
       {
         title: "dash",
-        join: {
-          const: "-"
-        },
+        join: "-",
         separator: "-"
       }
-    ]
+    ] as const
 
     test.each(cases)("expects $join as value of join to be joined with $title", async ({ join, separator }) => {
       await expectToEqualAsync({
@@ -39,6 +277,25 @@ describe("schema string join", () => {
         },
         expected: values.join(separator)
       })
+    })
+
+    test("dash with async fails on buildAsync", async () => {
+      const separator = "-"
+      const result = await new SchemaTaskResultBuilder()
+        .with({
+          schema: {
+            const: values,
+            join: {
+              const: "-",
+              reduce: {
+                delay: 50,
+              }
+            },
+          }
+        })
+        .buildAsync()
+
+      expect(result).toEqual(values.join(separator))
     })
   })
 
@@ -93,7 +350,7 @@ describe("schema async function", async () => {
       propiedades: {
         getSeven: {
           asyncFunction: {
-            delay: 1000,
+            delay: 50,
             const: 7
           }
         }
@@ -127,57 +384,68 @@ test("with bind arg", () => {
   expect(func()).toEqual("Melany")
 })
 
-test("redefine getter with same name and value access", () => {
-  const obj = { nombreInicial: "Melany" }
+describe("define property", () => {
 
-  Object.defineProperty(obj, "nombre", {
-    configurable: true,
-    get: () => obj.nombreInicial
+  type Obj = Partial<{
+    nombreInicial: string,
+    nombre: string,
+    _nombre: string
+  }>
+
+  test("redefine getter with same name and value access", () => {
+  
+    const obj: Obj = { nombreInicial: "Melany" }
+  
+    Object.defineProperty(obj, "nombre", {
+      configurable: true,
+      get: () => obj.nombreInicial
+    })
+  
+    Object.defineProperty(obj, "_nombre", Object.getOwnPropertyDescriptor(obj, "nombre"))
+  
+    Object.defineProperty(obj, "nombre", {
+      get: () => obj["_nombre"] + " Flores"
+    })
+  
+    obj.nombreInicial = "Fer"
+  
+    expect(obj.nombre).toEqual("Fer Flores")
   })
 
-  Object.defineProperty(obj, "_nombre", Object.getOwnPropertyDescriptor(obj, "nombre"))
-
-  Object.defineProperty(obj, "nombre", {
-    get: () => obj["_nombre"] + " Flores"
+  test.fails("reuse getter from obj copy", () => {
+    const obj: Obj = {}
+  
+    Object.defineProperty(obj, "nombre", {
+      configurable: true,
+      get: () => "Melany"
+    })
+  
+    const objCopy = obj
+  
+    // throws
+  
+    Object.defineProperty(obj, "nombre", {
+      get: () => objCopy.nombre + " Flores"
+    })
+  
+    expect(obj.nombre).toEqual("Melany Flores")
   })
 
-  obj.nombreInicial = "Fer"
-
-  expect(obj.nombre).toEqual("Fer Flores")
-})
-
-test.fails("reuse getter from obj copy", () => {
-  const obj = {}
-
-  Object.defineProperty(obj, "nombre", {
-    configurable: true,
-    get: () => "Melany"
+  test("redefine property", () => {
+    const obj: Obj = {}
+  
+    Object.defineProperty(obj, "nombre", {
+      configurable: true,
+      get: () => "Melany"
+    })
+  
+    Object.defineProperty(obj, "nombre", {
+      value: "Fer"
+    })
+  
+    expect(obj.nombre).toEqual("Fer")
   })
 
-  const objCopy = obj
-
-  // throws
-
-  Object.defineProperty(obj, "nombre", {
-    get: () => objCopy.nombre + " Flores"
-  })
-
-  expect(obj.nombre).toEqual("Melany Flores")
-})
-
-test("redefine property", () => {
-  const obj = {}
-
-  Object.defineProperty(obj, "nombre", {
-    configurable: true,
-    get: () => "Melany"
-  })
-
-  Object.defineProperty(obj, "nombre", {
-    value: "Fer"
-  })
-
-  expect(obj.nombre).toEqual("Fer")
 })
 
 test("object with function to set sibling", () => {
@@ -185,9 +453,7 @@ test("object with function to set sibling", () => {
     .with({
       schema: {
         propiedades: {
-          nombre: {
-            const: "Melany"
-          },
+          nombre: "Melany",
           setNombre: {
             function: {
               set: "sibling.nombre"
@@ -227,9 +493,7 @@ test("import with multiple stores", async () => {
     store: {
       userSchema: {
         propiedades: {
-          titulo: {
-            const: titulo
-          },
+          titulo,
           detalles: {
             propiedades: {
               nombre: {
@@ -250,13 +514,17 @@ test("import with multiple stores", async () => {
           store: {
             path: "stores.user"
           },
-          import: "current"
+          schemaFrom: {
+            path: "current"
+          }
         },
         topUser: {
           store: {
             path: "stores.allUsers.0"
           },
-          import: "current"
+          schemaFrom: {
+            path: "current"
+          }
         },
         mari: {
           store: {
@@ -265,7 +533,9 @@ test("import with multiple stores", async () => {
               cedula: "9-750-104"
             }
           },
-          import: "current"
+          schemaFrom: {
+            path: "current"
+          }
         }
       }
     },
@@ -299,9 +569,7 @@ test("map then filter from target", async () => {
   await expectToEqualAsync({
     schema: {
       propiedades: {
-        search: {
-          const: 1
-        },
+        search: 1,
         items: {
           const: Array.from(Array(3).keys()),
           map: {
@@ -316,14 +584,9 @@ test("map then filter from target", async () => {
       reduce: {
         path: "current.items",
         filter: {
-          source: {
-            path: "target.search",
-          },
-          match: {
-            path: "current.id",
-            equals: {
-              path: "source"
-            }
+          path: "current.id",
+          equals: {
+            path: "target.search"
           }
         }
       }
@@ -345,15 +608,8 @@ test("map then filter", async () => {
       },
       reduce: {
         filter: {
-          source: {
-            const: 1,
-          },
-          match: {
-            path: "current.id",
-            equals: {
-              path: "source"
-            }
-          }
+          path: "current.id",
+          equals: 1
         }
       }
     },
@@ -361,20 +617,13 @@ test("map then filter", async () => {
   })
 })
 
-test("filter with match", async () => {
+test("filter simple case", async () => {
   await expectToEqualAsync({
     schema: {
       const: Array.from(Array(3).keys()),
       filter: {
-        source: {
-          const: 1,
-        },
-        match: {
-          path: "current",
-          equals: {
-            path: "source"
-          }
-        }
+        path: "current",
+        equals: 1
       }
     },
     expected: [1]
@@ -428,9 +677,7 @@ test("nested stores with call to root store", async () => {
           child: {
             store: {
               propiedades: {
-                nombre: {
-                  const: "Melany"
-                },
+                nombre: "Melany",
                 setName: {
                   path: "setName"
                 }
@@ -522,9 +769,7 @@ test("schema withStore", async () => {
     schema: {
       store: {
         propiedades: {
-          nombre: {
-            const: "Melany"
-          }
+          nombre: "Melany"
         }
       },
       path: "nombre"
@@ -560,9 +805,11 @@ describe("schema import", () => {
 test("equals with current properties", async () => {
   await expectToEqualAsync({
     schema: {
-      path: "current.uno",
-      equals: {
-        path: "target.one"
+      reduce: {
+        path: "current.uno",
+        equals: {
+          path: "target.one"
+        }
       }
     },
     initial: {
@@ -573,7 +820,7 @@ test("equals with current properties", async () => {
   })
 })
 
-test("equals with current properties", async () => {
+test("equals with current properties dos", async () => {
   await expectToEqualAsync({
     schema: {
       const: {
@@ -593,7 +840,7 @@ test("equals with current properties", async () => {
 
 test("schema array async", async () => {
   await expectToEqualAsync({
-    schema: [1, 2, 3].map((n): Schema => ({ delay: 2000, reduce: { const: n } })),
+    schema: [1, 2, 3].map((n): Schema => ({ delay: 50, reduce: { const: n } })),
     expected: [1, 2, 3]
   })
 })
@@ -785,25 +1032,11 @@ test("filter with source tres", async () => {
     {
       schema: {
         const: ["tres", "dos", "cuatro"],
-        filter: {
-          source: {
-            propiedades: {
-              length: {
-                path: "current.length"
-              },
-              sourceSchema: {
-                schema: {
-                  path: "current.length",
-                  equals: {
-                    path: "source.length"
-                  }
-                }
-              }
-            }
-          },
-          match: {
-            schemaFrom: {
-              path: "source.sourceSchema"
+        reduce: {
+          filter: {
+            path: "current.length",
+            equals: {
+              path: "target.length"
             }
           }
         }
@@ -820,16 +1053,14 @@ test("filter with source dos", async () => {
         search: "  in  "
       },
       schema: {
-        const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
-        filter: {
-          source: {
-            path: "search",
-            trim: true
-          },
-          match: {
+        path: "search",
+        trim: true,
+        reduce: {
+          const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
+          filter: {
             path: "current",
             includes: {
-              path: "source"
+              path: "target"
             }
           }
         }
@@ -844,14 +1075,11 @@ test("filter with source", async () => {
     {
       schema: {
         const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
-        filter: {
-          source: {
-            path: "current.length"
-          },
-          match: {
+        reduce: {
+          filter: {
             path: "current.length",
             equals: {
-              path: "source"
+              path: "target.length"
             }
           }
         }
@@ -866,7 +1094,6 @@ test("map builder with undefined", async () => {
   const result = items.map(x => {
     return new SchemaTaskResultBuilder()
       .with({
-        target: 100,
         initial: x,
         schema: {
           propiedades: {
@@ -883,14 +1110,13 @@ test("map builder with undefined", async () => {
   expect(result).toEqual(expected)
 })
 
-test("target defined and const with undefined", async () => {
+test("initial defined and const with undefined", async () => {
   await expectToEqualAsync({
     schema: {
       const: undefined,
     },
     expected: undefined,
-    // initial: undefined, // stops failing
-    target: 1
+    initial: 1,
   })
 })
 
@@ -898,13 +1124,15 @@ test("map path target", async () => {
 
   await expectToEqualAsync({
     schema: {
-      const: [1, 2, 3, 4],
-      map: {
-        path: "target"
+      const: 1,
+      reduce: {
+        const: [1, 2, 3, 4],
+        map: {
+          path: "target"
+        }
       }
     },
     expected: [1, 1, 1, 1],
-    target: 1
   })
 
 })
@@ -917,9 +1145,7 @@ describe("includes", () => {
     await expectToEqualAsync({
       schema: {
         const: "hola",
-        includes: {
-          const: keyword
-        }
+        includes: keyword
       },
       expected: true,
     })
@@ -927,9 +1153,12 @@ describe("includes", () => {
 
   test("with array", async () => {
     const schema = {
-      path: "local.selectedItems",
-      includes: {
-        path: "target.id"
+      const: { id: 1 },
+      reduce: {
+        path: "local.selectedItems",
+        includes: {
+          path: "target.id"
+        }
       }
     }
 
@@ -941,7 +1170,6 @@ describe("includes", () => {
       },
       schema,
       expected: true,
-      target: { id: 1 }
     })
   })
 })
@@ -967,12 +1195,10 @@ test("path target", async () => {
 
 test("not", () => {
   const result = new SchemaTaskResultBuilder()
-    .with({
-      target: { activated: true }
-    })
     .withSchema({
-      path: "target.activated",
+      const: { activated: true },
       not: {
+        path: "current.activated",
       }
     })
     .build()
@@ -980,13 +1206,11 @@ test("not", () => {
   expect(result).toBe(false)
 })
 
-test("array builder with undefined schema", () => {
+test("array builder with schema with find", () => {
   const schema = {
     find: {
       path: "current.nombre",
-      equals: {
-        const: "Melany"
-      }
+      equals: "Melany"
     }
   }
 
@@ -998,21 +1222,9 @@ test("array builder with undefined schema", () => {
   ]
 
   const builder = new SchemaTaskResultBuilder()
-    .with({
-      target: [
-        1,
-        "dos",
-        { nombre: "Mari" },
-        { nombre: "Melany" }
-      ]
-    })
-    .withSchema(schema)
-  // .build()
-
   const result = new ArrayBuilder(target, builder).build(schema)
 
   expect(result).toEqual({ nombre: "Melany" })
-
 })
 
 describe("array filter property 'keywords' contains string", () => {
@@ -1055,9 +1267,7 @@ describe("array filter property 'keywords' contains string", () => {
         const: items,
         filter: {
           path: "current.keywords",
-          includes: {
-            const: "Melany"
-          }
+          includes: "Melany"
         }
       },
       expected
@@ -1073,9 +1283,7 @@ test("schema as value", async () => {
         value: {
           path: "id"
         },
-        nombre: {
-          const: "Melany"
-        }
+        nombre: "Melany"
       }
     }
   }
@@ -1189,42 +1397,31 @@ describe("not", () => {
       true
     ]
 
-    const expected = source.map(x => !x)
-
     await expectToEqualAsync({
       schema: {
         map: {
           not: {}
         }
       },
-      target: [
-        true,
-        false,
-        false,
-        true
-      ],
-      expected
+      initial: source,
+      expected: source.map(x => !x)
     })
   })
 
   test("propiedades", async () => {
     await expectToEqualAsync({
-      store: {},
       schema: {
         propiedades: {
-          activated: {
+          active: {
             not: {
-              source: "activated"
+              path: "active"
             }
           }
         }
       },
       expected: {
-        activated: true
+        active: true
       },
-      sources: {
-        activated: false
-      }
     })
   })
 
@@ -1377,11 +1574,9 @@ describe("if schema", () => {
     await expectToEqualAsync({
       store: { mod },
       schema: {
+        const: mod,
         if: {
-          path: "mod",
-          equals: {
-            const: 0
-          }
+          equals: 0
         },
         then: {
           const: ok
@@ -1398,7 +1593,7 @@ describe("if schema", () => {
 test("getPathValue throws on null source", () => {
   const source = null
 
-  expect(() => getPathValue(source, "test")).toThrow()
+  expect(() => entry(source!).get("test")).toThrow()
 })
 
 describe("select", () => {
@@ -1407,7 +1602,6 @@ describe("select", () => {
       store: {
         selected: [2]
       },
-      target: { id: 3 }
     })
 
   const cases = [
@@ -1419,10 +1613,13 @@ describe("select", () => {
     const resultado = builder
       .with({
         schema: {
-          path: "target.id",
-          selectSet: "selected",
+          const: { id: 3 },
           reduce: {
-            path: "selected"
+            path: "target.id",
+            selectSet: "selected",
+            reduce: {
+              path: "selected"
+            }
           }
         }
       })
@@ -1437,13 +1634,15 @@ describe("propiedades builder", () => {
   type CaseOptions = {
     target?: any,
     source?: any,
-    propiedades: Record<string, Schema>
+    propiedades: Propiedades
     expected: Record<string, any>
   }
 
   const expectResultsAsync = async (options: CaseOptions) => {
     const { source, target, propiedades, expected } = options
-    const builder = new SchemaTaskResultBuilder(target, { store: source })
+    const builder = new SchemaTaskResultBuilder(target)
+      .with({ store: source })
+      
     const propiedadesBuilder = new PropiedadesBuilder(propiedades, builder)
     const results = [propiedadesBuilder.build(), await propiedadesBuilder.buildAsync()]
 
@@ -1454,15 +1653,11 @@ describe("propiedades builder", () => {
     await expectResultsAsync({
       target: { detalles: { titulo: "Hola" } },
       propiedades: {
-        uno: {
-          const: 1
-        },
+        uno: 1,
         dos: {
           path: "siblings.uno"
         },
-        tres: {
-          const: 3
-        },
+        tres: 3,
         saludo: {
           path: "target.detalles.titulo",
         },
@@ -1488,15 +1683,11 @@ describe("propiedades builder", () => {
   test("sibling", async () => {
     await expectResultsAsync({
       propiedades: {
-        uno: {
-          const: 1
-        },
+        uno: 1,
         dos: {
           path: "siblings.uno"
         },
-        tres: {
-          const: 3
-        }
+        tres: 3
       },
       expected: {
         uno: 1,
@@ -1509,15 +1700,9 @@ describe("propiedades builder", () => {
   test("basico", async () => {
     await expectResultsAsync({
       propiedades: {
-        uno: {
-          const: 1
-        },
-        dos: {
-          const: 2
-        },
-        tres: {
-          const: 3
-        }
+        uno: 1,
+        dos: 2,
+        tres: 3
       },
       expected: {
         uno: 1,
@@ -1570,21 +1755,15 @@ test("sibling nested", async () => {
     store: {},
     schema: {
       propiedades: {
-        id: {
-          const: id++
-        },
+        id: id++,
         idCopy,
         children: {
           propiedades: {
-            id: {
-              const: id++
-            },
+            id: id++,
             idCopy,
             children: {
               propiedades: {
-                id: {
-                  const: id++
-                },
+                id: id++,
                 idCopy
               }
             }
@@ -1614,12 +1793,8 @@ describe("sibling", () => {
       store: {},
       schema: {
         propiedades: {
-          title: {
-            const: "One"
-          },
-          value: {
-            const: 1
-          },
+          title: "One",
+          value: 1,
           titleCopy: {
             path: "siblings.title"
           }
@@ -1653,7 +1828,7 @@ describe("spread", () => {
     {
       tipo: "con reduce",
       schema: {
-        reduceMany: [
+        reduce: [
           {
             spread: {
               path: "dos"
@@ -1686,7 +1861,7 @@ describe("spread", () => {
       },
       schema,
       expected,
-      target: {
+      initial: {
         subUno: 1
       }
     })
@@ -1699,7 +1874,7 @@ describe("entries", () => {
       schema: {
         entries: true
       },
-      target: {
+      initial: {
         nombre: "Melany",
         cedula: "9-123-456",
         fechaDeNacimiento: "18/09/2019"
@@ -1718,26 +1893,6 @@ describe("entries", () => {
           value: "18/09/2019"
         }
       ]
-    })
-  })
-})
-
-describe("calc", () => {
-
-  test.each([
-    ["sumar", 115],
-    ["restar", 85],
-    ["multiplicar", 5000],
-    ["dividir", 2]
-  ])("%s 100, 10, 5 da: %s", async (calc, expected) => {
-
-    await expectToEqualAsync({
-      store: {},
-      schema: {
-        const: [100, 10, 5],
-        calc
-      },
-      expected
     })
   })
 })
@@ -1805,9 +1960,7 @@ describe("comparacion", () => {
         store: { nombre: "Melany" },
         schema: {
           path: "nombre",
-          equals: {
-            const: nombre
-          }
+          equals: nombre,
         },
         expected
       })
@@ -1945,12 +2098,10 @@ describe("array", () => {
         schema: {
           find: {
             path: "current.nombre",
-            equals: {
-              const: "Melany"
-            }
+            equals: "Melany"
           }
         },
-        target: [
+        initial: [
           1,
           "dos",
           { nombre: "Mari" },
@@ -1982,9 +2133,7 @@ describe("array", () => {
                 }
               ],
               contains: {
-                equals: {
-                  const: true
-                }
+                equals: true
               }
             }
           }
@@ -2082,9 +2231,7 @@ describe("array", () => {
           const: Array(2).fill(store),
           contains: {
             path: "current.nombre",
-            equals: {
-              const: "Melany"
-            }
+            equals: "Melany"
           }
         },
         expected: true
@@ -2097,19 +2244,17 @@ describe("array", () => {
 
     test.each([
       ["const", { const: ["Melany", "Melany", "Melany"] }],
-      ["path", { path: "store.items" }]
+      ["path", { path: "items" }]
     ])("con definition %s", async (tipo, schema: Schema) => {
 
       await expectToEqualAsync({
         store: {
-          store: { items: [] }
+          items: []
         },
         schema: {
           ...schema,
           items: {
-            equals: {
-              const: "Melany"
-            }
+            equals: "Melany"
           }
         },
         expected: true
@@ -2128,9 +2273,7 @@ describe("array", () => {
         const: source,
         filter: {
           path: "current.nombre",
-          equals: {
-            const: "Melany"
-          }
+          equals: "Melany"
         },
         reduce: {
           propiedades: {
@@ -2174,7 +2317,7 @@ describe("mixed", () => {
   test.todo("reduce, orderBy and filter", async () => {
     const schema: Schema = {
       const: [3, 10, 2, 4, 1].map(id => ({ id, nombre: [4, 10].includes(id) ? "Melany" : "Fernando" })),
-      reduceMany: [
+      reduce: [
         {
           // array: {
           //   orderBy: "id"
@@ -2270,15 +2413,9 @@ describe("mixed", () => {
         store: {},
         schema: {
           propiedades: {
-            nombre: {
-              const: "Melany",
-            },
-            cedula: {
-              const: "9-123",
-            },
-            id: {
-              const: 7
-            }
+            nombre: "Melany",
+            cedula: "9-123",
+            id: 7
           },
           reduce: {
             unpack: ["nombre", "id"],

@@ -35,34 +35,104 @@ export const getFormData = (source: {}) => {
     return data
 }
 
-export const getValueFromPaths = (obj: Record<string, any> | undefined, paths: string[]) => {
-
-    obj = obj ?? (() => { throw "source object is null or undefined" })()
-
-    return paths.reduce((p, c) => p?.[c], obj as Record<string, any> | undefined);
-}
-
 const getPaths = (path: string | string[], separator = ".") => {
     return Array.isArray(path) ? path : path.split(separator)
 }
 
-export const getPathValueContainer = (obj: Record<string, any> | undefined, path: string | string[], separator = ".") => {
-    const paths = getPaths(path, separator)
-    const [last, ...objPaths] = [paths.pop(), ...paths]
-    const container = getValueFromPaths(obj, objPaths)
-    
-    paths.push(last)
+const setPathValueFromPaths = (obj: Record<string, any>, path: string[], value: any) => {
+    const first = path[0]
 
-    return (last && container?.hasOwnProperty(last))
-        ? { 
-            value: container[last],
-            paths
-        }
-        : { paths }
+    if (path.length === 1) {
+        obj[first] = value;
+    }
+    else if (path.length === 0) {
+        throw "No hay paths para actualizar el objeto";
+    }
+    else {
+        obj[first] = obj[first] ?? {}
+
+        return setPathValueFromPaths(obj[first], path.slice(1), value);
+    }
+};
+
+type Path = string | string[]
+
+class Entry {
+    constructor(private source: Record<string, any>) {
+        source ?? (() => { throw "source object is null or undefined" })()
+    }
+
+    paths: string[] = []
+    private separator = "."
+
+    with(path: Path) {
+        this.paths = getPaths(path, this.separator)
+
+        return this
+    }
+
+    withSeparator(separator: string) {
+        this.separator = separator
+    }
+
+    get(callback = (prev: any, curr: any) => prev?.[curr], initial = this.source) {
+        return this.paths.reduce(callback, initial)
+    }
+
+    set(value: any) {
+        return setPathValueFromPaths(this.source, this.paths, value)
+    }
 }
 
-export const getPathValue = (obj: Record<string, any> | undefined, path: string | string[], separator = ".") => {
-    return getValueFromPaths(obj, getPaths(path, separator))
+export const entry = (obj: Record<string, any>) => {
+    const entry = new Entry(obj)
+
+    return {
+        withPathSeparator(separator: string){
+            entry.withSeparator(separator)
+
+            return this
+        },
+        get(path: Path) {
+            const { container, value } = this.getWithProperties(path)
+            
+            return typeof(value) == "function" ? value.bind(container) : value
+        },
+        getWithProperties(path: Path){
+            const value = entry.with(path).get(({ value }, path) => {
+                return {
+                    container: value,
+                    value: value?.[path],
+                }
+            }, { container: obj, value: obj })
+
+            return Object.assign(value, { paths: entry.paths })
+        },
+        set(path: Path, value: any) {
+            return entry.with(path).set(value)
+        },
+        unpackAsGetters(keys: string[] = Object.getOwnPropertyNames(obj)) {
+            return assignAll({}, ...keys.map(key => ({ get [key]() { return obj[key] } })))
+        }
+    }
+}
+
+export const assignAll = (target: any, ...source: any[]) => {
+    source.filter(obj => typeof obj !== "undefined")
+        .forEach(obj => {
+            Object.defineProperties(target, Object.getOwnPropertyDescriptors(obj));
+        })
+    return target;
+};
+
+export const getterTrap = <T extends Record<string, any>>(defaultSource: T, ...sources: T[]) => {
+    return new Proxy({} as T, {
+        get: (target, prop: string) => {
+            const source = sources.find(s => prop in s) ?? defaultSource
+
+            return source[prop]
+        }
+    })
 }
 
 export const spreadArray = (target: any[], source: any) => {
@@ -96,20 +166,22 @@ export const comparar = (a: any, b: any, method = "equal") => {
 }
 
 export const ordenar = (objs: any[], orderBy: string) => objs.sort((a, b) => {
-    a = getPathValue(a, orderBy)
-    b = getPathValue(b, orderBy)
+    a = entry(a).get(orderBy)
+    b = entry(b).get(orderBy)
 
     return (a > b) ? 1 : ((b > a) ? -1 : 0)
 })
 
-export const isObject = (value: any) => {
-    return typeof value === "object"
-        && value !== null
-        && !Array.isArray(value)
+export const isNotPrimitive = <T>(value: T) => {
+    return typeof value === "object" && value != null
 }
 
-export const flat = (obj: {}) => Object.entries(obj).reduce((p, [k, v]) => {
-    const valor: any = isObject(v) ? v : { [k]: v }
+export const isObject = (value: any) => {
+    return isNotPrimitive(value) && !Array.isArray(value)
+}
+
+export const flat = (obj: Record<string, any>) => Object.entries(obj).reduce((p, [k, v]) => {
+    const valor = isObject(v) ? v : { [k]: v }
     return { ...p, ...valor }
 }, {})
 
@@ -130,28 +202,6 @@ export const tryCopy = (obj: {}) => {
 const toArray = (value: any) => Array.isArray(value) ? value : [value]
 
 export const toArrayOrNull = (value: any) => value != null ? toArray(value) : null
-
-const setPathValueFromPaths = (obj: Record<string, any>, path: string[], value: any) => {
-    const first = path[0]
-
-    if (path.length === 1) {
-        obj[first] = value;
-    }
-    else if (path.length === 0) {
-        throw "No hay paths para actualizar el objeto";
-    }
-    else {
-        obj[first] = obj[first] ?? {}
-
-        return setPathValueFromPaths(obj[first], path.slice(1), value);
-    }
-};
-
-export const setPathValue = (obj: Record<string, any>, path: string | string[], value: any, separator = ".") => {
-    const paths = Array.isArray(path) ? path : path.split(separator)
-
-    return setPathValueFromPaths(obj, paths, value)
-};
 
 export const removeNullOrUndefined = (source: {}) => {
     return Object.fromEntries(entriesWithValues(source));

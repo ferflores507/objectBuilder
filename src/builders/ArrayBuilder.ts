@@ -36,20 +36,8 @@ export class ArrayBuilder extends ArrayBuilderBase {
         return this
     }
 
-    withFilterResult(schema: ArraySchema | undefined) {
-        const { filter } = schema ?? {}
-                
-        const builder = filter?.source
-            ? this.builder.with({
-                store: {
-                    source: this.builder.with({ initial: this.items, schema: filter.source }).build()
-                }
-            })
-            : this.builder
-
-        schema = { ...schema, filter: filter?.match ?? filter }
-
-        this.items = new ArrayFilterResultBuilder(this.items, builder).build(schema)
+    withFilterResult(schema: ArraySchema | undefined) {                
+        this.items = new ArrayFilterResultBuilder(this.items, this.builder).build(schema)
 
         return this
     }

@@ -1,4 +1,4 @@
-import type { ArraySchema, Consulta, Schema, SchemaDefinition } from "../models"
+import type { ArraySchema, Consulta, Propiedades, Schema, SchemaDefinition, SchemaPrimitive } from "../models"
 import * as varios from "../helpers/varios"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
 import { PlainResultBuilder } from "./PlainResultBuilder"
@@ -6,35 +6,57 @@ import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
+import { assignAll, getterTrap, isNotPrimitive } from "../helpers/varios"
+
+type TaskOptions = Task | {
+    task: Task,
+    transform: (schema: Schema) => any
+}
 
 export type BuilderOptions = {
     store: Record<string, any>
     siblings: Record<string, any>
-    sources: Record<string, any>
-
     target: any
     functions: Record<string, Function>
     schema: SchemaDefinition
     initial: any
+    operators: Record<string, TaskOptions>
 }
 
 export type Builder = {
     options: Partial<BuilderOptions>
     with: (options: Partial<BuilderOptions>) => Builder
     withSchema: (schema: SchemaDefinition | undefined) => Builder
+    withSchemaOrDefault(value: SchemaDefinition | SchemaPrimitive | undefined): Builder
     build: () => any
     buildAsync: () => Promise<any>
 }
 
+const defaultOperators = {
+    unpackAsGetters: (obj: {}, b: string[]) => varios.entry(obj).unpackAsGetters(b),
+    spread: (a: any, b: any) => varios.spread(a, b),
+    spreadFlat: (a: any, b: any[]) => varios.spread(a, b.flat()),
+    join: {
+        task: (source: [], separator: any) => source.join(separator),
+        transform: (schema: any) => schema === true ? "" : schema
+    },
+    plus: (a: number, b: number) => a + b,
+    minus: (a: number, b: number) => a - b,
+    times: (a: number, b: number) => a * b,
+    dividedBy: (a: number, b: number) => a / b,
+};
+
+const imported = new Map()
+
 export class SchemaTaskResultBuilder implements Builder {
-    constructor(private target?: any, options?: BuilderOptions) {
+    constructor(private target?: any, options?: Partial<BuilderOptions>) {
         this.options = options ?? {
             store: {},
             siblings: {},
-            sources: {}
+            operators: defaultOperators
         }
 
-        this.taskBuilder = new TaskBuilder().with({ target: "initial" in this.options ? this.options.initial : target })
+        this.taskBuilder = new TaskBuilder().with({ target: options?.initial })
     }
 
     readonly options: Partial<BuilderOptions>
@@ -56,6 +78,20 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
+    withUnshift(task: Task) {
+        const isBuilder = (value: any) => value instanceof SchemaTaskResultBuilder
+
+        return this
+            .add(task)
+            .add(result => isBuilder(result) ? this.unshift(result) : result)
+    }
+
+    withUnshiftArray(task: (a: any, b: any) => SchemaTaskResultBuilder[]) {
+        return this
+            .add(task)
+            .add(result => this.taskBuilder.unshiftArray(result))
+    }
+
     add(task: Task) {
         this.taskBuilder.add(task)
 
@@ -70,51 +106,59 @@ export class SchemaTaskResultBuilder implements Builder {
         return this.taskBuilder.buildAsync()
     }
 
-    with(options: Partial<BuilderOptions>) : SchemaTaskResultBuilder {
-        const { schema, target = this.target, ...rest } = options 
-        const newOptions = { ...this.options, ...rest }
-        const builder = new SchemaTaskResultBuilder(target, newOptions)
-        
-        return schema ? builder.withSchema(schema) : builder 
+    getOperators(newOperators: Record<string, TaskOptions> | undefined) {
+        const { operators } = this.options
 
+        return newOperators
+            ? { ...operators, ...newOperators }
+            : operators
     }
 
-    getStoreValue(path: string) {
-        return varios.getPathValue(this.options.store, path)
+    with(options: Partial<BuilderOptions>): SchemaTaskResultBuilder {
+        const operators = this.getOperators(options.operators)
+
+        const builder = new SchemaTaskResultBuilder(
+            this.target,
+            assignAll({}, this.options, options, { operators })
+        )
+
+        return options.schema
+            ? builder.withSchema(options.schema)
+            : builder
+
     }
 
     set(path: string, value: any) {
         const store = path.startsWith("stores") ? this.options : this.options.store
 
-        varios.setPathValue(store ?? {}, path, value)
+        varios.entry(store).set(path, value)
 
         return value
     }
 
-    withSchema(schema: SchemaDefinition | undefined) : SchemaTaskResultBuilder {
+    withSchema(schema: SchemaDefinition | undefined): SchemaTaskResultBuilder {
 
         schema = Array.isArray(schema) ? { definitions: schema } : schema
-        
+
         const {
-            join,
             bindArg,
             status,
             delay,
-            propiedades, 
-            spread,
-            reduceOrDefault, 
-            reduce, 
-            reduceMany,
-            definitions, 
+            path,
+            propiedades,
+            reduceOrDefault,
+            reduce,
+            definitions,
             checkout,
             schemaFrom,
             selectSet,
-            not,
             increment,
             decrement,
             consulta,
             import: importPath,
             store,
+            log,
+            default: defaultSchema,
             ...rest
         } = schema ?? {}
 
@@ -124,8 +168,9 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withUses(rest)
                 .withStore(store)
                 .withDelay(delay)
-                .withPaths(schema)
+                .withPath(path)
                 .withImport(importPath)
+                .withDefault(defaultSchema)
                 .withInitialSchema(schema)
                 .withSchemaFrom(schemaFrom)
                 .withSelectSet(selectSet)
@@ -135,34 +180,65 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withConsulta(consulta)
                 .withDefinitions(definitions)
                 .withPropiedades(propiedades)
-                .withSpread(spread)
                 .withFunction(schema)
                 .withBindArg(bindArg)
+                .withBinary(schema)
                 .withEndSchema(schema)
-                .withJoin(join)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
-                .withReduceMany(reduceMany)
                 .withCheckout(checkout)
+                .withLog(log)
             : this
     }
 
-    withJoin(schema: SchemaDefinition | true | undefined) {
-        if(schema) {
-            this.add((items: any[]) => {
-                const separator = schema === true 
-                    ? "" 
-                    : this.with({ initial: items, schema }).build()
-                
-                return items.join(separator)
+    withDefault(schema: SchemaDefinition | SchemaPrimitive | undefined) {
+        return schema != null
+            ? this.withUnshift(initial => initial ?? this.with({ initial }).withSchemaOrDefault(schema))
+            : this
+    }
+
+    withLog(schema: SchemaDefinition | undefined) {
+        return schema
+            ? this
+                .withSchema(schema)
+                .add(logValue => console.log(logValue))
+            : this
+    }
+
+    filterTasks(tasks: Record<string, TaskOptions>, schema: Schema | undefined) {
+        return Object.entries(tasks)
+            .map(([key, options]) => ({
+                options,
+                definition: schema?.hasOwnProperty(key) ? schema[key] : null
+            }))
+            .filter(({ definition }) => definition != null)
+            .map(({ options, definition }) => typeof options == "function"
+                ? { definition, task: options }
+                : {
+                    ...options,
+                    definition: options.transform(definition),
+                })
+    }
+
+    withSchemaOrDefault(value: SchemaDefinition | SchemaPrimitive | undefined) {
+        return this.withUnshift((initial: any) => isNotPrimitive(value)
+            ? this.with({ initial, schema: value })
+            : value)
+    }
+
+    withBinary(schema: Schema | undefined) {
+        this.filterTasks(this.options.operators, schema)
+            .forEach(({ definition, task }) => {
+                this.addMerge()
+                    .withSchemaOrDefault(definition)
+                    .add((current, prev) => task(prev, current))
             })
-        }
 
         return this
     }
 
     withBindArg(schema: SchemaDefinition | undefined) {
-        return schema 
+        return schema
             ? this.add(func => (initial: any) => {
                 const arg = this.with({ initial, schema }).build()
 
@@ -176,7 +252,6 @@ export class SchemaTaskResultBuilder implements Builder {
 
         Object.entries(uses ?? {})
             .filter(([name]) => functions?.hasOwnProperty(name))
-            .sort(([a], [b]) => a.localeCompare(b))
             .forEach(([name, val]) => functions?.[name]?.(val, this))
 
         return this
@@ -184,56 +259,62 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withCall(path: string | undefined) {
         const throwError = () => { throw `La función ${path} no está definida.` }
-        
-        return path 
+
+        return path
             ? this
                 .addMerge()
-                .withPaths({ path })
+                .withPath(path)
                 .add((func, prev) => (func ?? throwError)(prev))
             : this
     }
 
     withStore(schema: Schema | undefined) {
-        if(schema) {
-            this.add(current => {
-                this.setStore(this.with({ initial: current, schema }).build())
+        return schema 
+            ? this.add(initial => {
+                this.setStore(this.with({ initial, schema }).build())
 
-                return current
-            })
-        }
-
-        return this
-    }
-
-    withUnshift(options: Partial<BuilderOptions>) {
-        return this.unshift(this.with(options))
+                return initial
+                })
+            : this
     }
 
     withImport(path: string | undefined) {
-        return path ? this.withSchemaFrom({ path }) : this
+        return path 
+            ? this
+                .addMerge()
+                .withPath(path)
+                .add((schema, initial) => ({ schema, initial }))
+                .addMerge()
+                .withUnshift(options => imported.has(options.schema) ? imported.get(options.schema) : this.with(options))
+                .add((result, { schema }) => (imported.set(schema, result), result))
+            : this
     }
 
     withFunction(schema: Schema | undefined) {
-        const { asyncFunction } = schema ?? {}
-        const targetSchema = asyncFunction ?? schema?.function
+        const { asyncFunction, function: functionSchema } = schema ?? {}
+        const targetSchema = asyncFunction ?? functionSchema
 
         return targetSchema
-            ? this.add(() => (initial: any) => this.with({
-                initial,
-                schema: targetSchema
-            })[asyncFunction ? "buildAsync" : "build"]())
+            ? this.add(() => (initial: any) => {
+                const builder = this.with({
+                    initial,
+                    schema: targetSchema
+                })
+
+                return asyncFunction ? builder.buildAsync() : builder.build()
+            })
             : this
     }
 
     withStatus(path: string | undefined) {
-        if(path) {
+        if (path) {
             this.add(target => {
                 // const value = this.getStoreValue(path) as number
                 // this.set(path, { loading: value + 1 })
 
                 // this.with({}).withIncrement(path).build()
-                
-                this.with({ schema: { increment: path }}).build()
+
+                this.with({ schema: { increment: path } }).build()
 
                 return target
             })
@@ -243,18 +324,15 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withConsulta(consulta: Consulta | undefined) {
-        if(consulta) {
-            const { cargar } = useConsulta()
-
-            this.add(async (target: any) => {
+        return consulta
+            ? this.add(async () => {
+                const { cargar } = useConsulta()
                 const response = await cargar(consulta, new AbortController().signal)
                 const { ok, data } = response
 
                 return ok ? data : (() => { throw response })
-            })
-        }
-
-        return this
+                })
+            : this
     }
 
     withDelay(ms: number | undefined) {
@@ -271,49 +349,41 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withCheckout(schema: SchemaDefinition | undefined) : SchemaTaskResultBuilder {
-        if(schema) {
-            this.add((target) => {
-                this.target = target
-
-                return target
-            })
-            
-            this.withSchema(schema)
-        }
-
-        return this
+    withCheckout(schema: SchemaDefinition | true | undefined): SchemaTaskResultBuilder {
+        return schema
+            ? this
+                .add((target) => this.target = target)
+                .withUnshift(initial => schema === true ? initial : this.with({ initial, schema }))
+            : this
     }
 
     withUse(path: string | undefined) {
-        const task = (target) => {
-            const { functions } = this.options
-            const func = functions?.[path] ?? (() => { throw `La función ${path} no está definida.` })()
-            
-            return func(target, this)
-        }
+        return path
+            ? this.add((target) => {
+                const func = this.options.functions?.[path]
+                const throwMsg = () => { throw `La función ${path} no está definida.` }
 
-        return path ? this.add(task) : this
+                return (func ?? throwMsg)(target, this)
+            })
+            : this
     }
 
-    withSpread(schema: SchemaDefinition | undefined) {
-        if(schema) {
-            this.addMerge()
-                .withSchema(schema)
-                .add((current, prev) => varios.spread(prev, current))
+    withConditional(schema: Schema | undefined): SchemaTaskResultBuilder {
+        const schemaOrPath = (value: string | SchemaDefinition) => {
+            return typeof (value) == "string" ? { path: value } : value
         }
 
-        return this
-    }
+        const { if: condition, then: thenCondition, else: elseCondition } = schema ?? {}
 
-    withConditional(schema: Schema | undefined) : SchemaTaskResultBuilder {
-        const condition = schema?.if
-
-        const result = typeof(condition) == "string"
-            ? this.getStoreValue(condition)
-            : this.with({ schema: condition }).build() // safe copy build
-
-        return this.withSchema(result ? schema?.then : schema?.else)
+        return condition
+            ? this
+                .addMerge()
+                .withSchema(schemaOrPath(condition))
+                .withUnshift((result, prev) => this.with({
+                    initial: prev,
+                    schema: result ? thenCondition : elseCondition
+                }))
+            : this
     }
 
     withArraySchema(schema: ArraySchema | undefined) {
@@ -341,25 +411,18 @@ export class SchemaTaskResultBuilder implements Builder {
             .withSet(set)
     }
 
-    withReduceOrDefault(schema: SchemaDefinition | undefined) : SchemaTaskResultBuilder {
-        return schema 
-            ? this.add(current => {
-                if(current != null) {
-                    const builder = this.with({ initial: current, schema })
-                    this.unshift(builder)
-                }
-
-                return current
-            }) 
+    withReduceOrDefault(schema: SchemaDefinition | undefined): SchemaTaskResultBuilder {
+        return schema
+            ? this.withUnshift(initial => initial != null ? this.with({ initial, schema }) : initial)
             : this
     }
 
-    withReduce(schema: SchemaDefinition | undefined) : SchemaTaskResultBuilder {
-        return schema ? this.add(current => this.target = current).withSchema(schema) : this
+    withReduce(schema: SchemaDefinition | undefined): SchemaTaskResultBuilder {
+        return schema ? this.add(current => this.target = current).withManySchemas(schema) : this
     }
 
-    withReduceMany(schemas: Schema[] | undefined) {
-        schemas?.map(s => this.withReduce(s))
+    withManySchemas(definition: SchemaDefinition) {
+        Array.isArray(definition) ? definition.map(schema => this.withSchema(schema)) : this.withSchema(definition)
 
         return this
     }
@@ -367,7 +430,7 @@ export class SchemaTaskResultBuilder implements Builder {
     withIncrement(path: string | undefined, amount = 1) {
         return path
             ? this
-                .withPaths({ path })
+                .withPath(path)
                 .add(value => (value ?? 0) + amount)
                 .withSet(path)
             : this
@@ -379,75 +442,59 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withComparison(schema: Schema | undefined) {
 
-        const comparison: Record<string, any> = {
+        const tasks = {
             equals: varios.esIgual,
-            includes: (target: any[] | string, result: any) => target.includes(result),
-            not: (target: any) => !target
+            includes: (a: any[] | string, b: any) => a.includes(b),
+            not: (a: any, b: any) => !b,
+            greaterThan: (a: any, b: any) => a > b,
+            lessThan: (a: any, b: any) => a < b
         }
 
-        const entries = Object.entries(schema ?? {})
-            .filter(([k]) => comparison.hasOwnProperty(k))
+        const entries = this.filterTasks(tasks, schema)
 
-        if(entries.length) {
-            this.add((target, prev) => {
-                const builders = entries.map(([k, v]) => {
-                    return this.with({
-                        target: prev,
-                        initial: target,
-                        schema: v
-                    })
-                    .add(result => comparison[k](target, result))
+        return entries.length
+            ? this.withUnshiftArray(initial => {
+                return entries.map(({ definition, task }) => this.with({
+                    initial,
                 })
-    
-                this.taskBuilder.unshiftArray(builders)
-            })
-            .add((results: []) => results.every(Boolean))
-        }
-
-        return this
+                    .withSchemaOrDefault(definition)
+                    .add((current, prev) => task(prev, current))
+                )
+            }).add((results: []) => results.every(Boolean))
+            : this
     }
 
-    withPropiedades(propiedades: Record<string, SchemaDefinition> | undefined) {
+    withPropiedades(propiedades: Propiedades | undefined) {
         return propiedades
-            ? this.add((target) => new PropiedadesBuilder(propiedades, this.with({ initial: target })).build())
+            ? this.add(initial => new PropiedadesBuilder(propiedades, this.with({ initial })).build())
             : this
     }
 
     withDefinitions(schemas: Schema[] | undefined) {
-        const task = (target) => schemas?.map(schema => this.with({ initial: target, schema }))
-
-        return schemas 
-            ? this
-                .add(task)
-                .add(builders => this.taskBuilder.unshiftArray(builders))
+        return schemas
+            ? this.withUnshiftArray(initial => schemas?.map(schema => this.with({ initial, schema })))
             : this
     }
 
     withSelectSet(path: string | undefined) {
-        if(path) {
-            const task = (target) => {
-                const items = this.getStoreValue(path) as any[]
-                const newItems = new ArrayMapBuilder(items, this)
-                    .withSelect({ value: target })
+        return path
+            ? this
+                .addMerge()
+                .withPath(path)
+                .add((items, prev) => new ArrayMapBuilder(items, this)
+                    .withSelect({ value: prev })
                     .build()
-                
-                return this.set(path, newItems)
-            }
-
-            this.add(task)
-        }
-
-        return this
+                )
+                .withSet(path)
+            : this
     }
 
-    withSchemaFrom(source: SchemaDefinition | undefined) : SchemaTaskResultBuilder {
-        return source 
+    withSchemaFrom(source: SchemaDefinition | undefined): SchemaTaskResultBuilder {
+        return source
             ? this
                 .addMerge()
                 .withSchema(source)
-                .add((current, prev) => {
-                    return this.with({ initial: prev, schema: current }).build()
-            }) 
+                .withUnshift((schema, initial) => this.with({ initial, schema }))
             : this
     }
 
@@ -462,16 +509,14 @@ export class SchemaTaskResultBuilder implements Builder {
         })
     }
 
-    withPaths(schema: Schema | undefined) {
-        const { path } = schema ?? {}
+    withPath(path: string | undefined) {
+        return path
+            ? this.add(current => {
+                const sources = [{ current, target: this.target }, this.options]
+                const proxy = getterTrap(this.options.store, ...sources)
 
-        return this.add((target) =>
-            new PlainResultBuilder(target)
-                .withPath(path ? { 
-                    ...this.options, 
-                    // ...this.store.get(), 
-                    target: this.target, current: target } : {}, path)
-                .build() ?? (path ? this.getStoreValue(path) : target)
-        )
+                return varios.entry(proxy).get(path)
+            })
+            : this
     }
 }

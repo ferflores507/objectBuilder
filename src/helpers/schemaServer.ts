@@ -4,7 +4,7 @@ const port = process.env.PORT || 8000;
 
 type HandlerMiddleWare = (path: string, res: ServerResponse, payload: any) => void
 const sleep = () => new Promise(resolve => {
-    setTimeout(resolve, 200)
+    setTimeout(resolve, 50)
 })
 
 const useRouter = () => {

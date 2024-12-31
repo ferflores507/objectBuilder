@@ -1,6 +1,5 @@
-import { Calc } from "../helpers/calc"
 import * as helpers from "../helpers/varios"
-import { CalcMethod, Schema } from "../models"
+import { Schema } from "../models"
 
 export class PlainResultBuilder {
     constructor(private target: any) {}
@@ -11,8 +10,7 @@ export class PlainResultBuilder {
 
     withSchema(schema: Schema | undefined) {
         const {
-            entries, 
-            calc, 
+            entries,
             unpack,
             stringify,
             parse,
@@ -23,7 +21,6 @@ export class PlainResultBuilder {
 
         this.target = this
             .withEntries(entries)
-            .withCalc(calc)
             .withUnpack(unpack)
             .withStringify(stringify)
             .withParse(parse)
@@ -59,9 +56,9 @@ export class PlainResultBuilder {
         return this
     }
 
-    withIsNullOrWhiteSpace(isNullOrWhiteSpace: true | undefined) {
-        if(isNullOrWhiteSpace) {
-            this.target = ((this.target ?? "").toString()).trim() === ""
+    withIsNullOrWhiteSpace(isNullOrWhiteSpace: boolean | undefined) {
+        if(typeof(isNullOrWhiteSpace) == "boolean") {
+            this.target = ((this.target as string ?? "").toString().trim() === "") === isNullOrWhiteSpace
         }
 
         return this
@@ -87,25 +84,6 @@ export class PlainResultBuilder {
         return this
     }
 
-    withCalc(method: CalcMethod | undefined) {
-
-        if (method) {
-
-            const calc = new Calc(...this.target as [])
-
-            const metodos: Record<CalcMethod, () => number> = {
-                "sumar": () => calc.sumar(),
-                "restar": () => calc.restar(),
-                "multiplicar": () => calc.multiplicar(),
-                "dividir": () => calc.dividir()
-            }
-
-            this.target = metodos[method]()
-        }
-
-        return this
-    }
-
     withEntries(entries: true | undefined){
         if(entries){
           this.target = helpers.entries(this.target as {})
@@ -113,12 +91,4 @@ export class PlainResultBuilder {
   
         return this
       }
-    
-    withPath(source: Record<string, any> | undefined, path: string | undefined) {
-        if(path) {
-            this.target = helpers.getPathValue(source, path)
-        }
-
-        return this
-    }
 }

@@ -1,5 +1,3 @@
-export type CalcMethod = "sumar" | "restar" | "multiplicar" | "dividir"
-
 export type Join = {
     items: Schema
     match: Schema
@@ -23,7 +21,7 @@ export type ArraySchema = Partial<{
     select: {
         [P in keyof SelectSchema]: Schema;
     },
-    filter: FilterSchema,
+    filter: Schema,
     find: Schema,
     items: Schema,
     contains: Schema,
@@ -42,36 +40,45 @@ export type Consulta = { url: string } & Partial<{
 
 export type SchemaDefinition = Schema | Schema[]
 
+export type SchemaPrimitive = string | number | bigint | boolean | null
+export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive>
+
 export type Schema = Partial<{
+    plus: SchemaDefinition | number
+    minus: SchemaDefinition | number
+    times: SchemaDefinition | number
+    dividedBy: SchemaDefinition | number
     asyncFunction: SchemaDefinition
     bindArg: SchemaDefinition
     consulta: Consulta
-    calc: CalcMethod
     call: string
-    checkout: SchemaDefinition
+    checkout: SchemaDefinition | true
     const: any
     decrement: string
+    default: SchemaDefinition | SchemaPrimitive
     definitions: Schema[]
     delay: number
     else: SchemaDefinition
     entries: true
-    equals: SchemaDefinition
+    equals: SchemaDefinition | SchemaPrimitive
     flat: true
     function: SchemaDefinition
+    greaterThan: SchemaDefinition | SchemaPrimitive
+    lessThan: SchemaDefinition | SchemaPrimitive
     if: SchemaDefinition | string
     isComputed: true
-    isNullOrWhiteSpace: true
-    includes: SchemaDefinition
+    isNullOrWhiteSpace: boolean
+    includes: SchemaDefinition | SchemaPrimitive
     increment: string
     import: string
-    join: SchemaDefinition
+    join: SchemaDefinition | SchemaPrimitive
+    log: SchemaDefinition
     not: SchemaDefinition
     path: string
     parse: true
-    propiedades: Record<string, SchemaDefinition>
+    propiedades: Propiedades
     reduce: SchemaDefinition
     reduceOrDefault: SchemaDefinition
-    reduceMany: Schema[]
     required: string[]
     schemaFrom: SchemaDefinition
     selectSet: string
@@ -84,9 +91,11 @@ export type Schema = Partial<{
     store: Schema
     stringify: true
     spread: SchemaDefinition
+    spreadFlat: Schema[]
     then: SchemaDefinition
     trim: true
     unpack: string[]
+    unpackAsGetters: SchemaDefinition
     use: string
     UUID: true
 }> & ArraySchema
