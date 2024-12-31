@@ -46,6 +46,8 @@ const defaultOperators = {
     dividedBy: (a: number, b: number) => a / b,
 };
 
+const imported = new Map()
+
 export class SchemaTaskResultBuilder implements Builder {
     constructor(private target?: any, options?: Partial<BuilderOptions>) {
         this.options = options ?? {
