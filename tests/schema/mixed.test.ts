@@ -846,7 +846,7 @@ test("schema array async", async () => {
 })
 
 test("withFunction", async () => {
-  const functionValue = new SchemaTaskResultBuilder()
+  const func = new SchemaTaskResultBuilder()
     .with({
       store: {
         nombre: "Melany"
@@ -858,7 +858,7 @@ test("withFunction", async () => {
       }
     }).build()
 
-  expect(functionValue()).toEqual("Melany")
+  expect(func()).toEqual("Melany")
 })
 
 test("use with reduce", async () => {
