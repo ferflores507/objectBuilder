@@ -845,21 +845,17 @@ test("schema array async", async () => {
   })
 })
 
-test("withFunction", async () => {
-  const func = new SchemaTaskResultBuilder()
-    .with({
-      schema: {
-        function: {
-          definitions: [
-            {
-              path: "current"
-            }
-          ]
+describe("withFunction", () => {
+  test.each(["arg", "current"])("expect function call to return array with arg", async (path) => {
+    const func = new SchemaTaskResultBuilder()
+      .with({
+        schema: {
+          function: [{ path }]
         }
-      }
-    }).build()
-
-  expect(func("Melany")).toEqual(["Melany"])
+      }).build()
+  
+    expect(func("Melany")).toEqual(["Melany"])
+  })
 })
 
 test("use with reduce", async () => {
