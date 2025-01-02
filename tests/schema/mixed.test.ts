@@ -848,17 +848,18 @@ test("schema array async", async () => {
 test("withFunction", async () => {
   const func = new SchemaTaskResultBuilder()
     .with({
-      store: {
-        nombre: "Melany"
-      },
       schema: {
         function: {
-          path: "nombre"
+          definitions: [
+            {
+              path: "current"
+            }
+          ]
         }
       }
     }).build()
 
-  expect(func()).toEqual("Melany")
+  expect(func("Melany")).toEqual(["Melany"])
 })
 
 test("use with reduce", async () => {
