@@ -21,6 +21,7 @@ export type BuilderOptions = {
     schema: SchemaDefinition
     initial: any
     operators: Record<string, TaskOptions>
+    arg: any
 }
 
 export type Builder = {
@@ -298,6 +299,7 @@ export class SchemaTaskResultBuilder implements Builder {
             ? this.add(() => (initial: any) => {
                 const builder = this.with({
                     initial,
+                    arg: initial,
                     schema: targetSchema
                 })
 

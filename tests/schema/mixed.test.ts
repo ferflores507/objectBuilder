@@ -845,20 +845,17 @@ test("schema array async", async () => {
   })
 })
 
-test("withFunction", async () => {
-  const functionValue = new SchemaTaskResultBuilder()
-    .with({
-      store: {
-        nombre: "Melany"
-      },
-      schema: {
-        function: {
-          path: "nombre"
+describe("withFunction", () => {
+  test.each(["arg", "current"])("expect function call to return array with arg", async (path) => {
+    const func = new SchemaTaskResultBuilder()
+      .with({
+        schema: {
+          function: [{ path }]
         }
-      }
-    }).build()
-
-  expect(functionValue()).toEqual("Melany")
+      }).build()
+  
+    expect(func("Melany")).toEqual(["Melany"])
+  })
 })
 
 test("use with reduce", async () => {
