@@ -98,4 +98,5 @@ export type Schema = Partial<{
     unpackAsGetters: SchemaDefinition
     use: string
     UUID: true
+    with: Schema
 }> & ArraySchema
