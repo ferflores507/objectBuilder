@@ -9,6 +9,39 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("array with", () => {
+  const cases = [
+    {
+      initial: [1, 2, 3],
+      propiedades: {
+        value: 4
+      },
+      expected: [4, 2, 3]
+    },
+    {
+      initial: [4, 7, 7],
+      propiedades: {
+        index: 1,
+        value: 6
+      } as Propiedades,
+      expected: [4, 6, 7]
+    }
+  ]
+
+  test.each(cases)("expect array with value replaced at index", async options => {
+    const { initial, expected, ...schema } = options
+    
+    await expectToEqualAsync({
+      initial,
+      schema: {
+        with: schema
+      },
+      expected
+    })
+  })
+
+})
+
 test("unpack as getters", () => {
   const user = {
     nombre: "Melany",
