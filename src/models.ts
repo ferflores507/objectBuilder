@@ -71,6 +71,7 @@ export type Schema = Partial<{
     includes: SchemaDefinition | SchemaPrimitive
     increment: string
     import: string
+    init: Propiedades
     join: SchemaDefinition | SchemaPrimitive
     log: SchemaDefinition
     not: SchemaDefinition

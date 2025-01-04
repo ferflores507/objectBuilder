@@ -22,6 +22,7 @@ export type BuilderOptions = {
     initial: any
     operators: Record<string, TaskOptions>
     arg: any
+    variables: Record<string, any>
 }
 
 export type Builder = {
@@ -65,7 +66,8 @@ export class SchemaTaskResultBuilder implements Builder {
         this.options = options ?? {
             store: {},
             siblings: {},
-            operators: defaultOperators
+            operators: defaultOperators,
+            variables: {}
         }
 
         this.taskBuilder = new TaskBuilder().with({ target: options?.initial })
@@ -165,6 +167,7 @@ export class SchemaTaskResultBuilder implements Builder {
             schemaFrom,
             selectSet,
             increment,
+            init,
             decrement,
             consulta,
             import: importPath,
@@ -177,6 +180,7 @@ export class SchemaTaskResultBuilder implements Builder {
         return schema ?
             this
                 .withStatus(status)
+                .withInit(init)
                 .withUses(rest)
                 .withStore(store)
                 .withDelay(delay)
@@ -200,6 +204,20 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withReduce(reduce)
                 .withCheckout(checkout)
                 .withLog(log)
+            : this
+    }
+
+    withInit(propiedades: Propiedades | undefined) {
+        return propiedades
+            ? this
+                .addMerge()
+                .withPropiedades(propiedades)
+                .add((current, prev) => {
+                    const entries = Object.entries(current).map(([key, val]) => ["$" + key, val])
+                    Object.assign(this.options.variables, Object.fromEntries(entries))
+
+                    return prev
+                })
             : this
     }
 
@@ -525,7 +543,7 @@ export class SchemaTaskResultBuilder implements Builder {
     withPath(path: string | undefined) {
         return path
             ? this.add(current => {
-                const sources = [{ current, target: this.target }, this.options]
+                const sources = [{ current, target: this.target }, this.options, this.options.variables]
                 const proxy = getterTrap(this.options.store, ...sources)
 
                 return varios.entry(proxy).get(path)
