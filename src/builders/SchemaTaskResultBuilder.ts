@@ -156,6 +156,7 @@ export class SchemaTaskResultBuilder implements Builder {
             schemaFrom,
             selectSet,
             increment,
+            init,
             decrement,
             consulta,
             import: importPath,
@@ -168,6 +169,7 @@ export class SchemaTaskResultBuilder implements Builder {
         return schema ?
             this
                 .withStatus(status)
+                .withInit(init)
                 .withUses(rest)
                 .withStore(store)
                 .withDelay(delay)
@@ -191,6 +193,20 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withReduce(reduce)
                 .withCheckout(checkout)
                 .withLog(log)
+            : this
+    }
+
+    withInit(schema: Schema | undefined) {
+        return schema
+            ? this
+                .addMerge()
+                .withSchema(schema)
+                .add((current, prev) => {
+                    const entries = Object.entries(current).map(([key, val]) => ["$" + key, val])
+                    Object.assign(this.options.variables, Object.fromEntries(entries))
+
+                    return prev
+                })
             : this
     }
 
