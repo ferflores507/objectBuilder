@@ -9,6 +9,30 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("with init", async () => {
+  await expectToEqualAsync({
+    schema: {
+      init: {
+        const: {
+          search: "b"
+        }
+      },
+      const: [
+        { id: 1, text: "a" },
+        { id: 2, text: "b" },
+        { id: 3, text: "c" }
+      ],
+      find: {
+        path: "current.text",
+        equals: {
+          path: "$search"
+        }
+      }
+    },
+    expected: { id: 2, text: "b" }
+  })
+})
+
 test("unpack as getters", () => {
   const user = {
     nombre: "Melany",
