@@ -99,4 +99,5 @@ export type Schema = Partial<{
     use: string
     UUID: true
     with: Schema
+    withPatch: Schema
 }> & ArraySchema

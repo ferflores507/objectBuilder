@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { entry } from '../../src/helpers/varios'
-import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuilder'
+import { BuilderOptions, SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuilder'
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
@@ -10,34 +10,53 @@ import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
 describe("array with", () => {
-  const cases = [
+  const cases: Case[] = [
+    {
+      initial: [1, 2, 3].map(id => ({ id, a: id, b: id })),
+      schema: {
+        withPatch: {
+          propiedades: {
+            value: {
+              const: { id: 2, b: "Dos" }
+            }
+          },
+        },
+      },
+      expected: [1, 2, 3].map(id => {
+        return {
+          id,
+          a: id,
+          b: id === 2 ? "Dos" : id
+        }
+      })
+    },
     {
       initial: [1, 2, 3],
-      propiedades: {
-        value: 4
+      schema: {
+        with: {
+          propiedades: {
+            value: 4
+          },
+        },
       },
       expected: [4, 2, 3]
     },
     {
       initial: [4, 7, 7],
-      propiedades: {
-        index: 1,
-        value: 6
-      } as Propiedades,
+      schema: {
+        with: {
+          propiedades: {
+            index: 1,
+            value: 6
+          },
+        },
+      },
       expected: [4, 6, 7]
     }
   ]
 
-  test.each(cases)("expect array with value replaced at index", async options => {
-    const { initial, expected, ...schema } = options
-    
-    await expectToEqualAsync({
-      initial,
-      schema: {
-        with: schema
-      },
-      expected
-    })
+  test.each(cases)("expect array with value replaced at index or value with same key", async options => {
+    await expectToEqualAsync(options)
   })
 
 })

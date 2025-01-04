@@ -35,6 +35,11 @@ export type Builder = {
 
 const defaultOperators = {
     with: (array: any[], { index = 0, value } : { index?: number, value: any }) => array.with(index, value),
+    withPatch: (array: any[], { key = "id", value } : { key?: string, value: any }) => {
+        const index = array.findIndex(item => item[key] === value[key])
+        
+        return array.with(index, { ...array[index], ...value })
+    },
     unpackAsGetters: (obj: {}, b: string[]) => varios.entry(obj).unpackAsGetters(b),
     spread: (a: any, b: any) => varios.spread(a, b),
     spreadFlat: (a: any, b: any[]) => varios.spread(a, b.flat()),
