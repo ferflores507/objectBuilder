@@ -34,7 +34,12 @@ export type Builder = {
 }
 
 const defaultOperators = {
-    with: (array: any[], { index = 0, value } : { index?: number, value: any }) => array.with(index, value),
+    spreadStart: (target: any[], value: any) => {        
+        return Array.isArray(value) ? [...value, ...target] : [value, ...target]
+    },
+    with: (array: any[], { index = 0, value } : { index?: number, value: any }) => {        
+        return array.with(index, value)
+    },
     withPatch: (array: any[], { key = "id", value } : { key?: string, value: any }) => {
         const index = array.findIndex(item => item[key] === value[key])
         

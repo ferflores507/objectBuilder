@@ -2,12 +2,24 @@ import { describe, expect, test } from 'vitest'
 import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { entry } from '../../src/helpers/varios'
-import { BuilderOptions, SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuilder'
+import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuilder'
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
+
+test("array spread start", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: [2, 3],
+      spreadStart: {
+        const: 1
+      }
+    },
+    expected: [1, 2, 3]
+  })
+})
 
 describe("array with", () => {
   const cases: Case[] = [
