@@ -532,7 +532,7 @@ export class SchemaTaskResultBuilder implements Builder {
     withPath(path: string | undefined) {
         return path
             ? this.add(current => {
-                const sources = [{ current, target: this.target }, this.options]
+                const sources = [{ current, target: this.target }, this.options, this.options.variables]
                 const proxy = getterTrap(this.options.store, ...sources)
 
                 return varios.entry(proxy).get(path)
