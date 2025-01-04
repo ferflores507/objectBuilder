@@ -22,6 +22,7 @@ export type BuilderOptions = {
     initial: any
     operators: Record<string, TaskOptions>
     arg: any
+    variables: Record<string, any>
 }
 
 export type Builder = {
@@ -54,7 +55,8 @@ export class SchemaTaskResultBuilder implements Builder {
         this.options = options ?? {
             store: {},
             siblings: {},
-            operators: defaultOperators
+            operators: defaultOperators,
+            variables: {}
         }
 
         this.taskBuilder = new TaskBuilder().with({ target: options?.initial })
