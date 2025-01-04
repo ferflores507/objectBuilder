@@ -13,9 +13,7 @@ test("with init", async () => {
   await expectToEqualAsync({
     schema: {
       init: {
-        const: {
-          search: "b"
-        }
+        search: "b"
       },
       const: [
         { id: 1, text: "a" },

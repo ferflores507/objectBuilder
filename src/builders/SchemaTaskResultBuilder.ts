@@ -196,11 +196,11 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withInit(schema: Schema | undefined) {
-        return schema
+    withInit(propiedades: Propiedades | undefined) {
+        return propiedades
             ? this
                 .addMerge()
-                .withSchema(schema)
+                .withPropiedades(propiedades)
                 .add((current, prev) => {
                     const entries = Object.entries(current).map(([key, val]) => ["$" + key, val])
                     Object.assign(this.options.variables, Object.fromEntries(entries))
