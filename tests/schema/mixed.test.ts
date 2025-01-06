@@ -9,6 +9,92 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("with init", async () => {
+  await expectToEqualAsync({
+    schema: {
+      init: {
+        search: "b"
+      },
+      const: [
+        { id: 1, text: "a" },
+        { id: 2, text: "b" },
+        { id: 3, text: "c" }
+      ],
+      find: {
+        path: "current.text",
+        equals: {
+          path: "$search"
+        }
+      }
+    },
+    expected: { id: 2, text: "b" }
+  })
+})
+
+test("array spread start", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: [2, 3],
+      spreadStart: {
+        const: 1
+      }
+    },
+    expected: [1, 2, 3]
+  })
+})
+
+describe("array with", () => {
+  const cases: Case[] = [
+    {
+      initial: [1, 2, 3].map(id => ({ id, a: id, b: id })),
+      schema: {
+        withPatch: {
+          propiedades: {
+            value: {
+              const: { id: 2, b: "Dos" }
+            }
+          },
+        },
+      },
+      expected: [1, 2, 3].map(id => {
+        return {
+          id,
+          a: id,
+          b: id === 2 ? "Dos" : id
+        }
+      })
+    },
+    {
+      initial: [1, 2, 3],
+      schema: {
+        with: {
+          propiedades: {
+            value: 4
+          },
+        },
+      },
+      expected: [4, 2, 3]
+    },
+    {
+      initial: [4, 7, 7],
+      schema: {
+        with: {
+          propiedades: {
+            index: 1,
+            value: 6
+          },
+        },
+      },
+      expected: [4, 6, 7]
+    }
+  ]
+
+  test.each(cases)("expect array with value replaced at index or value with same key", async options => {
+    await expectToEqualAsync(options)
+  })
+
+})
+
 test("unpack as getters", () => {
   const user = {
     nombre: "Melany",

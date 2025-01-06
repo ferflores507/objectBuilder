@@ -71,6 +71,7 @@ export type Schema = Partial<{
     includes: SchemaDefinition | SchemaPrimitive
     increment: string
     import: string
+    init: Propiedades
     join: SchemaDefinition | SchemaPrimitive
     log: SchemaDefinition
     not: SchemaDefinition
@@ -91,6 +92,7 @@ export type Schema = Partial<{
     store: Schema
     stringify: true
     spread: SchemaDefinition
+    spreadStart: SchemaDefinition
     spreadFlat: Schema[]
     then: SchemaDefinition
     trim: true
@@ -98,4 +100,6 @@ export type Schema = Partial<{
     unpackAsGetters: SchemaDefinition
     use: string
     UUID: true
+    with: Schema
+    withPatch: Schema
 }> & ArraySchema
