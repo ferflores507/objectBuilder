@@ -56,7 +56,7 @@ export type Schema = Partial<{
     const: any
     decrement: string
     default: SchemaDefinition | SchemaPrimitive
-    definitions: Schema[]
+    definitions: (Schema | SchemaPrimitive)[]
     delay: number
     else: SchemaDefinition
     entries: true

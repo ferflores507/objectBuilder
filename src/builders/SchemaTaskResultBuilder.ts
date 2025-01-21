@@ -503,7 +503,9 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withDefinitions(schemas: Schema[] | undefined) {
         return schemas
-            ? this.withUnshiftArray(initial => schemas?.map(schema => this.with({ initial, schema })))
+            ? this.withUnshiftArray(initial => schemas?.map(schema => {
+                return this.with({ initial }).withSchemaOrDefault(schema)
+            }))
             : this
     }
 
