@@ -9,6 +9,15 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("definitions with primitives", async () => {
+  await expectToEqualAsync({
+    schema: {
+      definitions: [1, 2, 3]
+    },
+    expected: [1, 2, 3]
+  })
+})
+
 test("with init", async () => {
   await expectToEqualAsync({
     schema: {
@@ -2205,18 +2214,14 @@ describe("array", () => {
           propiedades: {
             inner: {
               definitions: [
-                {
-                  const: false
-                },
+                false,
                 {
                   path: "current.detalles.activo"
                 },
-                {
-                  const: false
-                }
+                1
               ],
               contains: {
-                equals: true
+                equals: 1
               }
             }
           }
