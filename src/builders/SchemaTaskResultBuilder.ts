@@ -227,10 +227,10 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withLog(schema: SchemaDefinition | undefined) {
+    withLog(schema: SchemaDefinition | SchemaPrimitive | undefined) {
         return schema
             ? this
-                .withSchema(schema)
+                .withSchemaOrDefault(schema)
                 .add(logValue => console.log(logValue))
             : this
     }
