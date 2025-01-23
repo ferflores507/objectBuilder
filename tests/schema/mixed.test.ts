@@ -772,8 +772,11 @@ test("nested stores with call to root store", async () => {
             reduce: {
               set: "updateName",
               function: {
-                path: "nombre",
-                call: "setName"
+                call: {
+                  setName: {
+                    path: "nombre"
+                  }
+                }
               },
               reduce: {
                 call: "updateName"
@@ -797,8 +800,9 @@ test("with call", async () => {
           path: "current"
         },
         reduce: {
-          const: "Melany",
-          call: "getName"
+          call: {
+            getName: "Melany"
+          }
         }
       },
       expected: "Melany"

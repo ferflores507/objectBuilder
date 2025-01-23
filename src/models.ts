@@ -51,7 +51,7 @@ export type Schema = Partial<{
     asyncFunction: SchemaDefinition
     bindArg: SchemaDefinition
     consulta: Consulta
-    call: string
+    call: string | Propiedades
     checkout: SchemaDefinition | true
     const: any
     decrement: string

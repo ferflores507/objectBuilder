@@ -287,14 +287,25 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
-    withCall(path: string | undefined) {
-        const throwError = () => { throw `La función ${path} no está definida.` }
+    getCallOptions(propiedades: Propiedades | string) {
+        const [path, schema] = typeof(propiedades) == "string" 
+            ? [propiedades] 
+            : Object.entries(propiedades)[0] ?? (() => { throw `La ubicación de la función no está definida.` })()
 
-        return path
+        const func = this.withPath(path).build() ?? (() => { throw `La función ${path} no está definida.` })()
+
+        return {
+            func, schema
+        }
+    }
+
+    withCall(propiedades: Propiedades | string | undefined) {
+        const options = propiedades && this.getCallOptions(propiedades)
+
+        return options
             ? this
-                .addMerge()
-                .withPath(path)
-                .add((func, prev) => (func ?? throwError)(prev))
+                .withSchemaOrDefault(options.schema)
+                .add(arg => options.func(arg))
             : this
     }
 
