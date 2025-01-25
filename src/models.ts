@@ -93,7 +93,7 @@ export type Schema = Partial<{
     stringify: true
     spread: SchemaDefinition
     spreadStart: SchemaDefinition
-    spreadFlat: Schema[]
+    spreadFlat: SchemaDefinition
     then: SchemaDefinition
     trim: true
     unpack: string[]

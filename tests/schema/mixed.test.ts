@@ -174,20 +174,14 @@ test("spread flat", async() => {
         1,
         2
       ],
-      spreadFlat: [
-        {
-          const: 3
-        },
-        {
-          const: [4, 5]
-        },
-        {
-          const: 6
-        },
-        {
-          const: 7
-        }
-      ]
+      spreadFlat: {
+        const: [
+          3,
+          [4, 5],
+          6,
+          7
+        ]
+      }
     },
     expected: Array.from(Array(7).keys()).map(i => i +1)
   })
