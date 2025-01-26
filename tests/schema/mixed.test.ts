@@ -931,20 +931,14 @@ describe("schema import", () => {
 
 test("init then equals with current properties", async () => {
   await expectToEqualAsync({
-    schema: {
-      init: {
-        temp: {
-          path: "current"
-        }
-      },
-      path: "current.uno",
-      equals: {
-        path: "$temp.one"
-      }
-    },
     initial: {
       uno: 1,
-      one: 1
+      one: 1,
+      dos: 2
+    },
+    schema: {
+      unpack: ["uno", "one"],
+      allEqual: true
     },
     expected: true
   })
@@ -952,17 +946,14 @@ test("init then equals with current properties", async () => {
 
 test("equals: reduce to use current as target", async () => {
   await expectToEqualAsync({
+    initial: {
+      one: 1,
+      seven: 7,
+      siete: 7,
+    },
     schema: {
-      const: {
-        uno: 1,
-        one: 1
-      },
-      reduce: {
-        path: "current.uno",
-        equals: {
-          path: "target.one"
-        }
-      }
+      unpack: ["seven", "siete"],
+      allEqualTo: 7
     },
     expected: true
   })
