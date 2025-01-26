@@ -17,7 +17,6 @@ export type FilterSchema = {
 }
 
 export type ArraySchema = Partial<{
-    add: Schema
     select: {
         [P in keyof SelectSchema]: Schema;
     },
@@ -51,12 +50,11 @@ export type Schema = Partial<{
     asyncFunction: SchemaDefinition
     bindArg: SchemaDefinition
     consulta: Consulta
-    call: string
-    checkout: SchemaDefinition | true
+    call: string | Propiedades
     const: any
     decrement: string
     default: SchemaDefinition | SchemaPrimitive
-    definitions: Schema[]
+    definitions: (Schema | SchemaPrimitive)[]
     delay: number
     else: SchemaDefinition
     entries: true
@@ -73,7 +71,7 @@ export type Schema = Partial<{
     import: string
     init: Propiedades
     join: SchemaDefinition | SchemaPrimitive
-    log: SchemaDefinition
+    log: SchemaDefinition | SchemaPrimitive
     not: SchemaDefinition
     path: string
     parse: true
@@ -93,7 +91,7 @@ export type Schema = Partial<{
     stringify: true
     spread: SchemaDefinition
     spreadStart: SchemaDefinition
-    spreadFlat: Schema[]
+    spreadFlat: SchemaDefinition
     then: SchemaDefinition
     trim: true
     unpack: string[]

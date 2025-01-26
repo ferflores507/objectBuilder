@@ -202,7 +202,6 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withEndSchema(schema)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
-                .withCheckout(checkout)
                 .withLog(log)
             : this
     }
@@ -227,10 +226,10 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withLog(schema: SchemaDefinition | undefined) {
+    withLog(schema: SchemaDefinition | SchemaPrimitive | undefined) {
         return schema
             ? this
-                .withSchema(schema)
+                .withSchemaOrDefault(schema)
                 .add(logValue => console.log(logValue))
             : this
     }
@@ -287,14 +286,25 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
-    withCall(path: string | undefined) {
-        const throwError = () => { throw `La función ${path} no está definida.` }
+    getCallOptions(propiedades: Propiedades | string) {
+        const [path, schema] = typeof(propiedades) == "string" 
+            ? [propiedades] 
+            : Object.entries(propiedades)[0] ?? (() => { throw `La ubicación de la función no está definida.` })()
 
-        return path
+        const func = this.withPath(path).build() ?? (() => { throw `La función ${path} no está definida.` })()
+
+        return {
+            func, schema
+        }
+    }
+
+    withCall(propiedades: Propiedades | string | undefined) {
+        const options = propiedades && this.getCallOptions(propiedades)
+
+        return options
             ? this
-                .addMerge()
-                .withPath(path)
-                .add((func, prev) => (func ?? throwError)(prev))
+                .withSchemaOrDefault(options.schema)
+                .add(arg => options.func(arg))
             : this
     }
 
@@ -311,12 +321,10 @@ export class SchemaTaskResultBuilder implements Builder {
     withImport(path: string | undefined) {
         return path 
             ? this
-                .addMerge()
                 .withPath(path)
-                .add((schema, initial) => ({ schema, initial }))
                 .addMerge()
-                .withUnshift(options => imported.has(options.schema) ? imported.get(options.schema) : this.with(options))
-                .add((result, { schema }) => (imported.set(schema, result), result))
+                .withUnshift(schema => imported.has(schema) ? imported.get(schema) : this.with({ schema }))
+                .add((result, schema) => (imported.set(schema, result), result))
             : this
     }
 
@@ -377,14 +385,6 @@ export class SchemaTaskResultBuilder implements Builder {
 
                 return target
             })
-            : this
-    }
-
-    withCheckout(schema: SchemaDefinition | true | undefined): SchemaTaskResultBuilder {
-        return schema
-            ? this
-                .add((target) => this.target = target)
-                .withUnshift(initial => schema === true ? initial : this.with({ initial, schema }))
             : this
     }
 
@@ -503,7 +503,9 @@ export class SchemaTaskResultBuilder implements Builder {
 
     withDefinitions(schemas: Schema[] | undefined) {
         return schemas
-            ? this.withUnshiftArray(initial => schemas?.map(schema => this.with({ initial, schema })))
+            ? this.withUnshiftArray(initial => schemas?.map(schema => {
+                return this.with({ initial }).withSchemaOrDefault(schema)
+            }))
             : this
     }
 

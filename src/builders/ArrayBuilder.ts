@@ -18,22 +18,10 @@ export class ArrayBuilder extends ArrayBuilderBase {
             throw "El elemento debe ser de tipo arreglo."
         }
 
-        const { add } = schema ?? {}
-
-        this.withAdd(add)
-            .withFilterResult(schema)
+        this.withFilterResult(schema)
             .withArrayResult(schema)
 
         return this.items
-    }
-
-    withAdd(schema: Schema | undefined) {
-        if(schema) {
-            const item = this.builder.with({ schema }).build()
-            this.items = [...this.items, item]
-        }
-
-        return this
     }
 
     withFilterResult(schema: ArraySchema | undefined) {                
