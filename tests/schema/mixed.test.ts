@@ -9,6 +9,34 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("with boolean", () => {
+  const cases = [
+    [undefined, false],
+    [null, false],
+    [NaN, false],
+    [false, false],
+    [true, true],
+    [0, false],
+    [1, true],
+    ["", false],
+    [" ", true],
+    ["0", true],
+    ["2", true],
+    [{}, true],
+    [[], true]
+  ] as const
+
+  test.each(cases)("", async (initial, expected) => {
+    await expectToEqualAsync({
+      initial,
+      schema: {
+        boolean: true
+      },
+      expected
+    })
+  })
+})
+
 test("remove accents", async () => {
   await expectToEqualAsync({
     schema: {

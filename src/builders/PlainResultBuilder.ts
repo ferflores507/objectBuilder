@@ -17,10 +17,12 @@ export class PlainResultBuilder {
             isNullOrWhiteSpace,
             trim,
             UUID,
-            removeAccents
+            removeAccents,
+            boolean
         } = schema ?? {}
 
         this.target = this
+            .withBoolean(boolean)
             .withRemoveAccents(removeAccents)
             .withEntries(entries)
             .withUnpack(unpack)
@@ -38,6 +40,10 @@ export class PlainResultBuilder {
         this.target = callback(this.target)
 
         return this
+    }
+
+    withBoolean(value: true | undefined) {
+        return value ? this.withValue(val => !!val) : this
     }
 
     withRemoveAccents(removeAccents: true | undefined) {
