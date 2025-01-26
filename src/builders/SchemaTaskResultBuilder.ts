@@ -59,6 +59,14 @@ const defaultOperators = {
     dividedBy: (a: number, b: number) => a / b,
 };
 
+const comparisonTasks = {
+    equals: varios.esIgual,
+    includes: (a: any[] | string, b: any) => a.includes(b),
+    not: (a: any, b: any) => !b,
+    greaterThan: (a: any, b: any) => a > b,
+    lessThan: (a: any, b: any) => a < b
+}
+
 const imported = new Map()
 
 export class SchemaTaskResultBuilder implements Builder {
@@ -472,16 +480,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withComparison(schema: Schema | undefined) {
-
-        const tasks = {
-            equals: varios.esIgual,
-            includes: (a: any[] | string, b: any) => a.includes(b),
-            not: (a: any, b: any) => !b,
-            greaterThan: (a: any, b: any) => a > b,
-            lessThan: (a: any, b: any) => a < b
-        }
-
-        const entries = this.filterTasks(tasks, schema)
+        const entries = this.filterTasks(comparisonTasks, schema)
 
         return entries.length
             ? this.withUnshiftArray(initial => {
