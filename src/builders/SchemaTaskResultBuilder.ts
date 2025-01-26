@@ -202,7 +202,6 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withEndSchema(schema)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
-                .withCheckout(checkout)
                 .withLog(log)
             : this
     }
@@ -386,14 +385,6 @@ export class SchemaTaskResultBuilder implements Builder {
 
                 return target
             })
-            : this
-    }
-
-    withCheckout(schema: SchemaDefinition | true | undefined): SchemaTaskResultBuilder {
-        return schema
-            ? this
-                .add((target) => this.target = target)
-                .withUnshift(initial => schema === true ? initial : this.with({ initial, schema }))
             : this
     }
 

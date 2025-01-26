@@ -2139,23 +2139,26 @@ describe("array", () => {
             }
           ],
           map: {
-            checkout: {
-              spread: {
-                const: [
-                  {
-                    nombre: "nombre",
-                    valor: "Melany"
-                  },
-                  {
-                    nombre: "nombre",
-                    valor: "Melany"
-                  }
-                ],
-                find: {
-                  path: "current.nombre",
-                  equals: {
-                    path: "target.nombre"
-                  }
+            init: {
+              temp: {
+                path: "current"
+              }
+            },
+            spread: {
+              const: [
+                {
+                  nombre: "nombre",
+                  valor: "Melany"
+                },
+                {
+                  nombre: "nombre",
+                  valor: "Melany"
+                }
+              ],
+              find: {
+                path: "current.nombre",
+                equals: {
+                  path: "$temp.nombre"
                 }
               }
             }
@@ -2256,19 +2259,22 @@ describe("array", () => {
     const schema = {
       const: [{ id: 1 }, ...ids],
       map: {
-        checkout: {
-          spread: {
-            const: [
-              {
-                id: 1,
-                nombre: "Melany"
-              }
-            ],
-            find: {
-              path: "current.id",
-              equals: {
-                path: "target.id"
-              }
+        init: {
+          temp: {
+            path: "current"
+          }
+        },
+        spread: {
+          const: [
+            {
+              id: 1,
+              nombre: "Melany"
+            }
+          ],
+          find: {
+            path: "current.id",
+            equals: {
+              path: "$temp.id"
             }
           }
         }
