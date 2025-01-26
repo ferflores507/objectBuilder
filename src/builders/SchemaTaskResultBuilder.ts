@@ -75,10 +75,10 @@ const comparisonTasks = {
     allEqualTo: (obj: any[], value: any) => {
         return defaultOperators.values(obj).every(item => comparisonTasks.equals(item, value))
     },
-    allEqual: (obj: any[]) => {
+    allEqual: (obj: any[], allEqual: boolean) => {
         const values = defaultOperators.values(obj)
 
-        return comparisonTasks.allEqualTo(values, values[0])
+        return comparisonTasks.allEqualTo(values, values[0]) === allEqual
     },
     includes: (a: any[] | string, b: any) => a.includes(b),
     not: (a: any, b: any) => !b,

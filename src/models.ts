@@ -43,6 +43,8 @@ export type SchemaPrimitive = string | number | bigint | boolean | null
 export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive>
 
 export type Schema = Partial<{
+    allEqual: boolean
+    allEqualTo: SchemaDefinition | SchemaPrimitive
     plus: SchemaDefinition | number
     minus: SchemaDefinition | number
     times: SchemaDefinition | number

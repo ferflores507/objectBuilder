@@ -929,7 +929,21 @@ describe("schema import", () => {
   })
 })
 
-test("init then equals with current properties", async () => {
+test("all equal false (not all equal)", async () => {
+  await expectToEqualAsync({
+    initial: {
+      uno: 1,
+      one: 1,
+      dos: 2
+    },
+    schema: {
+      allEqual: false
+    },
+    expected: true
+  })
+})
+
+test("all equal true", async () => {
   await expectToEqualAsync({
     initial: {
       uno: 1,
@@ -944,7 +958,7 @@ test("init then equals with current properties", async () => {
   })
 })
 
-test("equals: reduce to use current as target", async () => {
+test("all equal to primitive", async () => {
   await expectToEqualAsync({
     initial: {
       one: 1,
@@ -954,6 +968,26 @@ test("equals: reduce to use current as target", async () => {
     schema: {
       unpack: ["seven", "siete"],
       allEqualTo: 7
+    },
+    expected: true
+  })
+})
+
+test("all equal to schema", async () => {
+  await expectToEqualAsync({
+    store: {
+      value: 7
+    },
+    initial: {
+      one: 1,
+      seven: 7,
+      siete: 7,
+    },
+    schema: {
+      unpack: ["seven", "siete"],
+      allEqualTo: {
+        path: "value"
+      }
     },
     expected: true
   })
