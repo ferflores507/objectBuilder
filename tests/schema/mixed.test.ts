@@ -654,28 +654,25 @@ test("import with multiple stores", async () => {
   })
 })
 
-test("map then filter from target", async () => {
+test("init search then map with filter", async () => {
   await expectToEqualAsync({
     schema: {
-      propiedades: {
+      init: {
         search: 1,
-        items: {
-          const: Array.from(Array(3).keys()),
-          map: {
-            propiedades: {
-              id: {
-                path: "current"
-              }
-            }
-          },
+      },
+      const: Array.from(Array(3).keys()),
+      map: {
+        propiedades: {
+          id: {
+            path: "current"
+          }
         }
       },
       reduce: {
-        path: "current.items",
         filter: {
           path: "current.id",
           equals: {
-            path: "target.search"
+            path: "$search"
           }
         }
       }
@@ -895,14 +892,17 @@ describe("schema import", () => {
   })
 })
 
-test("equals with current properties", async () => {
+test("init then equals with current properties", async () => {
   await expectToEqualAsync({
     schema: {
-      reduce: {
-        path: "current.uno",
-        equals: {
-          path: "target.one"
+      init: {
+        temp: {
+          path: "current"
         }
+      },
+      path: "current.uno",
+      equals: {
+        path: "$temp.one"
       }
     },
     initial: {
@@ -913,7 +913,7 @@ test("equals with current properties", async () => {
   })
 })
 
-test("equals with current properties dos", async () => {
+test("equals: reduce to use current as target", async () => {
   await expectToEqualAsync({
     schema: {
       const: {
@@ -1099,25 +1099,6 @@ test("filter with empty schema return all items === true", async () => {
   )
 })
 
-test("filter with source tres", async () => {
-  await expectToEqualAsync(
-    {
-      schema: {
-        const: ["tres", "dos", "cuatro"],
-        reduce: {
-          filter: {
-            path: "current.length",
-            equals: {
-              path: "target.length"
-            }
-          }
-        }
-      },
-      expected: ["dos"]
-    }
-  )
-})
-
 test("filter with source dos", async () => {
   await expectToEqualAsync(
     {
@@ -1125,15 +1106,17 @@ test("filter with source dos", async () => {
         search: "  in  "
       },
       schema: {
-        path: "search",
-        trim: true,
-        reduce: {
-          const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
-          filter: {
-            path: "current",
-            includes: {
-              path: "target"
-            }
+        init: {
+          search: {
+            path: "search",
+            trim: true,
+          }
+        },
+        const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
+        filter: {
+          path: "current",
+          includes: {
+            path: "$search"
           }
         }
       },
@@ -1225,17 +1208,15 @@ describe("includes", () => {
 
   test("with array", async () => {
     const schema = {
-      const: { id: 1 },
-      reduce: {
-        path: "local.selectedItems",
-        includes: {
-          path: "target.id"
-        }
+      path: "local.selectedItems",
+      includes: {
+        path: "search.id"
       }
     }
 
     await expectToEqualAsync({
       store: {
+        search: { id: 1 },
         local: {
           selectedItems: [1]
         }
@@ -1246,7 +1227,7 @@ describe("includes", () => {
   })
 })
 
-test("path target", async () => {
+test("path current", async () => {
 
   const items = [1, 2, 3]
 
@@ -1286,7 +1267,7 @@ test("array builder with schema with find", () => {
     }
   }
 
-  const target = [
+  const items = [
     1,
     "dos",
     { nombre: "Mari" },
@@ -1294,7 +1275,7 @@ test("array builder with schema with find", () => {
   ]
 
   const builder = new SchemaTaskResultBuilder()
-  const result = new ArrayBuilder(target, builder).build(schema)
+  const result = new ArrayBuilder(items, builder).build(schema)
 
   expect(result).toEqual({ nombre: "Melany" })
 })
@@ -1685,13 +1666,10 @@ describe("select", () => {
     const resultado = builder
       .with({
         schema: {
-          const: { id: 3 },
+          const: 3,
+          selectSet: "selected",
           reduce: {
-            path: "target.id",
-            selectSet: "selected",
-            reduce: {
-              path: "selected"
-            }
+            path: "selected"
           }
         }
       })
@@ -2337,7 +2315,7 @@ describe("array", () => {
 
   })
 
-  test("reduce: filtrar array y luego asignar length a propiedad total por medio de target", async () => {
+  test("reduce: filtrar array y luego asignar a nuevo objeto con propiedad 'total' con valor de length", async () => {
     const melany = { nombre: "Melany" }
     const source = [melany, { nombre: "Fernando" }, melany, melany]
 
