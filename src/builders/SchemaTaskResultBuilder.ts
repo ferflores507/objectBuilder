@@ -61,6 +61,13 @@ const defaultOperators = {
 
 const comparisonTasks = {
     equals: varios.esIgual,
+    allEqualTo: (array: any[], value: any) => {
+        return Object.values(array).every(item => comparisonTasks.equals(item, value))
+    },
+    allEqual: (array: any[]) => {
+        const values = Object.values(array)
+        return comparisonTasks.allEqualTo(values, values[0])
+    },
     includes: (a: any[] | string, b: any) => a.includes(b),
     not: (a: any, b: any) => !b,
     greaterThan: (a: any, b: any) => a > b,
