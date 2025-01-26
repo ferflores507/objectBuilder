@@ -1,3 +1,9 @@
+export const splitAccents = (str: string) => str.normalize("NFD")
+
+export const removeAccents = (str: string) => {
+    return splitAccents(str).replace(/[\u0300-\u036f]/g, "")
+}
+
 export function toShift<T> (items: T[]) : [T, T[]] {
     return [
         items[0],

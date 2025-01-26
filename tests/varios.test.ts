@@ -1,6 +1,14 @@
 import { expect, describe, test } from 'vitest';
 import * as varios from '../src/helpers/varios';
 import { expectToEqualAsync } from './schema/buildResultsASync';
+import { removeAccents } from '../src/helpers/varios';
+
+test("remove accents", () => {
+    const str = "Éxàmplê òf áccéntéd téxt"
+    const actual = removeAccents(str)
+
+    expect(actual).toBe("Example of accented text")
+})
 
 test("expect get function from path is bind to container", () => {
     const source = {
