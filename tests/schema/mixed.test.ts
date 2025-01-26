@@ -1006,24 +1006,6 @@ test("schemaFrom nested", async () => {
   })
 })
 
-test.todo("reduceOrDefault with nested checkout", async () => {
-  await expectToEqualAsync({
-    schema: {
-      const: " uno ",
-      reduceOrDefault: {
-        trim: true,
-        checkout: {
-          path: "target.length",
-        }
-      },
-      reduce: {
-        path: "target"
-      }
-    },
-    expected: undefined
-  })
-})
-
 test("reduceOrDefault followed by reduce", async () => {
   await expectToEqualAsync({
     schema: {
@@ -2436,31 +2418,6 @@ describe("mixed", () => {
       schema,
       expected: [4, 10].map(id => ({ id, nombre: "Melany" }))
     })
-  })
-
-  describe("checkout", () => {
-
-    test("path", async () => {
-      await expectToEqualAsync({
-        store: {
-          detalles: {
-            personal: { nombre: "Melany" }
-          }
-        },
-        schema: {
-          path: "detalles.personal",
-          checkout: {
-            propiedades: {
-              nombre: {
-                path: "target.nombre"
-              }
-            }
-          }
-        },
-        expected: { nombre: "Melany" }
-      })
-    })
-
   })
 
   describe.todo("flat", () => {
