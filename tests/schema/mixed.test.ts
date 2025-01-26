@@ -1689,9 +1689,9 @@ describe("propiedades builder", () => {
   }
 
   const expectResultsAsync = async (options: CaseOptions) => {
-    const { source, target, propiedades, expected } = options
-    const builder = new SchemaTaskResultBuilder(target)
-      .with({ store: source })
+    const { propiedades, expected, ...rest } = options
+    const builder = new SchemaTaskResultBuilder()
+      .with(rest)
       
     const propiedadesBuilder = new PropiedadesBuilder(propiedades, builder)
     const results = [propiedadesBuilder.build(), await propiedadesBuilder.buildAsync()]
@@ -1699,20 +1699,23 @@ describe("propiedades builder", () => {
     expect(results).toEqual([expected, expected])
   }
 
-  test("target path", async () => {
+  test("options value path", async () => {
     await expectResultsAsync({
-      target: { detalles: { titulo: "Hola" } },
+      store: { dos: 2 },
+      value: { detalles: { titulo: "Hola" } },
       propiedades: {
         uno: 1,
-        dos: {
+        unoCopy: {
           path: "siblings.uno"
         },
-        tres: 3,
+        dos: {
+          path: "dos"
+        },
         saludo: {
-          path: "target.detalles.titulo",
+          path: "value.detalles.titulo",
         },
         saludoNested: {
-          path: "target.detalles",
+          path: "value.detalles",
           propiedades: {
             titulo: {
               path: "current.titulo"
@@ -1722,8 +1725,8 @@ describe("propiedades builder", () => {
       },
       expected: {
         uno: 1,
-        dos: 1,
-        tres: 3,
+        unoCopy: 1,
+        dos: 2,
         saludo: "Hola",
         saludoNested: { titulo: "Hola" }
       }
