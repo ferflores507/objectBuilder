@@ -9,6 +9,15 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("remove accents", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: "Éxàmplê òf áccéntéd téxt",
+      removeAccents: true
+    },
+    expected: "Example of accented text"
+  })
+})
 test("definitions with primitives", async () => {
   await expectToEqualAsync({
     schema: {

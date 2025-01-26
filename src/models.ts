@@ -78,6 +78,7 @@ export type Schema = Partial<{
     propiedades: Propiedades
     reduce: SchemaDefinition
     reduceOrDefault: SchemaDefinition
+    removeAccents: true
     required: string[]
     schemaFrom: SchemaDefinition
     selectSet: string

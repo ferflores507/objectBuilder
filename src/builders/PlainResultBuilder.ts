@@ -16,10 +16,12 @@ export class PlainResultBuilder {
             parse,
             isNullOrWhiteSpace,
             trim,
-            UUID
+            UUID,
+            removeAccents
         } = schema ?? {}
 
         this.target = this
+            .withRemoveAccents(removeAccents)
             .withEntries(entries)
             .withUnpack(unpack)
             .withStringify(stringify)
@@ -30,6 +32,18 @@ export class PlainResultBuilder {
             .build()
 
         return this
+    }
+
+    withValue(callback: (value: any) => any) {
+        this.target = callback(this.target)
+
+        return this
+    }
+
+    withRemoveAccents(removeAccents: true | undefined) {
+        return removeAccents
+            ? this.withValue(helpers.removeAccents)
+            : this
     }
 
     withStringify(stringify: true | undefined) {
