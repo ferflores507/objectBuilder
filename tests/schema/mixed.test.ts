@@ -1385,14 +1385,14 @@ test("schema as value", async () => {
   })
 })
 
-test("add", async () => {
+test("spread item to array", async () => {
   await expectToEqualAsync({
     store: {},
     schema: {
       const: [
         1, 2, 3
       ],
-      add: {
+      spread: {
         const: 4
       }
     },

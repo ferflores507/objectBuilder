@@ -17,7 +17,6 @@ export type FilterSchema = {
 }
 
 export type ArraySchema = Partial<{
-    add: Schema
     select: {
         [P in keyof SelectSchema]: Schema;
     },
