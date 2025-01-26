@@ -57,15 +57,27 @@ const defaultOperators = {
     minus: (a: number, b: number) => a - b,
     times: (a: number, b: number) => a * b,
     dividedBy: (a: number, b: number) => a / b,
+    values: (obj: any[]) => {
+        try {
+            return Array.isArray(obj) ? obj : Object.values(obj)
+        }
+        catch {
+            throw { 
+                mensaje: "Error al obtener los valores enumerables",
+                fuente: obj
+            }
+        }
+    }
 };
 
 const comparisonTasks = {
     equals: varios.esIgual,
-    allEqualTo: (array: any[], value: any) => {
-        return Object.values(array).every(item => comparisonTasks.equals(item, value))
+    allEqualTo: (obj: any[], value: any) => {
+        return defaultOperators.values(obj).every(item => comparisonTasks.equals(item, value))
     },
-    allEqual: (array: any[]) => {
-        const values = Object.values(array)
+    allEqual: (obj: any[]) => {
+        const values = defaultOperators.values(obj)
+
         return comparisonTasks.allEqualTo(values, values[0])
     },
     includes: (a: any[] | string, b: any) => a.includes(b),
