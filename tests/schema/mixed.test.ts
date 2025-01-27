@@ -9,6 +9,24 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("or", async () => {
+
+  const falsyValues = [undefined, null, NaN, false, 0, ""]
+  
+  test.each(falsyValues)("or...", async (value) => {
+    await expectToEqualAsync({
+      store: {
+        value
+      },
+      schema: {
+        path: "value",
+        or: "default"
+      },
+      expected: "default"
+    })
+  })
+})
+
 test("assign", async () => {
   await expectToEqualAsync({
     schema: {

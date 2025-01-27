@@ -54,6 +54,7 @@ const defaultOperators = {
         task: (source: [], separator: any) => source.join(separator),
         transform: (schema: any) => schema === true ? "" : schema
     },
+    or: (a: any, b: any) => a || b,
     plus: (a: number, b: number) => a + b,
     minus: (a: number, b: number) => a - b,
     times: (a: number, b: number) => a * b,
