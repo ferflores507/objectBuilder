@@ -9,6 +9,28 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("assign", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: { id: 1 },
+      assign: {
+        propiedades: {
+          titulo: "uno"
+        }
+      },
+      reduce: {
+        equals: {
+          const: { 
+            id: 1,
+            titulo: "uno"
+          }
+        }
+      }
+    },
+    expected: true
+  })
+})
+
 describe("with boolean", () => {
   const cases = [
     [undefined, false],

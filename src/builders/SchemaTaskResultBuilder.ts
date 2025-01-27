@@ -35,6 +35,7 @@ export type Builder = {
 }
 
 const defaultOperators = {
+    assign: (target: {}, source: any) => Object.assign(target, source),
     spreadStart: (target: any[], value: any) => {        
         return Array.isArray(value) ? [...value, ...target] : [value, ...target]
     },
