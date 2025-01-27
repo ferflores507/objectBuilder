@@ -314,10 +314,19 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
-    getCallOptions(propiedades: Propiedades | string) {
-        const [path, schema] = typeof(propiedades) == "string" 
-            ? [propiedades] 
-            : Object.entries(propiedades)[0] ?? (() => { throw `La ubicación de la función no está definida.` })()
+    getCallOptions(propiedades: Propiedades | string | string[]) {
+        const typeOptions = {
+            string: () => [propiedades],
+            object: () => Object.entries(propiedades)[0],
+            array: () => {
+                const [path, argPath] = propiedades as any[]
+                
+                return [path, { path: argPath }]
+            }
+        } as Record<string, any>
+
+        const type = Array.isArray(propiedades) ? "array" : typeof propiedades
+        const [path, schema] = typeOptions[type]?.() ?? (() => { throw `La ubicación de la función no está definida.` })()
 
         const func = this.withPath(path).build() ?? (() => { throw `La función ${path} no está definida.` })()
 

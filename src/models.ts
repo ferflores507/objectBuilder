@@ -54,7 +54,7 @@ export type Schema = Partial<{
     bindArg: SchemaDefinition
     boolean: true
     consulta: Consulta
-    call: string | Propiedades
+    call: string | Propiedades | string[]
     const: any
     decrement: string
     default: SchemaDefinition | SchemaPrimitive

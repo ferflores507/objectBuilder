@@ -849,24 +849,48 @@ test("nested stores with call to root store", async () => {
   })
 })
 
-test("with call", async () => {
-  await expectToEqualAsync(
-    {
-      store: {},
-      schema: {
-        set: "getName",
-        function: {
-          path: "current"
-        },
-        reduce: {
-          call: {
-            getName: "Melany"
+describe("with call", () => {
+
+  test("with call", async () => {
+    await expectToEqualAsync(
+      {
+        store: {},
+        schema: {
+          set: "getName",
+          function: {
+            path: "current"
+          },
+          reduce: {
+            call: {
+              getName: "Melany"
+            }
           }
-        }
-      },
-      expected: "Melany"
-    }
-  )
+        },
+        expected: "Melany"
+      }
+    )
+  })
+
+  test("with call arg path", async () => {
+    await expectToEqualAsync(
+      {
+        store: {
+          name: "Melany"
+        },
+        schema: {
+          set: "getName",
+          function: {
+            path: "current"
+          },
+          reduce: {
+            call: ["getName", "name"]
+          }
+        },
+        expected: "Melany"
+      }
+    )
+  })
+
 })
 
 test("schema with multiple stores", async () => {
