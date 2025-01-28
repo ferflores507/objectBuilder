@@ -9,6 +9,30 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("is subset with", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: ["uno", "dos"],
+      isSubsetWith: {
+        propiedades: {
+          array: {
+            const: ["1 - uno", "2 - dos", "3 - tres"]
+          },
+          match: {
+            schema: {
+              path: "other",
+              includes: {
+                path: "targetItem"
+              }
+            }
+          }
+        }
+      }
+    },
+    expected: true
+  })
+})
+
 describe("or", async () => {
 
   const falsyValues = [undefined, null, NaN, false, 0, ""]

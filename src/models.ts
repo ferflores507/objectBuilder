@@ -72,6 +72,7 @@ export type Schema = Partial<{
     isNullOrWhiteSpace: boolean
     includes: SchemaDefinition | SchemaPrimitive
     increment: string
+    isSubsetWith: SchemaDefinition
     import: string
     init: Propiedades
     join: SchemaDefinition | SchemaPrimitive
