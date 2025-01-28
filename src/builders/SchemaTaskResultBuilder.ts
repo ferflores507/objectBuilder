@@ -326,12 +326,17 @@ export class SchemaTaskResultBuilder implements Builder {
         } as Record<string, any>
 
         const type = Array.isArray(propiedades) ? "array" : typeof propiedades
-        const [path, schema] = typeOptions[type]?.() ?? (() => { throw `La ubicación de la función no está definida.` })()
+        const [path, schema] = typeOptions[type]?.()
 
-        const func = this.withPath(path).build() ?? (() => { throw `La función ${path} no está definida.` })()
+        if (!path) {
+            throw {
+                msg: `La ubicación de la función no está definida.`,
+                propiedades
+            }
+        }
 
         return {
-            func, schema
+            path, schema
         }
     }
 
@@ -340,8 +345,19 @@ export class SchemaTaskResultBuilder implements Builder {
 
         return options
             ? this
-                .withSchemaOrDefault(options.schema)
-                .add(arg => options.func(arg))
+                .withPropiedades({
+                    func: {
+                        path: options.path
+                    },
+                    arg: options.schema
+                })
+                .add(({ func, arg }) => {
+                    if (!func) {
+                        throw `La función ${options.path} no está definida.`
+                    }
+
+                    return func(arg)
+                })
             : this
     }
 

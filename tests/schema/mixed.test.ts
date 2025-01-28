@@ -891,6 +891,24 @@ describe("with call", () => {
     )
   })
 
+  test("with call current as arg path", async () => {
+    await expectToEqualAsync(
+      {
+        schema: {
+          set: "getName",
+          function: {
+            path: "current"
+          },
+          reduce: {
+            const: "Melany",
+            call: ["getName", "current"]
+          }
+        },
+        expected: "Melany"
+      }
+    )
+  })
+
 })
 
 test("schema with multiple stores", async () => {
