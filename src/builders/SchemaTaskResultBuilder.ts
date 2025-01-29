@@ -54,6 +54,12 @@ const defaultOperators = {
         task: (source: [], separator: any) => source.join(separator),
         transform: (schema: any) => schema === true ? "" : schema
     },
+    keywords: (value: string) => {
+        return value
+            .trim()
+            .split(/\s+/)
+            .map(word => varios.removeAccents(word).toLowerCase())
+    },
     or: (a: any, b: any) => a || b,
     plus: (a: number, b: number) => a + b,
     minus: (a: number, b: number) => a - b,

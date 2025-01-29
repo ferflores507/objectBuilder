@@ -9,6 +9,16 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("keywords", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: " AccéntéD   téxT  WitH    eXtra  spaCes  and  CapiTals ",
+      keywords: true
+    },
+    expected: ["accented", "text", "with", "extra", "spaces", "and", "capitals"]
+  })
+})
+
 test("is keywords of", async () => {
   await expectToEqualAsync({
     schema: {

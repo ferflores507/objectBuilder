@@ -3,6 +3,12 @@ import * as varios from '../src/helpers/varios';
 import { expectToEqualAsync } from './schema/buildResultsASync';
 import { removeAccents } from '../src/helpers/varios';
 
+test("split string with extra spaces", () => {
+    const str = "No   extra   spaces    allowed"
+
+    expect(str.split(/\s+/)).toEqual(["No", "extra", "spaces", "allowed"])
+})
+
 test("remove accents", () => {
     const str = "Éxàmplê òf áccéntéd téxt"
     const actual = removeAccents(str)
