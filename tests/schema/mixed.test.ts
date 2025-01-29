@@ -9,6 +9,18 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("is keywords of", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: ["uno", "dos"],
+      isKeywordsOf: {
+        const: ["tres", "dos", "uno"]
+      }
+    },
+    expected: true
+  })
+})
+
 test("is subset with", async () => {
   await expectToEqualAsync({
     schema: {

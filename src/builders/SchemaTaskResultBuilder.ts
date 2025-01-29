@@ -72,6 +72,12 @@ const defaultOperators = {
     }
 };
 
+type KeywordItem = string
+type SubsetOptions = {
+    container: any[]
+    match: (value: { item: KeywordItem, containerItem : KeywordItem }) => boolean
+}
+
 const comparisonTasks = {
     equals: varios.esIgual,
     allEqualTo: (obj: any[], value: any) => {
@@ -83,8 +89,14 @@ const comparisonTasks = {
         return comparisonTasks.allEqualTo(values, values[0]) === allEqual
     },
     includes: (a: any[] | string, b: any) => a.includes(b),
-    isSubsetOf: (array: any[], { container, match }: { container: any[], match: Function }) => {
+    isSubsetOf: (array: any[], { container, match }: SubsetOptions) => {
         return array.every(item => container.some(containerItem => match({ item, containerItem })))
+    },
+    isKeywordsOf: (keywords: any[], container: any[]) => {
+        return comparisonTasks.isSubsetOf(keywords, {
+            container,
+            match: ({ item, containerItem }) => containerItem.includes(item)
+        })
     },
     not: (a: any, b: any) => !b,
     greaterThan: (a: any, b: any) => a > b,
