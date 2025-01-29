@@ -13,16 +13,16 @@ test("is subset with", async () => {
   await expectToEqualAsync({
     schema: {
       const: ["uno", "dos"],
-      isSubsetWith: {
+      isSubsetOf: {
         propiedades: {
-          array: {
+          container: {
             const: ["1 - uno", "2 - dos", "3 - tres"]
           },
           match: {
-            schema: {
-              path: "other",
+            function: {
+              path: "arg.containerItem",
               includes: {
-                path: "targetItem"
+                path: "arg.item"
               }
             }
           }

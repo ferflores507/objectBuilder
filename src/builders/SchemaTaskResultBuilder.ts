@@ -9,7 +9,7 @@ import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
 import { assignAll, getterTrap, isNotPrimitive } from "../helpers/varios"
 
 type TaskOptions = Task | {
-    task: Task | ((initial: any, current: any, builder: Builder) => any),
+    task: Task,
     transform: (schema: Schema) => any
 }
 
@@ -83,19 +83,8 @@ const comparisonTasks = {
         return comparisonTasks.allEqualTo(values, values[0]) === allEqual
     },
     includes: (a: any[] | string, b: any) => a.includes(b),
-    isSubsetWith: (target: any[], options: { array: any[], match: SchemaDefinition }, builder: Builder) => {
-        const { array, match } = options
-        return target.every(item => array.some(other => {
-            return builder
-                .with({
-                    initial: item,
-                    targetItem: item,
-                    other,
-                    schema: match
-                })
-                .build() === true
-        }
-        ))
+    isSubsetOf: (array: any[], { container, match }: { container: any[], match: Function }) => {
+        return array.every(item => container.some(containerItem => match({ item, containerItem })))
     },
     not: (a: any, b: any) => !b,
     greaterThan: (a: any, b: any) => a > b,
@@ -548,7 +537,7 @@ export class SchemaTaskResultBuilder implements Builder {
                     initial,
                 })
                     .withSchemaOrDefault(definition)
-                    .add((current, prev) => task(prev, current, this))
+                    .add((current, prev) => task(prev, current))
                 )
             }).add((results: []) => results.every(Boolean))
             : this
