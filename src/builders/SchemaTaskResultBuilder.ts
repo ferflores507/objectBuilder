@@ -34,38 +34,41 @@ export type Builder = {
     buildAsync: () => Promise<any>
 }
 
-const defaultOperators = {
-    assign: (target: {}, source: any) => Object.assign(target, source),
-    spreadStart: (target: any[], value: any) => {        
+export class Operators {
+    constructor(otherOperators = {}) {
+        Object.assign(this, otherOperators)
+    }
+    assign = (target: {}, source: any) => Object.assign(target, source)
+    spreadStart = (target: any[], value: any) => {        
         return Array.isArray(value) ? [...value, ...target] : [value, ...target]
-    },
-    with: (array: any[], { index = 0, value } : { index?: number, value: any }) => {        
+    }
+    with = (array: any[], { index = 0, value } : { index?: number, value: any }) => {        
         return array.with(index, value)
-    },
-    withPatch: (array: any[], { key = "id", value } : { key?: string, value: any }) => {
+    }
+    withPatch = (array: any[], { key = "id", value } : { key?: string, value: any }) => {
         const index = array.findIndex(item => item[key] === value[key])
         
         return array.with(index, { ...array[index], ...value })
-    },
-    unpackAsGetters: (obj: {}, b: string[]) => varios.entry(obj).unpackAsGetters(b),
-    spread: (a: any, b: any) => varios.spread(a, b),
-    spreadFlat: (a: any, b: any[]) => varios.spread(a, b.flat()),
-    join: {
+    }
+    unpackAsGetters = (obj: {}, b: string[]) => varios.entry(obj).unpackAsGetters(b)
+    spread = (a: any, b: any) => varios.spread(a, b)
+    spreadFlat = (a: any, b: any[]) => this.spread(a, b.flat())
+    join = {
         task: (source: [], separator: any) => source.join(separator),
         transform: (schema: any) => schema === true ? "" : schema
-    },
-    keywords: (value: string) => {
+    }
+    keywords = (value: string) => {
         return value
             .trim()
             .split(/\s+/)
             .map(word => varios.removeAccents(word).toLowerCase())
-    },
-    or: (a: any, b: any) => a || b,
-    plus: (a: number, b: number) => a + b,
-    minus: (a: number, b: number) => a - b,
-    times: (a: number, b: number) => a * b,
-    dividedBy: (a: number, b: number) => a / b,
-    values: (obj: any[]) => {
+    }
+    or = (a: any, b: any) => a || b
+    plus = (a: number, b: number) => a + b
+    minus = (a: number, b: number) => a - b
+    times = (a: number, b: number) => a * b
+    dividedBy = (a: number, b: number) => a / b
+    values = (obj: any[]) => {
         try {
             return Array.isArray(obj) ? obj : Object.values(obj)
         }
@@ -84,30 +87,34 @@ type SubsetOptions = {
     match: (value: { item: KeywordItem, containerItem : KeywordItem }) => boolean
 }
 
-const comparisonTasks = {
-    equals: varios.esIgual,
-    allEqualTo: (obj: any[], value: any) => {
-        return defaultOperators.values(obj).every(item => comparisonTasks.equals(item, value))
-    },
-    allEqual: (obj: any[], allEqual: boolean) => {
-        const values = defaultOperators.values(obj)
+class ComparisonTasks {
+    constructor(private operators: Operators) {}
+    
+    equals = varios.esIgual
+    allEqualTo = (obj: any[], value: any) => {
+        return this.operators.values(obj).every(item => this.equals(item, value))
+    }
+    allEqual = (obj: any[], allEqual: boolean) => {
+        const values = this.operators.values(obj)
 
-        return comparisonTasks.allEqualTo(values, values[0]) === allEqual
-    },
-    includes: (a: any[] | string, b: any) => a.includes(b),
-    isSubsetOf: (array: any[], { container, match }: SubsetOptions) => {
+        return this.allEqualTo(values, values[0]) === allEqual
+    }
+    includes = (a: any[] | string, b: any) => a.includes(b)
+    isSubsetOf = (array: any[], { container, match }: SubsetOptions) => {
         return array.every(item => container.some(containerItem => match({ item, containerItem })))
-    },
-    isKeywordsOf: (keywords: any[], container: any[]) => {
-        return comparisonTasks.isSubsetOf(keywords, {
+    }
+    isKeywordsOf = (keywords: any[], container: any[]) => {
+        return this.isSubsetOf(keywords, {
             container,
             match: ({ item, containerItem }) => containerItem.includes(item)
         })
-    },
-    not: (a: any, b: any) => !b,
-    greaterThan: (a: any, b: any) => a > b,
-    lessThan: (a: any, b: any) => a < b
+    }
+    not = (a: any, b: any) => !b
+    greaterThan = (a: any, b: any) => a > b
+    lessThan = (a: any, b: any) => a < b
 }
+
+const comparisonTasks = new ComparisonTasks(new Operators())
 
 const imported = new Map()
 
@@ -116,7 +123,7 @@ export class SchemaTaskResultBuilder implements Builder {
         this.options = options ?? {
             store: {},
             siblings: {},
-            operators: defaultOperators,
+            operators: new Operators(),
             variables: {}
         }
 
@@ -170,26 +177,18 @@ export class SchemaTaskResultBuilder implements Builder {
         return this.taskBuilder.buildAsync()
     }
 
-    getOperators(newOperators: Record<string, TaskOptions> | undefined) {
-        const { operators } = this.options
-
-        return newOperators
-            ? { ...operators, ...newOperators }
-            : operators
-    }
-
     with(options: Partial<BuilderOptions>): SchemaTaskResultBuilder {
-        const operators = this.getOperators(options.operators)
-
-        const builder = new SchemaTaskResultBuilder(
-            this.target,
-            assignAll({}, this.options, options, { operators })
+        const { operators, schema, ...rest } = options
+        const newOptions = assignAll(
+            {}, 
+            this.options, 
+            rest, 
+            { operators: operators ? new Operators(operators) : this.options.operators }
         )
 
-        return options.schema
-            ? builder.withSchema(options.schema)
-            : builder
+        const builder = new SchemaTaskResultBuilder(this.target, newOptions)
 
+        return schema ? builder.withSchema(schema) : builder
     }
 
     set(path: string, value: any) {

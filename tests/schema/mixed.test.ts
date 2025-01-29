@@ -9,6 +9,31 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("override spread operator", async () => {
+  await expectToEqualAsync({
+    operators: {
+      spread: (value, source) => {
+        return [...value, ...source ]
+      }
+    },
+    schema: {
+      const: [
+        1,
+        2
+      ],
+      spreadFlat: {
+        const: [
+          3,
+          [4, 5],
+          6,
+          7
+        ]
+      }
+    },
+    expected: Array.from(Array(7).keys()).map(i => i +1)
+  })
+})
+
 test("keywords", async () => {
   await expectToEqualAsync({
     schema: {
@@ -58,7 +83,7 @@ test("is subset with", async () => {
 describe("or", async () => {
 
   const falsyValues = [undefined, null, NaN, false, 0, ""]
-  
+  Array
   test.each(falsyValues)("or...", async (value) => {
     await expectToEqualAsync({
       store: {
