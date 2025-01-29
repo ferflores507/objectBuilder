@@ -1579,12 +1579,16 @@ test("spread item to array", async () => {
 })
 
 test("UUID", async () => {
-  const store = {}
   const schema: Schema = {
     UUID: true
   }
 
-  await expect(buildResultsAsync({ store, schema })).resolves.not.toThrow()
+  await expect(buildResultsAsync({ schema })).resolves.not.toThrow()
+  
+  const results = await buildResultsAsync({ schema })
+  
+  expect(results).not.contain(undefined)
+  expect(results).not.contain(null)
 })
 
 describe("increment or decrement", () => {

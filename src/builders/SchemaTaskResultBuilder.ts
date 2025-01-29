@@ -86,7 +86,7 @@ export class Operators {
     unpack = (target: Record<string, any>, keys: string[]) => keys.reduce((obj, key) => {
         return { ...obj, [key]: target[key] }
     }, {})
-    uuid = () => crypto.randomUUID()
+    UUID = () => crypto.randomUUID()
     trim = (value: string) => value.trim()
 };
 
