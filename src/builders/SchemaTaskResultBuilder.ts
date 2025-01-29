@@ -1,7 +1,6 @@
 import type { ArraySchema, Consulta, Propiedades, Schema, SchemaDefinition, SchemaPrimitive } from "../models"
 import * as varios from "../helpers/varios"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
-import { PlainResultBuilder } from "./PlainResultBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
@@ -38,7 +37,9 @@ export class Operators {
     constructor(otherOperators = {}) {
         Object.assign(this, otherOperators)
     }
-    assign = (target: {}, source: any) => Object.assign(target, source)
+    assign = Object.assign
+    boolean = (value: any) => !!value
+    entries = varios.entries
     spreadStart = (target: any[], value: any) => {        
         return Array.isArray(value) ? [...value, ...target] : [value, ...target]
     }
@@ -51,7 +52,7 @@ export class Operators {
         return array.with(index, { ...array[index], ...value })
     }
     unpackAsGetters = (obj: {}, b: string[]) => varios.entry(obj).unpackAsGetters(b)
-    spread = (a: any, b: any) => varios.spread(a, b)
+    spread = varios.spread
     spreadFlat = (a: any, b: any[]) => this.spread(a, b.flat())
     join = {
         task: (source: [], separator: any) => source.join(separator),
@@ -61,13 +62,16 @@ export class Operators {
         return value
             .trim()
             .split(/\s+/)
-            .map(word => varios.removeAccents(word).toLowerCase())
+            .map(word => this.removeAccents(word).toLowerCase())
     }
     or = (a: any, b: any) => a || b
     plus = (a: number, b: number) => a + b
     minus = (a: number, b: number) => a - b
     times = (a: number, b: number) => a * b
     dividedBy = (a: number, b: number) => a / b
+    parse = JSON.parse
+    removeAccents = varios.removeAccents
+    stringify = JSON.stringify
     values = (obj: any[]) => {
         try {
             return Array.isArray(obj) ? obj : Object.values(obj)
@@ -79,6 +83,11 @@ export class Operators {
             }
         }
     }
+    unpack = (target: Record<string, any>, keys: string[]) => keys.reduce((obj, key) => {
+        return { ...obj, [key]: target[key] }
+    }, {})
+    uuid = () => crypto.randomUUID()
+    trim = (value: string) => value.trim()
 };
 
 type KeywordItem = string
@@ -100,6 +109,11 @@ class ComparisonTasks {
         return this.allEqualTo(values, values[0]) === allEqual
     }
     includes = (a: any[] | string, b: any) => a.includes(b)
+    isNullOrWhiteSpace = (value: any, boolValue: boolean | undefined) => {
+        return typeof(boolValue) == "boolean"
+            ? ((value as string ?? "").toString().trim() === "") === boolValue
+            : value
+    }
     isSubsetOf = (array: any[], { container, match }: SubsetOptions) => {
         return array.every(item => container.some(containerItem => match({ item, containerItem })))
     }
@@ -599,11 +613,8 @@ export class SchemaTaskResultBuilder implements Builder {
     withInitialSchema(schema: Schema | undefined) {
         return this.add((target) => {
             const prop = (["schema", "const"] as const).find(str => str in (schema ?? {}))
-            const initialValue = prop ? schema?.[prop] : target
-
-            return new PlainResultBuilder(initialValue)
-                .withSchema(schema)
-                .build()
+            
+            return prop ? schema?.[prop] : target
         })
     }
 
