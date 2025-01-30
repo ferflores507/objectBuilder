@@ -33,6 +33,12 @@ export type Builder = {
     buildAsync: () => Promise<any>
 }
 
+type KeywordItem = string | string[]
+type SubsetOptions = {
+    container: any[]
+    match: (value: { item: string, containerItem : string }) => boolean
+}
+
 export class Operators {
     constructor(otherOperators = {}) {
         Object.assign(this, otherOperators)
@@ -64,6 +70,7 @@ export class Operators {
             .split(/\s+/)
             .map(word => this.removeAccents(word).toLowerCase())
     }
+    keywordsOrDefault = (value: KeywordItem) => Array.isArray(value) ? value : this.keywords(value)
     plus = (a: number, b: number) => a + b
     minus = (a: number, b: number) => a - b
     times = (a: number, b: number) => a * b
@@ -87,14 +94,8 @@ export class Operators {
     unpack = (target: Record<string, any>, keys: string[]) => keys.reduce((obj, key) => {
         return { ...obj, [key]: target[key] }
     }, {})
-    uuid = () => crypto.randomUUID()
+    UUID = () => crypto.randomUUID()
 };
-
-type KeywordItem = string
-type SubsetOptions = {
-    container: any[]
-    match: (value: { item: KeywordItem, containerItem : KeywordItem }) => boolean
-}
 
 class ComparisonTasks {
     constructor(private operators: Operators) {}
@@ -117,7 +118,9 @@ class ComparisonTasks {
     isSubsetOf = (array: any[], { container, match }: SubsetOptions) => {
         return array.every(item => container.some(containerItem => match({ item, containerItem })))
     }
-    isKeywordsOf = (keywords: any[], container: any[]) => {
+    isKeywordsOf = (keywords: KeywordItem, container: KeywordItem) => {
+        [keywords, container] = [keywords, container].map(this.operators.keywordsOrDefault)
+        
         return this.isSubsetOf(keywords, {
             container,
             match: ({ item, containerItem }) => containerItem.includes(item)
@@ -255,13 +258,13 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withSelectSet(selectSet)
                 .withIncrement(increment)
                 .withDecrement(decrement)
-                .withConditional(schema)
                 .withConsulta(consulta)
                 .withDefinitions(definitions)
                 .withPropiedades(propiedades)
                 .withFunction(schema)
                 .withBindArg(bindArg)
                 .withBinary(schema)
+                .withConditional(schema)
                 .withEndSchema(schema)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)

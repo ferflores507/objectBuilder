@@ -77,6 +77,7 @@ export type Schema = Partial<{
     import: string
     init: Propiedades
     join: SchemaDefinition | SchemaPrimitive
+    keywords: true
     log: SchemaDefinition | SchemaPrimitive
     not: SchemaDefinition
     or: SchemaDefinition | SchemaPrimitive
