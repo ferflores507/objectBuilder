@@ -95,6 +95,7 @@ export class Operators {
         return { ...obj, [key]: target[key] }
     }, {})
     UUID = () => crypto.randomUUID()
+    log = (initial: any, current: any) => (console.log(current), initial)
 };
 
 class ComparisonTasks {
@@ -268,7 +269,6 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withEndSchema(schema)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
-                .withLog(log)
             : this
     }
 
@@ -289,14 +289,6 @@ export class SchemaTaskResultBuilder implements Builder {
     withDefault(schema: SchemaDefinition | SchemaPrimitive | undefined) {
         return schema != null
             ? this.withUnshift(initial => initial ?? this.with({ initial }).withSchemaOrDefault(schema))
-            : this
-    }
-
-    withLog(schema: SchemaDefinition | SchemaPrimitive | undefined) {
-        return schema
-            ? this
-                .withSchemaOrDefault(schema)
-                .add(logValue => console.log(logValue))
             : this
     }
 
