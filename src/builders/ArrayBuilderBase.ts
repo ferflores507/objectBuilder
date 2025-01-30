@@ -1,6 +1,6 @@
-import { Builder } from "./SchemaTaskResultBuilder";
+import { SchemaTaskResultBuilder } from "./SchemaTaskResultBuilder";
 
 export class ArrayBuilderBase {
-    constructor(protected items: any[], readonly builder: Builder) {
+    constructor(protected items: any[], readonly builder: SchemaTaskResultBuilder) {
     }
 }
