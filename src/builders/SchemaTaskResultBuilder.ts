@@ -64,14 +64,15 @@ export class Operators {
             .split(/\s+/)
             .map(word => this.removeAccents(word).toLowerCase())
     }
-    or = (a: any, b: any) => a || b
     plus = (a: number, b: number) => a + b
     minus = (a: number, b: number) => a - b
     times = (a: number, b: number) => a * b
     dividedBy = (a: number, b: number) => a / b
     parse = JSON.parse
+    trim = (value: string) => value.trim()
     removeAccents = varios.removeAccents
     stringify = JSON.stringify
+    or = (a: any, b: any) => a || b
     values = (obj: any[]) => {
         try {
             return Array.isArray(obj) ? obj : Object.values(obj)
@@ -87,7 +88,6 @@ export class Operators {
         return { ...obj, [key]: target[key] }
     }, {})
     uuid = () => crypto.randomUUID()
-    trim = (value: string) => value.trim()
 };
 
 type KeywordItem = string
