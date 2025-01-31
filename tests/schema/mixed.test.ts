@@ -9,6 +9,99 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe.only("sort", () => {
+  const mapWithId = (array: any[], id = "id") => array.map(item => item === undefined ? {} : ({ [id]: item }))
+  const mapWithName = (array: any[]) => mapWithId(array, "name")
+  const cases = [
+    {
+      name: "sort",
+      sort: true,
+      items: ["b", "c", "a"],
+      expected: ["a", "b", "c"]
+    },
+    {
+      name: "sort",
+      sort: true,
+      items: [1, 2, 10],
+      expected: [1, 10, 2]
+    },
+    {
+      name: "sort desc",
+      sort: {
+        descending: true
+      },
+      items: [1, 2, 10],
+      expected: [2, 10, 1]
+    },
+    {
+      name: "sort by name",
+      sort: "name",
+      items: mapWithName(["b", undefined, "c", "a"]),
+      expected: mapWithName([undefined, "a", "b", "c"])
+    },
+    {
+      name: "sort by name desc",
+      sort: {
+        path: "name",
+        descending: true
+      },
+      items: mapWithName(["b", undefined, "c", "a"]),
+      expected: mapWithName(["c", "b", "a", undefined])
+    },
+    {
+      name: "sort by id numeric",
+      sort: {
+        path: "id",
+        type: "numeric"
+      },
+      items: mapWithId([1, 2, undefined, 10]),
+      expected: mapWithId([undefined, 1, 2, 10])
+    },
+    {
+      name: "sort by id numeric desc",
+      sort: {
+        path: "id",
+        type: "numeric",
+        descending: true
+      },
+      items: mapWithId([1, 2, undefined, 10]),
+      expected: mapWithId([10, 2, 1, undefined])
+    },
+    {
+      name: "sort by completed ascending (falsy values first)",
+      sort: {
+        path: "completed",
+        type: "numeric",
+      },
+      items: mapWithId([true, undefined, true, false], "completed"),
+      expected: mapWithId([undefined, false, true, true], "completed")
+    },
+    {
+      name: "sort by completed descending (truthy values first)",
+      sort: {
+        path: "completed",
+        type: "numeric",
+        descending: true
+      },
+      items: mapWithId([true, undefined, true, false], "completed"),
+      expected: mapWithId([true, true, undefined, false], "completed")
+    },
+  ]
+
+  test.each(cases)("expect $name, value: $sort $items to equal $expected", async ({ name, sort, items, expected }) => {
+    await expectToEqualAsync({
+      initial: items,
+      schema: {
+        sort: {
+          const: sort
+        }
+      },
+      expected
+    })
+  })
+
+})
+
 test("override spread operator", async () => {
   await expectToEqualAsync({
     operators: {

@@ -5,7 +5,7 @@ import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
-import { assignAll, getterTrap, isNotPrimitive } from "../helpers/varios"
+import { assignAll, formatSortOptions, getterTrap, isNotPrimitive, sortCompare, SortOptions } from "../helpers/varios"
 
 type TaskOptions = Task | {
     task: Task,
@@ -80,6 +80,11 @@ export class Operators {
     removeAccents = varios.removeAccents
     stringify = JSON.stringify
     or = (a: any, b: any) => a || b
+    sort = (array: any[], options: SortOptions) => {
+        const concreteOptions = formatSortOptions(options)
+        
+        return array.toSorted((a, b) => sortCompare(a, b, concreteOptions))
+    }
     values = (obj: any[]) => {
         try {
             return Array.isArray(obj) ? obj : Object.values(obj)
