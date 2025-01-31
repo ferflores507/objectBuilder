@@ -235,6 +235,7 @@ export class SchemaTaskResultBuilder implements Builder {
             delay,
             path,
             propiedades,
+            propiedadesAsync,
             reduceOrDefault,
             reduce,
             definitions,
@@ -269,6 +270,7 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withDecrement(decrement)
                 .withConsulta(consulta)
                 .withDefinitions(definitions)
+                .withPropiedadesAsync(propiedadesAsync)
                 .withPropiedades(propiedades)
                 .withFunction(schema)
                 .withBindArg(bindArg)
@@ -580,6 +582,22 @@ export class SchemaTaskResultBuilder implements Builder {
     withPropiedades(propiedades: Propiedades | undefined) {
         return propiedades
             ? this.add(initial => new PropiedadesBuilder(propiedades, this.with({ initial })).build())
+            : this
+    }
+
+    withPropiedadesAsync(propiedades: Propiedades | undefined) {
+        return propiedades
+            ? this.withUnshift(initial => {
+                    const entries = Object.entries(propiedades)
+                    const definitions = entries.map(([key, schema]) => schema)
+
+                    return this
+                        .with({ initial })
+                        .withDefinitions(definitions)
+                        .add((values: []) => entries.reduce((prev, [key], index) => {
+                            return { ...prev, [key]: values[index] }
+                        }, {})) 
+                })
             : this
     }
 
