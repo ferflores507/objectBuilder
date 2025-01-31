@@ -80,7 +80,10 @@ export class Operators {
     removeAccents = varios.removeAccents
     stringify = JSON.stringify
     or = (a: any, b: any) => a || b
-    sort = (array: any[], options: SortOptions) => {
+    sort = (array: any[], option: true | "descending" = true) => {
+        return this.sortBy(array, { descending: option === "descending" })
+    }
+    sortBy = (array: any[], options: SortOptions) => {
         const concreteOptions = formatSortOptions(options)
         
         return array.toSorted((a, b) => sortCompare(a, b, concreteOptions))

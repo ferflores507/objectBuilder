@@ -9,7 +9,7 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
-describe.only("sort", () => {
+describe("sort", () => {
   const mapWithId = (array: any[], id = "id") => array.map(item => item === undefined ? {} : ({ [id]: item }))
   const mapWithName = (array: any[]) => mapWithId(array, "name")
   const cases = [
@@ -27,7 +27,13 @@ describe.only("sort", () => {
     },
     {
       name: "sort desc",
-      sort: {
+      sort: "descending",
+      items: [1, 2, 10],
+      expected: [2, 10, 1]
+    },
+    {
+      name: "sort desc with options",
+      sortBy: {
         descending: true
       },
       items: [1, 2, 10],
@@ -35,13 +41,13 @@ describe.only("sort", () => {
     },
     {
       name: "sort by name",
-      sort: "name",
+      sortBy: "name",
       items: mapWithName(["b", undefined, "c", "a"]),
       expected: mapWithName([undefined, "a", "b", "c"])
     },
     {
       name: "sort by name desc",
-      sort: {
+      sortBy: {
         path: "name",
         descending: true
       },
@@ -50,7 +56,7 @@ describe.only("sort", () => {
     },
     {
       name: "sort by id numeric",
-      sort: {
+      sortBy: {
         path: "id",
         type: "numeric"
       },
@@ -59,7 +65,7 @@ describe.only("sort", () => {
     },
     {
       name: "sort by id numeric desc",
-      sort: {
+      sortBy: {
         path: "id",
         type: "numeric",
         descending: true
@@ -69,7 +75,7 @@ describe.only("sort", () => {
     },
     {
       name: "sort by completed ascending (falsy values first)",
-      sort: {
+      sortBy: {
         path: "completed",
         type: "numeric",
       },
@@ -78,7 +84,7 @@ describe.only("sort", () => {
     },
     {
       name: "sort by completed descending (truthy values first)",
-      sort: {
+      sortBy: {
         path: "completed",
         type: "numeric",
         descending: true
@@ -88,14 +94,12 @@ describe.only("sort", () => {
     },
   ]
 
-  test.each(cases)("expect $name, value: $sort $items to equal $expected", async ({ name, sort, items, expected }) => {
+  test.each(cases)("expect $name, value: $sort $items to equal $expected", async ({ sort, sortBy, items, expected }) => {
     await expectToEqualAsync({
       initial: items,
-      schema: {
-        sort: {
-          const: sort
-        }
-      },
+      schema: sort 
+        ? { sort } 
+        : { sortBy: { const: sortBy } },
       expected
     })
   })

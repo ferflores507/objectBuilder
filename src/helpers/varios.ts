@@ -1,12 +1,12 @@
 type ConcreteSortOptions = {
     path: string | undefined
-    descending: true | undefined
+    descending: boolean | undefined
     compareFn: (a: any, b: any) => number
 }
 
-export type SortOptions = string | true | {
+export type SortOptions = string | {
     path?: string
-    descending?: true
+    descending?: boolean
     type?: "numeric" | "string"
 }
 
@@ -18,9 +18,14 @@ const compareOptions = {
 export const formatSortOptions = (options: SortOptions) : ConcreteSortOptions => {
     const { path, descending, type = "string" } = typeof options == "object"
         ? options
-        : { 
-            path: typeof options == "string" ? options : undefined 
+        : { path: options }
+
+    if(path && typeof path != "string") {
+        throw {
+            msg: "El path definido para las opciones de ordenamiento no es de tipo texto",
+            path
         }
+    }
     
     return {
         path,

@@ -94,7 +94,8 @@ export type Schema = Partial<{
     schema: SchemaDefinition
     sibling: string
     some: any
-    sort: Schema
+    sort: Schema | SchemaPrimitive
+    sortBy: Schema
     source: string
     status: string
     store: Schema
