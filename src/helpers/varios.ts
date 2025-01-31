@@ -1,3 +1,42 @@
+type ConcreteSortOptions = {
+    path: string | undefined
+    descending: true | undefined
+    compareFn: (a: any, b: any) => number
+}
+
+export type SortOptions = string | true | {
+    path?: string
+    descending?: true
+    type?: "numeric" | "string"
+}
+
+const compareOptions = {
+    numeric: (a: any, b: any) => Number(a ?? 0) - Number(b ?? 0),
+    string: (a: any, b: any) => (a ? String(a) : "").localeCompare(b || "")
+}
+
+export const formatSortOptions = (options: SortOptions) : ConcreteSortOptions => {
+    const { path, descending, type = "string" } = typeof options == "object"
+        ? options
+        : { 
+            path: typeof options == "string" ? options : undefined 
+        }
+    
+    return {
+        path,
+        descending,
+        compareFn: compareOptions[type]
+    }
+}
+
+export const sortCompare = (a: any, b: any, options: ConcreteSortOptions) => {
+    const { path, descending, compareFn } = options
+    const values = (descending ? [b, a] : [a, b])
+    const [newA, newB] = values.map(obj => path ? entry(obj).get(path) : obj)
+    
+    return compareFn(newA, newB)
+}
+
 export const splitAccents = (str: string) => str.normalize("NFD")
 
 export const removeAccents = (str: string) => {
