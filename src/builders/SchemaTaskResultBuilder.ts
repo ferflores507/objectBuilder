@@ -286,7 +286,7 @@ export class SchemaTaskResultBuilder implements Builder {
         return propiedades
             ? this
                 .addMerge()
-                .withPropiedades(propiedades)
+                .withPropiedadesAsync(propiedades)
                 .add((current, prev) => {
                     const entries = Object.entries(current).map(([key, val]) => ["$" + key, val])
                     Object.assign(this.options.variables, Object.fromEntries(entries))

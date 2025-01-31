@@ -9,7 +9,7 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
-test.only("propiedadesAsync", async () => {
+test("propiedadesAsync", async () => {
 
   const result = await new SchemaTaskResultBuilder()
     .with({
@@ -37,7 +37,7 @@ test.only("propiedadesAsync", async () => {
   expect(result).toEqual({ total: 2 })
 })
 
-test.only("definitions with async call works", async () => {
+test("definitions with async call works", async () => {
 
   const result = await new SchemaTaskResultBuilder()
     .with({
@@ -65,7 +65,7 @@ test.only("definitions with async call works", async () => {
   expect(result).toEqual([2])
 })
 
-test.only.fails("propiedades fails with async call", async () => {
+test.fails("propiedades fails with async call", async () => {
 
   const result = await new SchemaTaskResultBuilder()
     .with({
