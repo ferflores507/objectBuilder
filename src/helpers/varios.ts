@@ -249,7 +249,7 @@ export const tryCopy = (obj: {}) => {
     return obj
 }
 
-const toArray = (value: any) => Array.isArray(value) ? value : [value]
+export const toArray = <T>(value: T) => Array.isArray(value) ? value : [value]
 
 export const toArrayOrNull = (value: any) => value != null ? toArray(value) : null
 

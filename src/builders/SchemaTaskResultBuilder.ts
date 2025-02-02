@@ -83,10 +83,20 @@ export class Operators {
     sort = (array: any[], option: true | "descending" = true) => {
         return this.sortBy(array, { descending: option === "descending" })
     }
-    sortBy = (array: any[], options: SortOptions) => {
-        const concreteOptions = formatSortOptions(options)
+    sortBy = (array: any[], options: SortOptions | SortOptions[]) => {
+        const concreteOptions = varios.toArray(options).map(formatSortOptions)
         
-        return array.toSorted((a, b) => sortCompare(a, b, concreteOptions))
+        return array.toSorted((a, b) => {
+            let result = 0
+
+            for(const option of concreteOptions) {
+                result = sortCompare(a, b, option)
+
+                if(result !== 0) break
+            }
+
+            return result
+        })
     }
     values = (obj: any[]) => {
         try {
