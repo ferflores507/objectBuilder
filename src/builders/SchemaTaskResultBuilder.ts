@@ -1,12 +1,11 @@
 import type { ArraySchema, Consulta, Propiedades, Schema, SchemaDefinition, SchemaPrimitive } from "../models"
 import * as varios from "../helpers/varios"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
-import { PlainResultBuilder } from "./PlainResultBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
-import { assignAll, getterTrap, isNotPrimitive } from "../helpers/varios"
+import { assignAll, formatSortOptions, getterTrap, isNotPrimitive, sortCompare, SortOptions } from "../helpers/varios"
 
 type TaskOptions = Task | {
     task: Task,
@@ -34,30 +33,114 @@ export type Builder = {
     buildAsync: () => Promise<any>
 }
 
-const defaultOperators = {
-    spreadStart: (target: any[], value: any) => {        
+type KeywordItem = string | string[]
+type SubsetOptions = {
+    container: any[]
+    match: (value: { item: string, containerItem : string }) => boolean
+}
+
+export class Operators {
+    constructor(otherOperators = {}) {
+        Object.assign(this, otherOperators)
+    }
+    assign = Object.assign
+    boolean = (value: any) => !!value
+    entries = varios.entries
+    spreadStart = (target: any[], value: any) => {        
         return Array.isArray(value) ? [...value, ...target] : [value, ...target]
-    },
-    with: (array: any[], { index = 0, value } : { index?: number, value: any }) => {        
+    }
+    with = (array: any[], { index = 0, value } : { index?: number, value: any }) => {        
         return array.with(index, value)
-    },
-    withPatch: (array: any[], { key = "id", value } : { key?: string, value: any }) => {
+    }
+    withPatch = (array: any[], { key = "id", value } : { key?: string, value: any }) => {
         const index = array.findIndex(item => item[key] === value[key])
         
         return array.with(index, { ...array[index], ...value })
-    },
-    unpackAsGetters: (obj: {}, b: string[]) => varios.entry(obj).unpackAsGetters(b),
-    spread: (a: any, b: any) => varios.spread(a, b),
-    spreadFlat: (a: any, b: any[]) => varios.spread(a, b.flat()),
-    join: {
+    }
+    unpackAsGetters = (obj: {}, b: string[]) => varios.entry(obj).unpackAsGetters(b)
+    spread = varios.spread
+    spreadFlat = (a: any, b: any[]) => this.spread(a, b.flat())
+    join = {
         task: (source: [], separator: any) => source.join(separator),
         transform: (schema: any) => schema === true ? "" : schema
-    },
-    plus: (a: number, b: number) => a + b,
-    minus: (a: number, b: number) => a - b,
-    times: (a: number, b: number) => a * b,
-    dividedBy: (a: number, b: number) => a / b,
+    }
+    keywords = (value: string) => {
+        return value
+            .trim()
+            .split(/\s+/)
+            .map(word => this.removeAccents(word).toLowerCase())
+    }
+    keywordsOrDefault = (value: KeywordItem) => Array.isArray(value) ? value : this.keywords(value)
+    plus = (a: number, b: number) => a + b
+    minus = (a: number, b: number) => a - b
+    times = (a: number, b: number) => a * b
+    dividedBy = (a: number, b: number) => a / b
+    parse = JSON.parse
+    trim = (value: string) => value.trim()
+    removeAccents = varios.removeAccents
+    stringify = JSON.stringify
+    or = (a: any, b: any) => a || b
+    sort = (array: any[], option: true | "descending" = true) => {
+        return this.sortBy(array, { descending: option === "descending" })
+    }
+    sortBy = (array: any[], options: SortOptions) => {
+        const concreteOptions = formatSortOptions(options)
+        
+        return array.toSorted((a, b) => sortCompare(a, b, concreteOptions))
+    }
+    values = (obj: any[]) => {
+        try {
+            return Array.isArray(obj) ? obj : Object.values(obj)
+        }
+        catch {
+            throw { 
+                mensaje: "Error al obtener los valores enumerables",
+                fuente: obj
+            }
+        }
+    }
+    unpack = (target: Record<string, any>, keys: string[]) => keys.reduce((obj, key) => {
+        return { ...obj, [key]: target[key] }
+    }, {})
+    UUID = () => crypto.randomUUID()
+    log = (initial: any, current: any) => (console.log(current), initial)
 };
+
+class ComparisonTasks {
+    constructor(private operators: Operators) {}
+    
+    equals = varios.esIgual
+    allEqualTo = (obj: any[], value: any) => {
+        return this.operators.values(obj).every(item => this.equals(item, value))
+    }
+    allEqual = (obj: any[], allEqual: boolean) => {
+        const values = this.operators.values(obj)
+
+        return this.allEqualTo(values, values[0]) === allEqual
+    }
+    includes = (a: any[] | string, b: any) => a.includes(b)
+    isNullOrWhiteSpace = (value: any, boolValue: boolean | undefined) => {
+        return typeof(boolValue) == "boolean"
+            ? ((value as string ?? "").toString().trim() === "") === boolValue
+            : value
+    }
+    isSubsetOf = (array: any[], { container, match }: SubsetOptions) => {
+        return array.every(item => container.some(containerItem => match({ item, containerItem })))
+    }
+    isKeywordsOf = (keywords: KeywordItem, container: KeywordItem) => {
+        [keywords, container] = [keywords, container].map(this.operators.keywordsOrDefault)
+        
+        return this.isSubsetOf(keywords, {
+            container,
+            match: ({ item, containerItem }) => containerItem.includes(item)
+        })
+    }
+    not = (a: any, b: any) => !b
+    greaterThan = (a: any, b: any) => a > b
+    lessThan = (a: any, b: any) => a < b
+}
+
+const comparisonTasks = new ComparisonTasks(new Operators())
 
 const imported = new Map()
 
@@ -66,7 +149,7 @@ export class SchemaTaskResultBuilder implements Builder {
         this.options = options ?? {
             store: {},
             siblings: {},
-            operators: defaultOperators,
+            operators: new Operators(),
             variables: {}
         }
 
@@ -120,26 +203,18 @@ export class SchemaTaskResultBuilder implements Builder {
         return this.taskBuilder.buildAsync()
     }
 
-    getOperators(newOperators: Record<string, TaskOptions> | undefined) {
-        const { operators } = this.options
-
-        return newOperators
-            ? { ...operators, ...newOperators }
-            : operators
-    }
-
     with(options: Partial<BuilderOptions>): SchemaTaskResultBuilder {
-        const operators = this.getOperators(options.operators)
-
-        const builder = new SchemaTaskResultBuilder(
-            this.target,
-            assignAll({}, this.options, options, { operators })
+        const { operators, schema, ...rest } = options
+        const newOptions = assignAll(
+            {}, 
+            this.options, 
+            rest, 
+            { operators: operators ? new Operators(operators) : this.options.operators }
         )
 
-        return options.schema
-            ? builder.withSchema(options.schema)
-            : builder
+        const builder = new SchemaTaskResultBuilder(this.target, newOptions)
 
+        return schema ? builder.withSchema(schema) : builder
     }
 
     set(path: string, value: any) {
@@ -160,6 +235,7 @@ export class SchemaTaskResultBuilder implements Builder {
             delay,
             path,
             propiedades,
+            propiedadesAsync,
             reduceOrDefault,
             reduce,
             definitions,
@@ -192,17 +268,17 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withSelectSet(selectSet)
                 .withIncrement(increment)
                 .withDecrement(decrement)
-                .withConditional(schema)
                 .withConsulta(consulta)
                 .withDefinitions(definitions)
+                .withPropiedadesAsync(propiedadesAsync)
                 .withPropiedades(propiedades)
                 .withFunction(schema)
                 .withBindArg(bindArg)
                 .withBinary(schema)
+                .withConditional(schema)
                 .withEndSchema(schema)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
-                .withLog(log)
             : this
     }
 
@@ -210,7 +286,7 @@ export class SchemaTaskResultBuilder implements Builder {
         return propiedades
             ? this
                 .addMerge()
-                .withPropiedades(propiedades)
+                .withPropiedadesAsync(propiedades)
                 .add((current, prev) => {
                     const entries = Object.entries(current).map(([key, val]) => ["$" + key, val])
                     Object.assign(this.options.variables, Object.fromEntries(entries))
@@ -223,14 +299,6 @@ export class SchemaTaskResultBuilder implements Builder {
     withDefault(schema: SchemaDefinition | SchemaPrimitive | undefined) {
         return schema != null
             ? this.withUnshift(initial => initial ?? this.with({ initial }).withSchemaOrDefault(schema))
-            : this
-    }
-
-    withLog(schema: SchemaDefinition | SchemaPrimitive | undefined) {
-        return schema
-            ? this
-                .withSchemaOrDefault(schema)
-                .add(logValue => console.log(logValue))
             : this
     }
 
@@ -286,15 +354,29 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
-    getCallOptions(propiedades: Propiedades | string) {
-        const [path, schema] = typeof(propiedades) == "string" 
-            ? [propiedades] 
-            : Object.entries(propiedades)[0] ?? (() => { throw `La ubicación de la función no está definida.` })()
+    getCallOptions(propiedades: Propiedades | string | string[]) {
+        const typeOptions = {
+            string: () => [propiedades],
+            object: () => Object.entries(propiedades)[0],
+            array: () => {
+                const [path, argPath] = propiedades as any[]
+                
+                return [path, { path: argPath }]
+            }
+        } as Record<string, any>
 
-        const func = this.withPath(path).build() ?? (() => { throw `La función ${path} no está definida.` })()
+        const type = Array.isArray(propiedades) ? "array" : typeof propiedades
+        const [path, schema] = typeOptions[type]?.()
+
+        if (!path) {
+            throw {
+                msg: `La ubicación de la función no está definida.`,
+                propiedades
+            }
+        }
 
         return {
-            func, schema
+            path, schema
         }
     }
 
@@ -303,8 +385,19 @@ export class SchemaTaskResultBuilder implements Builder {
 
         return options
             ? this
-                .withSchemaOrDefault(options.schema)
-                .add(arg => options.func(arg))
+                .withPropiedades({
+                    func: {
+                        path: options.path
+                    },
+                    arg: options.schema
+                })
+                .add(({ func, arg }) => {
+                    if (!func) {
+                        throw `La función ${options.path} no está definida.`
+                    }
+
+                    return func(arg)
+                })
             : this
     }
 
@@ -472,16 +565,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withComparison(schema: Schema | undefined) {
-
-        const tasks = {
-            equals: varios.esIgual,
-            includes: (a: any[] | string, b: any) => a.includes(b),
-            not: (a: any, b: any) => !b,
-            greaterThan: (a: any, b: any) => a > b,
-            lessThan: (a: any, b: any) => a < b
-        }
-
-        const entries = this.filterTasks(tasks, schema)
+        const entries = this.filterTasks(comparisonTasks, schema)
 
         return entries.length
             ? this.withUnshiftArray(initial => {
@@ -498,6 +582,22 @@ export class SchemaTaskResultBuilder implements Builder {
     withPropiedades(propiedades: Propiedades | undefined) {
         return propiedades
             ? this.add(initial => new PropiedadesBuilder(propiedades, this.with({ initial })).build())
+            : this
+    }
+
+    withPropiedadesAsync(propiedades: Propiedades | undefined) {
+        return propiedades
+            ? this.withUnshift(initial => {
+                    const entries = Object.entries(propiedades)
+                    const definitions = entries.map(([key, schema]) => schema)
+
+                    return this
+                        .with({ initial })
+                        .withDefinitions(definitions)
+                        .add((values: []) => entries.reduce((prev, [key], index) => {
+                            return { ...prev, [key]: values[index] }
+                        }, {})) 
+                })
             : this
     }
 
@@ -534,11 +634,8 @@ export class SchemaTaskResultBuilder implements Builder {
     withInitialSchema(schema: Schema | undefined) {
         return this.add((target) => {
             const prop = (["schema", "const"] as const).find(str => str in (schema ?? {}))
-            const initialValue = prop ? schema?.[prop] : target
-
-            return new PlainResultBuilder(initialValue)
-                .withSchema(schema)
-                .build()
+            
+            return prop ? schema?.[prop] : target
         })
     }
 

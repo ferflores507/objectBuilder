@@ -9,6 +9,335 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("propiedadesAsync", async () => {
+
+  const result = await new SchemaTaskResultBuilder()
+    .with({
+      schema: {
+        init: {
+          getNum: {
+            asyncFunction: {
+              delay: 1000,
+              const: 1
+            }
+          }
+        },
+        propiedadesAsync: {
+          total: {
+            call: "$getNum",
+            reduce: {
+              plus: 1
+            }
+          }
+        }
+      }
+    })
+    .buildAsync()
+
+  expect(result).toEqual({ total: 2 })
+})
+
+test("definitions with async call works", async () => {
+
+  const result = await new SchemaTaskResultBuilder()
+    .with({
+      schema: {
+        init: {
+          getNum: {
+            asyncFunction: {
+              delay: 1000,
+              const: 1
+            }
+          }
+        },
+        definitions: [
+          {
+            call: "$getNum",
+            reduce: {
+              plus: 1
+            }
+          }
+        ]
+      }
+    })
+    .buildAsync()
+
+  expect(result).toEqual([2])
+})
+
+test.fails("propiedades fails with async call", async () => {
+
+  const result = await new SchemaTaskResultBuilder()
+    .with({
+      schema: {
+        init: {
+          getNum: {
+            asyncFunction: {
+              delay: 1000,
+              const: 1
+            }
+          }
+        },
+        propiedades: {
+          total: {
+            call: "$getNum",
+            reduce: {
+              plus: 1
+            }
+          }
+        }
+      }
+    })
+    .buildAsync()
+
+  expect(result).toEqual({ total: 2 })
+})
+
+describe("sort", () => {
+  const mapWithId = (array: any[], id = "id") => array.map(item => item === undefined ? {} : ({ [id]: item }))
+  const mapWithName = (array: any[]) => mapWithId(array, "name")
+  const cases = [
+    {
+      name: "sort",
+      sort: true,
+      items: ["b", "c", "a"],
+      expected: ["a", "b", "c"]
+    },
+    {
+      name: "sort",
+      sort: true,
+      items: [1, 2, 10],
+      expected: [1, 10, 2]
+    },
+    {
+      name: "sort desc",
+      sort: "descending",
+      items: [1, 2, 10],
+      expected: [2, 10, 1]
+    },
+    {
+      name: "sort desc with options",
+      sortBy: {
+        descending: true
+      },
+      items: [1, 2, 10],
+      expected: [2, 10, 1]
+    },
+    {
+      name: "sort by name",
+      sortBy: "name",
+      items: mapWithName(["b", undefined, "c", "a"]),
+      expected: mapWithName([undefined, "a", "b", "c"])
+    },
+    {
+      name: "sort by name desc",
+      sortBy: {
+        path: "name",
+        descending: true
+      },
+      items: mapWithName(["b", undefined, "c", "a"]),
+      expected: mapWithName(["c", "b", "a", undefined])
+    },
+    {
+      name: "sort by id numeric",
+      sortBy: {
+        path: "id",
+        type: "numeric"
+      },
+      items: mapWithId([1, 2, undefined, 10]),
+      expected: mapWithId([undefined, 1, 2, 10])
+    },
+    {
+      name: "sort by id numeric desc",
+      sortBy: {
+        path: "id",
+        type: "numeric",
+        descending: true
+      },
+      items: mapWithId([1, 2, undefined, 10]),
+      expected: mapWithId([10, 2, 1, undefined])
+    },
+    {
+      name: "sort by completed ascending (falsy values first)",
+      sortBy: {
+        path: "completed",
+        type: "numeric",
+      },
+      items: mapWithId([true, undefined, true, false], "completed"),
+      expected: mapWithId([undefined, false, true, true], "completed")
+    },
+    {
+      name: "sort by completed descending (truthy values first)",
+      sortBy: {
+        path: "completed",
+        type: "numeric",
+        descending: true
+      },
+      items: mapWithId([true, undefined, true, false], "completed"),
+      expected: mapWithId([true, true, undefined, false], "completed")
+    },
+  ]
+
+  test.each(cases)("expect $name, value: $sort $items to equal $expected", async ({ sort, sortBy, items, expected }) => {
+    await expectToEqualAsync({
+      initial: items,
+      schema: sort 
+        ? { sort } 
+        : { sortBy: { const: sortBy } },
+      expected
+    })
+  })
+
+})
+
+test("override spread operator", async () => {
+  await expectToEqualAsync({
+    operators: {
+      spread: (value, source) => {
+        return [...value, ...source ]
+      }
+    },
+    schema: {
+      const: [
+        1,
+        2
+      ],
+      spreadFlat: {
+        const: [
+          3,
+          [4, 5],
+          6,
+          7
+        ]
+      }
+    },
+    expected: Array.from(Array(7).keys()).map(i => i +1)
+  })
+})
+
+test("keywords", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: " AccéntéD   téxT  WitH    eXtra  spaCes  and  CapiTals ",
+      keywords: true
+    },
+    expected: ["accented", "text", "with", "extra", "spaces", "and", "capitals"]
+  })
+})
+
+test("is keywords of", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: ["uno", "dos"],
+      isKeywordsOf: {
+        const: ["tres", "dos", "uno"]
+      }
+    },
+    expected: true
+  })
+})
+
+test("is subset with", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: ["uno", "dos"],
+      isSubsetOf: {
+        propiedades: {
+          container: {
+            const: ["1 - uno", "2 - dos", "3 - tres"]
+          },
+          match: {
+            function: {
+              path: "arg.containerItem",
+              includes: {
+                path: "arg.item"
+              }
+            }
+          }
+        }
+      }
+    },
+    expected: true
+  })
+})
+
+describe("or", async () => {
+
+  const falsyValues = [undefined, null, NaN, false, 0, ""]
+  Array
+  test.each(falsyValues)("or...", async (value) => {
+    await expectToEqualAsync({
+      store: {
+        value
+      },
+      schema: {
+        path: "value",
+        or: "default"
+      },
+      expected: "default"
+    })
+  })
+})
+
+test("assign", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: { id: 1 },
+      assign: {
+        propiedades: {
+          titulo: "uno"
+        }
+      },
+      reduce: {
+        equals: {
+          const: { 
+            id: 1,
+            titulo: "uno"
+          }
+        }
+      }
+    },
+    expected: true
+  })
+})
+
+describe("with boolean", () => {
+  const cases = [
+    [undefined, false],
+    [null, false],
+    [NaN, false],
+    [false, false],
+    [true, true],
+    [0, false],
+    [1, true],
+    ["", false],
+    [" ", true],
+    ["0", true],
+    ["2", true],
+    [{}, true],
+    [[], true]
+  ] as const
+
+  test.each(cases)("", async (initial, expected) => {
+    await expectToEqualAsync({
+      initial,
+      schema: {
+        boolean: true
+      },
+      expected
+    })
+  })
+})
+
+test("remove accents", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: "Éxàmplê òf áccéntéd téxt",
+      removeAccents: true
+    },
+    expected: "Example of accented text"
+  })
+})
 test("definitions with primitives", async () => {
   await expectToEqualAsync({
     schema: {
@@ -790,24 +1119,66 @@ test("nested stores with call to root store", async () => {
   })
 })
 
-test("with call", async () => {
-  await expectToEqualAsync(
-    {
-      store: {},
-      schema: {
-        set: "getName",
-        function: {
-          path: "current"
-        },
-        reduce: {
-          call: {
-            getName: "Melany"
+describe("with call", () => {
+
+  test("with call", async () => {
+    await expectToEqualAsync(
+      {
+        store: {},
+        schema: {
+          set: "getName",
+          function: {
+            path: "current"
+          },
+          reduce: {
+            call: {
+              getName: "Melany"
+            }
           }
-        }
-      },
-      expected: "Melany"
-    }
-  )
+        },
+        expected: "Melany"
+      }
+    )
+  })
+
+  test("with call arg path", async () => {
+    await expectToEqualAsync(
+      {
+        store: {
+          name: "Melany"
+        },
+        schema: {
+          set: "getName",
+          function: {
+            path: "current"
+          },
+          reduce: {
+            call: ["getName", "name"]
+          }
+        },
+        expected: "Melany"
+      }
+    )
+  })
+
+  test("with call current as arg path", async () => {
+    await expectToEqualAsync(
+      {
+        schema: {
+          set: "getName",
+          function: {
+            path: "current"
+          },
+          reduce: {
+            const: "Melany",
+            call: ["getName", "current"]
+          }
+        },
+        expected: "Melany"
+      }
+    )
+  })
+
 })
 
 test("schema with multiple stores", async () => {
@@ -892,39 +1263,64 @@ describe("schema import", () => {
   })
 })
 
-test("init then equals with current properties", async () => {
+test("all equal false (not all equal)", async () => {
   await expectToEqualAsync({
-    schema: {
-      init: {
-        temp: {
-          path: "current"
-        }
-      },
-      path: "current.uno",
-      equals: {
-        path: "$temp.one"
-      }
-    },
     initial: {
       uno: 1,
-      one: 1
+      one: 1,
+      dos: 2
+    },
+    schema: {
+      allEqual: false
     },
     expected: true
   })
 })
 
-test("equals: reduce to use current as target", async () => {
+test("all equal true", async () => {
   await expectToEqualAsync({
+    initial: {
+      uno: 1,
+      one: 1,
+      dos: 2
+    },
     schema: {
-      const: {
-        uno: 1,
-        one: 1
-      },
-      reduce: {
-        path: "current.uno",
-        equals: {
-          path: "target.one"
-        }
+      unpack: ["uno", "one"],
+      allEqual: true
+    },
+    expected: true
+  })
+})
+
+test("all equal to primitive", async () => {
+  await expectToEqualAsync({
+    initial: {
+      one: 1,
+      seven: 7,
+      siete: 7,
+    },
+    schema: {
+      unpack: ["seven", "siete"],
+      allEqualTo: 7
+    },
+    expected: true
+  })
+})
+
+test("all equal to schema", async () => {
+  await expectToEqualAsync({
+    store: {
+      value: 7
+    },
+    initial: {
+      one: 1,
+      seven: 7,
+      siete: 7,
+    },
+    schema: {
+      unpack: ["seven", "siete"],
+      allEqualTo: {
+        path: "value"
       }
     },
     expected: true
@@ -1364,12 +1760,16 @@ test("spread item to array", async () => {
 })
 
 test("UUID", async () => {
-  const store = {}
   const schema: Schema = {
     UUID: true
   }
 
-  await expect(buildResultsAsync({ store, schema })).resolves.not.toThrow()
+  await expect(buildResultsAsync({ schema })).resolves.not.toThrow()
+  
+  const results = await buildResultsAsync({ schema })
+  
+  expect(results).not.contain(undefined)
+  expect(results).not.contain(null)
 })
 
 describe("increment or decrement", () => {

@@ -1,10 +1,10 @@
 import type { Schema } from "../models"
 import { ArrayBuilderBase } from "./ArrayBuilderBase"
-import { Builder } from "./SchemaTaskResultBuilder"
+import { SchemaTaskResultBuilder } from "./SchemaTaskResultBuilder"
 
 export class ArrayFilterBuilder extends ArrayBuilderBase {
 
-    constructor(items: any[], builder: Builder) {
+    constructor(items: any[], builder: SchemaTaskResultBuilder) {
         super(items, builder)
         this.min = this.items.length
     }
@@ -31,14 +31,14 @@ export class ArrayFilterBuilder extends ArrayBuilderBase {
         const matches: any[] = []
         const { max, min } = this
 
+        const matchFn = this.builder
+            .with({})
+            .withFunction({ function: this.schema })
+            .build()
+
         for(const item of this.items) {
 
-            const isMatch = this.builder
-                .with({
-                    initial: item,
-                    schema: this.schema
-                })
-                .build()
+            const isMatch = matchFn(item)
 
             if(isMatch) {
                 matches.push(item)
