@@ -45,6 +45,7 @@ export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive>
 export type Schema = Partial<{
     allEqual: boolean
     allEqualTo: SchemaDefinition | SchemaPrimitive
+    and: SchemaDefinition | SchemaPrimitive
     assign: Schema
     plus: SchemaDefinition | number
     minus: SchemaDefinition | number

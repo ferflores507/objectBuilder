@@ -9,6 +9,24 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("and", async () => {
+
+  const truthyValues = [true, {}, [], 1, "0", "false"]
+  
+  test.each(truthyValues)("and...", async (value) => {
+    await expectToEqualAsync({
+      store: {
+        value
+      },
+      schema: {
+        path: "value",
+        and: "default"
+      },
+      expected: "default"
+    })
+  })
+})
+
 describe("sort by", () => {
   test("sort by completed (boolean) then by completed (numeric) descending", async () => {
     const items = Array.from(Array(6).keys()).map(i => i + 1)

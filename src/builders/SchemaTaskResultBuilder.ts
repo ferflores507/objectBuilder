@@ -79,6 +79,7 @@ export class Operators {
     trim = (value: string) => value.trim()
     removeAccents = varios.removeAccents
     stringify = JSON.stringify
+    and = (a: any, b: any) => a && b
     or = (a: any, b: any) => a || b
     sort = (array: any[], option: true | "descending" = true) => {
         return this.sortBy(array, { descending: option === "descending" })
