@@ -52,7 +52,10 @@ export class Operators {
     with = (array: any[], { index = 0, value } : { index?: number, value: any }) => {        
         return array.with(index, value)
     }
-    withPatch = (array: any[], { key = "id", value } : { key?: string, value: any }) => {
+    patch = (array: any[], value: any) => {        
+        return this.patchWith(array, { key: "id", value })
+    }
+    patchWith = (array: any[], { key = "id", value } : { key?: string, value: any }) => {
         const index = array.findIndex(item => item[key] === value[key])
         
         return array.with(index, { ...array[index], ...value })
@@ -79,14 +82,23 @@ export class Operators {
     trim = (value: string) => value.trim()
     removeAccents = varios.removeAccents
     stringify = JSON.stringify
-    or = (a: any, b: any) => a || b
     sort = (array: any[], option: true | "descending" = true) => {
         return this.sortBy(array, { descending: option === "descending" })
     }
-    sortBy = (array: any[], options: SortOptions) => {
-        const concreteOptions = formatSortOptions(options)
+    sortBy = (array: any[], options: SortOptions | SortOptions[]) => {
+        const concreteOptions = varios.toArray(options).map(formatSortOptions)
         
-        return array.toSorted((a, b) => sortCompare(a, b, concreteOptions))
+        return array.toSorted((a, b) => {
+            let result = 0
+
+            for(const option of concreteOptions) {
+                result = sortCompare(a, b, option)
+
+                if(result !== 0) break
+            }
+
+            return result
+        })
     }
     values = (obj: any[]) => {
         try {
@@ -277,6 +289,8 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withBinary(schema)
                 .withConditional(schema)
                 .withEndSchema(schema)
+                .withLogical(schema)
+                .withLogical(schema, false)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
             : this
@@ -334,6 +348,17 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
+    withLogical(schema: Schema, condition = true) {
+        const operator = condition ? "and" : "or"
+        return operator in schema
+            ? this.withUnshift((current, previous) => {
+                return !!current === condition
+                    ? this.with({ initial: previous }).withSchemaOrDefault(schema[operator])
+                    : current
+            })
+            : this
+    }
+    
     withBindArg(schema: SchemaDefinition | undefined) {
         return schema
             ? this.add(func => (initial: any) => {
@@ -568,14 +593,16 @@ export class SchemaTaskResultBuilder implements Builder {
         const entries = this.filterTasks(comparisonTasks, schema)
 
         return entries.length
-            ? this.withUnshiftArray(initial => {
-                return entries.map(({ definition, task }) => this.with({
-                    initial,
+            ? this
+                .addMerge()
+                .withUnshiftArray(initial => {
+                    return entries.map(({ definition, task }) => this
+                        .with({ initial })
+                        .withSchemaOrDefault(definition)
+                        .add((current, prev) => task(prev, current))
+                    )
                 })
-                    .withSchemaOrDefault(definition)
-                    .add((current, prev) => task(prev, current))
-                )
-            }).add((results: []) => results.every(Boolean))
+                .add((results: []) => results.every(Boolean))
             : this
     }
 

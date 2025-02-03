@@ -45,6 +45,7 @@ export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive>
 export type Schema = Partial<{
     allEqual: boolean
     allEqualTo: SchemaDefinition | SchemaPrimitive
+    and: SchemaDefinition | SchemaPrimitive
     assign: Schema
     plus: SchemaDefinition | number
     minus: SchemaDefinition | number
@@ -83,6 +84,8 @@ export type Schema = Partial<{
     or: SchemaDefinition | SchemaPrimitive
     path: string
     parse: true
+    patch: Schema
+    patchWith: Schema
     propiedadesAsync: Propiedades
     propiedades: Propiedades
     reduce: SchemaDefinition
@@ -96,7 +99,7 @@ export type Schema = Partial<{
     sibling: string
     some: any
     sort: Schema | SchemaPrimitive
-    sortBy: Schema
+    sortBy: SchemaDefinition
     source: string
     status: string
     store: Schema
@@ -111,5 +114,4 @@ export type Schema = Partial<{
     use: string
     UUID: true
     with: Schema
-    withPatch: Schema
 }> & ArraySchema

@@ -9,6 +9,196 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("and", async () => {
+
+  test("after comparison", async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: 7,
+        greaterThan: 5,
+        lessThan: 10,
+        and: "ok"
+      },
+      expected: "ok"
+    })
+  })
+
+  describe("with truthy values", () => {
+    const truthyValues = [true, {}, [], 1, "0", "false"]
+  
+    test.each(truthyValues)("and...", async (value) => {
+      await expectToEqualAsync({
+        store: {
+          value
+        },
+        schema: {
+          path: "value",
+          and: "default"
+        },
+        expected: "default"
+      })
+    })
+
+  })
+
+  describe("with falsy values", () => {
+    const truthyValues = [undefined, null, NaN, false, 0, ""]
+  
+    test.each(truthyValues)("and...", async (value) => {
+      await expectToEqualAsync({
+        store: {
+          value
+        },
+        schema: {
+          path: "value",
+          and: "default"
+        },
+        expected: value
+      })
+    })
+
+  })
+
+})
+
+describe("sort by", () => {
+  test("sort by completed (boolean) then by completed (numeric) descending", async () => {
+    const items = Array.from(Array(6).keys()).map(i => i + 1)
+    const zeros = [0, 0, 0]
+    
+    await expectToEqualAsync({
+      initial: items.toSpliced(3, 0, ...zeros).map(completed => ({ completed })),
+      schema: {
+        sortBy: [
+          {
+            propiedades: {
+              path: "completed",
+              type: "boolean"
+            }
+          },
+          {
+            propiedades: {
+              path: "completed",
+              type: "numeric",
+              descending: true
+            }
+          }
+        ]
+      },
+      expected: [...zeros, ...items.reverse()].map(completed => ({ completed }))
+    })
+  })
+
+  describe("sort by multiple options", () => {
+    const cases = [
+      {
+        name: "sort by id then by name",
+        items: [
+          [3, "b"],
+          [3, "a"],
+          [2, "b"],
+          [2, "a"],
+          [1, "b"],
+          [1, "a"]
+        ],
+      },
+      {
+        name: "sort by id then by name descending",
+        items: [
+          [3, "a"],
+          [3, "b"],
+          [2, "a"],
+          [2, "b"],
+          [1, "a"],
+          [1, "b"],
+        ],
+        descending: ["name"],
+      },
+      {
+        name: "sort by id descending then by name",
+        items: [
+          [1, "b"],
+          [1, "a"],
+          [2, "b"],
+          [2, "a"],
+          [3, "b"],
+          [3, "a"],
+        ],
+        descending: ["id"]
+      },
+      {
+        name: "sort by id descending then by name descending",
+        items: [
+          [1, "a"],
+          [1, "b"],
+          [2, "a"],
+          [2, "b"],
+          [3, "a"],
+          [3, "b"],
+        ],
+        descending: ["id", "name"]
+      }
+    ]
+    
+    test.each(cases)("$name", async ({ items, descending }) => {
+      const initial = items.map(([id, name]) => ({ id, name }))
+      await expectToEqualAsync({
+        initial,
+        schema: {
+          sortBy: [
+            {
+              const: {
+                path: "id",
+                type: "numeric",
+                descending: descending?.includes("id")
+              }
+            },
+            {
+              const: {
+                path: "name",
+                descending: descending?.includes("name")
+              }
+            }
+          ]
+        },
+        expected: initial.toReversed()
+      })
+    })
+  })
+
+  test("sort by name then by id", async () => {
+    const items = [
+      [3, "b"],
+      [2, "b"],
+      [1, "b"],
+      [3, "a"],
+      [2, "a"],
+      [1, "a"],
+    ].map(([id, name]) => ({ id, name }))
+  
+    await expectToEqualAsync({
+      schema: {
+        const: items,
+        sortBy: [
+          {
+            propiedades: {
+              path: "name",
+            }
+          },
+          {
+            propiedades: {
+              path: "id",
+              type: "numeric",
+            }
+          }
+        ]
+      },
+      expected: items.toReversed()
+    })
+  
+  })
+})
+
 test("propiedadesAsync", async () => {
 
   const result = await new SchemaTaskResultBuilder()
@@ -386,7 +576,42 @@ describe("array with", () => {
     {
       initial: [1, 2, 3].map(id => ({ id, a: id, b: id })),
       schema: {
-        withPatch: {
+        patch: {
+          const: { id: 2, b: "Dos" }
+        },
+      },
+      expected: [1, 2, 3].map(id => {
+        return {
+          id,
+          a: id,
+          b: id === 2 ? "Dos" : id
+        }
+      })
+    },
+    {
+      initial: [1, 2, 3].map(id => ({ testId: id, a: id, b: id })),
+      schema: {
+        patchWith: {
+          propiedades: {
+            key: "testId",
+            value: {
+              const: { testId: 2, b: "Dos" }
+            }
+          },
+        },
+      },
+      expected: [1, 2, 3].map(id => {
+        return {
+          testId: id,
+          a: id,
+          b: id === 2 ? "Dos" : id
+        }
+      })
+    },
+    {
+      initial: [1, 2, 3].map(id => ({ id, a: id, b: id })),
+      schema: {
+        patchWith: {
           propiedades: {
             value: {
               const: { id: 2, b: "Dos" }

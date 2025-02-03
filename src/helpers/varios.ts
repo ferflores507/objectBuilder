@@ -10,9 +10,10 @@ export type SortOptions = string | {
     type?: "numeric" | "string"
 }
 
-const compareOptions = {
-    numeric: (a: any, b: any) => Number(a ?? 0) - Number(b ?? 0),
-    string: (a: any, b: any) => (a ? String(a) : "").localeCompare(b || "")
+const compareOptions: Record<string, (a: any, b: any) => number> = {
+    boolean: (a, b) => Number(!!a) - Number(!!b),
+    numeric: (a, b) => Number(a ?? 0) - Number(b ?? 0),
+    string: (a, b) => (a ? String(a) : "").localeCompare(b || "")
 }
 
 export const formatSortOptions = (options: SortOptions) : ConcreteSortOptions => {
@@ -249,7 +250,7 @@ export const tryCopy = (obj: {}) => {
     return obj
 }
 
-const toArray = (value: any) => Array.isArray(value) ? value : [value]
+export const toArray = <T>(value: T) => Array.isArray(value) ? value : [value]
 
 export const toArrayOrNull = (value: any) => value != null ? toArray(value) : null
 
