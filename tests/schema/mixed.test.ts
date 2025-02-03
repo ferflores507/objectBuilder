@@ -576,7 +576,7 @@ describe("array with", () => {
     {
       initial: [1, 2, 3].map(id => ({ id, a: id, b: id })),
       schema: {
-        withPatch: {
+        patchWith: {
           propiedades: {
             value: {
               const: { id: 2, b: "Dos" }

@@ -52,7 +52,7 @@ export class Operators {
     with = (array: any[], { index = 0, value } : { index?: number, value: any }) => {        
         return array.with(index, value)
     }
-    withPatch = (array: any[], { key = "id", value } : { key?: string, value: any }) => {
+    patchWith = (array: any[], { key = "id", value } : { key?: string, value: any }) => {
         const index = array.findIndex(item => item[key] === value[key])
         
         return array.with(index, { ...array[index], ...value })

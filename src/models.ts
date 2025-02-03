@@ -84,6 +84,7 @@ export type Schema = Partial<{
     or: SchemaDefinition | SchemaPrimitive
     path: string
     parse: true
+    patchWith: Schema
     propiedadesAsync: Propiedades
     propiedades: Propiedades
     reduce: SchemaDefinition
@@ -112,5 +113,4 @@ export type Schema = Partial<{
     use: string
     UUID: true
     with: Schema
-    withPatch: Schema
 }> & ArraySchema
