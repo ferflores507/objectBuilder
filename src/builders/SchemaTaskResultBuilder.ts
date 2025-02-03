@@ -286,8 +286,8 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withBinary(schema)
                 .withConditional(schema)
                 .withEndSchema(schema)
-                .withAnd(schema)
-                .withOr(schema)
+                .withLogical(schema)
+                .withLogical(schema, false)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
             : this
@@ -345,18 +345,13 @@ export class SchemaTaskResultBuilder implements Builder {
         return this
     }
 
-    withAnd(schema: Schema) {
-        return "and" in schema
+    withLogical(schema: Schema, condition = true) {
+        const operator = condition ? "and" : "or"
+        return operator in schema
             ? this.withUnshift((current, previous) => {
-                return current && this.with({ initial: previous }).withSchemaOrDefault(schema.and)
-            })
-            : this
-    }
-
-    withOr(schema: Schema) {
-        return "or" in schema
-            ? this.withUnshift((current, previous) => {
-                return current || this.with({ initial: previous }).withSchemaOrDefault(schema.or)
+                return !!current === condition
+                    ? this.with({ initial: previous }).withSchemaOrDefault(schema[operator])
+                    : current
             })
             : this
     }
