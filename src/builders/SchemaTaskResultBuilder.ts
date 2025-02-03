@@ -79,7 +79,6 @@ export class Operators {
     trim = (value: string) => value.trim()
     removeAccents = varios.removeAccents
     stringify = JSON.stringify
-    or = (a: any, b: any) => a || b
     sort = (array: any[], option: true | "descending" = true) => {
         return this.sortBy(array, { descending: option === "descending" })
     }
@@ -288,6 +287,7 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withConditional(schema)
                 .withEndSchema(schema)
                 .withAnd(schema)
+                .withOr(schema)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
             : this
@@ -353,6 +353,14 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
+    withOr(schema: Schema) {
+        return "or" in schema
+            ? this.withUnshift((current, previous) => {
+                return current || this.with({ initial: previous }).withSchemaOrDefault(schema.or)
+            })
+            : this
+    }
+    
     withBindArg(schema: SchemaDefinition | undefined) {
         return schema
             ? this.add(func => (initial: any) => {
