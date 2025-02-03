@@ -84,6 +84,7 @@ export type Schema = Partial<{
     or: SchemaDefinition | SchemaPrimitive
     path: string
     parse: true
+    patch: Schema
     patchWith: Schema
     propiedadesAsync: Propiedades
     propiedades: Propiedades

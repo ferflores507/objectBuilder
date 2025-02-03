@@ -576,6 +576,21 @@ describe("array with", () => {
     {
       initial: [1, 2, 3].map(id => ({ id, a: id, b: id })),
       schema: {
+        patch: {
+          const: { id: 2, b: "Dos" }
+        },
+      },
+      expected: [1, 2, 3].map(id => {
+        return {
+          id,
+          a: id,
+          b: id === 2 ? "Dos" : id
+        }
+      })
+    },
+    {
+      initial: [1, 2, 3].map(id => ({ id, a: id, b: id })),
+      schema: {
         patchWith: {
           propiedades: {
             value: {
