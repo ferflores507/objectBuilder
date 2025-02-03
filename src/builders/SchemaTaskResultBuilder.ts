@@ -79,7 +79,6 @@ export class Operators {
     trim = (value: string) => value.trim()
     removeAccents = varios.removeAccents
     stringify = JSON.stringify
-    and = (a: any, b: any) => a && b
     or = (a: any, b: any) => a || b
     sort = (array: any[], option: true | "descending" = true) => {
         return this.sortBy(array, { descending: option === "descending" })
@@ -288,6 +287,7 @@ export class SchemaTaskResultBuilder implements Builder {
                 .withBinary(schema)
                 .withConditional(schema)
                 .withEndSchema(schema)
+                .withAnd(schema)
                 .withReduceOrDefault(reduceOrDefault)
                 .withReduce(reduce)
             : this
@@ -343,6 +343,14 @@ export class SchemaTaskResultBuilder implements Builder {
             })
 
         return this
+    }
+
+    withAnd(schema: Schema) {
+        return "and" in schema
+            ? this.withUnshift((current, previous) => {
+                return current && this.with({ initial: previous }).withSchemaOrDefault(schema.and)
+            })
+            : this
     }
 
     withBindArg(schema: SchemaDefinition | undefined) {
@@ -579,14 +587,16 @@ export class SchemaTaskResultBuilder implements Builder {
         const entries = this.filterTasks(comparisonTasks, schema)
 
         return entries.length
-            ? this.withUnshiftArray(initial => {
-                return entries.map(({ definition, task }) => this.with({
-                    initial,
+            ? this
+                .addMerge()
+                .withUnshiftArray(initial => {
+                    return entries.map(({ definition, task }) => this
+                        .with({ initial })
+                        .withSchemaOrDefault(definition)
+                        .add((current, prev) => task(prev, current))
+                    )
                 })
-                    .withSchemaOrDefault(definition)
-                    .add((current, prev) => task(prev, current))
-                )
-            }).add((results: []) => results.every(Boolean))
+                .add((results: []) => results.every(Boolean))
             : this
     }
 

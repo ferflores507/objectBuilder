@@ -11,20 +11,54 @@ import { Propiedades } from '../../src/models'
 
 describe("and", async () => {
 
-  const truthyValues = [true, {}, [], 1, "0", "false"]
-  
-  test.each(truthyValues)("and...", async (value) => {
+  test("after comparison", async () => {
     await expectToEqualAsync({
-      store: {
-        value
-      },
       schema: {
-        path: "value",
-        and: "default"
+        const: 7,
+        greaterThan: 5,
+        lessThan: 10,
+        and: "ok"
       },
-      expected: "default"
+      expected: "ok"
     })
   })
+
+  describe("with truthy values", () => {
+    const truthyValues = [true, {}, [], 1, "0", "false"]
+  
+    test.each(truthyValues)("and...", async (value) => {
+      await expectToEqualAsync({
+        store: {
+          value
+        },
+        schema: {
+          path: "value",
+          and: "default"
+        },
+        expected: "default"
+      })
+    })
+
+  })
+
+  describe("with falsy values", () => {
+    const truthyValues = [undefined, null, NaN, false, 0, ""]
+  
+    test.each(truthyValues)("and...", async (value) => {
+      await expectToEqualAsync({
+        store: {
+          value
+        },
+        schema: {
+          path: "value",
+          and: "default"
+        },
+        expected: value
+      })
+    })
+
+  })
+
 })
 
 describe("sort by", () => {
