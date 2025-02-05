@@ -9,54 +9,31 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
-describe("and", async () => {
-
-  test("after comparison", async () => {
-    await expectToEqualAsync({
-      schema: {
-        const: 7,
-        greaterThan: 5,
-        lessThan: 10,
-        and: "ok"
-      },
-      expected: "ok"
-    })
+test("with logical and after comparison", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: 7,
+      greaterThan: 5,
+      lessThan: 10,
+      and: "ok"
+    },
+    expected: "ok"
   })
+})
 
-  describe("with truthy values", () => {
-    const truthyValues = [true, {}, [], 1, "0", "false"]
-  
-    test.each(truthyValues)("and...", async (value) => {
+describe("logical", () => {
+  const initialValues = [true, {}, [], 1, "0", "false", undefined, null, NaN, false, 0, ""]
+
+  describe.each(["and", "or"])("with logical (%s)", andOr => {
+    const values = initialValues.map(v => [v, andOr === "and" ? v && "ok" : v || "ok"])
+    
+    test.each(values)(`expect %s ${andOr} 'ok' to equal '%s'`, async (initial, expected) => {
       await expectToEqualAsync({
-        store: {
-          value
-        },
-        schema: {
-          path: "value",
-          and: "default"
-        },
-        expected: "default"
+        initial,
+        schema: { [andOr]: "ok" },
+        expected
       })
     })
-
-  })
-
-  describe("with falsy values", () => {
-    const truthyValues = [undefined, null, NaN, false, 0, ""]
-  
-    test.each(truthyValues)("and...", async (value) => {
-      await expectToEqualAsync({
-        store: {
-          value
-        },
-        schema: {
-          path: "value",
-          and: "default"
-        },
-        expected: value
-      })
-    })
-
   })
 
 })
@@ -207,7 +184,7 @@ test("propiedadesAsync", async () => {
         init: {
           getNum: {
             asyncFunction: {
-              delay: 1000,
+              delay: 50,
               const: 1
             }
           }
@@ -235,7 +212,7 @@ test("definitions with async call works", async () => {
         init: {
           getNum: {
             asyncFunction: {
-              delay: 1000,
+              delay: 50,
               const: 1
             }
           }
@@ -263,7 +240,7 @@ test.fails("propiedades fails with async call", async () => {
         init: {
           getNum: {
             asyncFunction: {
-              delay: 1000,
+              delay: 50,
               const: 1
             }
           }
@@ -451,24 +428,6 @@ test("is subset with", async () => {
   })
 })
 
-describe("or", async () => {
-
-  const falsyValues = [undefined, null, NaN, false, 0, ""]
-  Array
-  test.each(falsyValues)("or...", async (value) => {
-    await expectToEqualAsync({
-      store: {
-        value
-      },
-      schema: {
-        path: "value",
-        or: "default"
-      },
-      expected: "default"
-    })
-  })
-})
-
 test("assign", async () => {
   await expectToEqualAsync({
     schema: {
@@ -493,22 +452,23 @@ test("assign", async () => {
 
 describe("with boolean", () => {
   const cases = [
-    [undefined, false],
-    [null, false],
-    [NaN, false],
-    [false, false],
-    [true, true],
-    [0, false],
-    [1, true],
-    ["", false],
-    [" ", true],
-    ["0", true],
-    ["2", true],
-    [{}, true],
-    [[], true]
-  ] as const
+    undefined,
+    null,
+    NaN,
+    false,
+    true,
+    0,
+    1,
+    "",
+    " ",
+    "0",
+    "2",
+    {},
+    []
+  ]
+  .map(value => [value, !!value])
 
-  test.each(cases)("", async (initial, expected) => {
+  test.each(cases)("expect boolean %o to equal %s", async (initial, expected) => {
     await expectToEqualAsync({
       initial,
       schema: {
@@ -1817,7 +1777,7 @@ describe("includes", () => {
 
   const keywords = ["h", "o", "l", "a", "ho", "ol", "la", "hol", "ola", "hola"]
 
-  test.each(keywords)("includes", async (keyword) => {
+  test.each(keywords)("hola includes %s", async (keyword) => {
     await expectToEqualAsync({
       schema: {
         const: "hola",
