@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { entry } from '../../src/helpers/varios'
@@ -8,6 +8,44 @@ import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
+
+describe("debounce", function () {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  const cases = [true, 300, 1000] as const
+  
+  test.each(cases)("expects function with debounce: %s to be called one time", (debounce) => {
+    const builder = new SchemaTaskResultBuilder()
+      .with({
+        store: {
+          total: 0
+        },
+        schema: {
+          function: {
+            increment: "total"
+          },
+          debounce
+        }
+      })
+
+    const incrementTotal = builder.build()
+  
+    incrementTotal()
+    incrementTotal()
+    incrementTotal()
+
+    const ms = debounce === true ? 500 : debounce
+
+    vi.advanceTimersByTime(ms - 1)
+    
+    expect(builder.options.store.total).toBe(0)
+
+    vi.advanceTimersByTime(2)
+
+    expect(builder.options.store.total).toBe(1)
+  })
+})
 
 test("with logical and after comparison", async () => {
   await expectToEqualAsync({
