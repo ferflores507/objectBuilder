@@ -1,7 +1,32 @@
-import { describe, expect, test } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 import { Schema } from "../.."
 import { buildResultsAsync, Case, expectToEqualAsync } from "./buildResultsASync"
-import { spread, entry } from "../../src/helpers/varios"
+import { spread, entry, createDebounce } from "../../src/helpers/varios"
+
+test("expect create debounce function only gets called one time", () => {
+  vi.useFakeTimers()
+  
+  let total = 0
+  
+  const setTotal = (a: number, b: number) => total += (a + b)
+  const debounceSetTotal = createDebounce(setTotal, 500)
+  const otherFastDebounce = createDebounce(() => true, 50)
+
+  debounceSetTotal(1, 2)
+  debounceSetTotal(2, 3)
+  debounceSetTotal(3, 4)
+  debounceSetTotal(1, 2) // expect this to update total
+
+  otherFastDebounce() // just to check that timeoutId is not shared
+
+  vi.advanceTimersByTime(400)
+
+  expect(total).toBe(0) // expect total to equal the same (before 500 ms)
+
+  vi.advanceTimersByTime(200)
+
+  expect(total).toBe(3) // expect total to be 3 (after 600 ms)
+})
 
 test("get value from paths (with container)", () => {
   const paths = ["user", "account", "details"]

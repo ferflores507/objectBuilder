@@ -1,6 +1,6 @@
 {
   "name": "@ferflores507/object-builder",
-  "version": "7.1.1",
+  "version": "7.2.0",
   "main": "index.js",
   "scripts": {
     "test": "vitest"
@@ -10,6 +10,6 @@
   "description": "",
   "devDependencies": {
     "@types/node": "^20.14.11",
-    "vitest": "^2.0.4"
+    "vitest": "^3.0.6"
   }
 }
