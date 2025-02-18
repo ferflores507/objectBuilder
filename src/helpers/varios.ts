@@ -1,3 +1,13 @@
+export const createDebounce = (callback: (...args: any[]) => any, ms: number) => {
+    let timeoutId: NodeJS.Timeout
+
+    return (...args: any[]) => {
+        clearTimeout(timeoutId)
+        
+        timeoutId = setTimeout(() => callback(...args), ms)
+    }
+}
+
 type ConcreteSortOptions = {
     path: string | undefined
     descending: boolean | undefined
