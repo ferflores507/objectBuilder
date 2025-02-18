@@ -57,6 +57,7 @@ export type Schema = Partial<{
     consulta: Consulta
     call: string | Propiedades | string[]
     const: any
+    debounce: Schema | SchemaPrimitive
     decrement: string
     default: SchemaDefinition | SchemaPrimitive
     definitions: (Schema | SchemaPrimitive)[]

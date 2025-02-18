@@ -45,6 +45,9 @@ export class Operators {
     }
     assign = Object.assign
     boolean = (value: any) => !!value
+    debounce = (fn: (...args: []) => any, ms: number | true) => {
+        return varios.createDebounce(fn, ms === true ? 500 : ms)
+    }
     entries = varios.entries
     spreadStart = (target: any[], value: any) => {        
         return Array.isArray(value) ? [...value, ...target] : [value, ...target]
