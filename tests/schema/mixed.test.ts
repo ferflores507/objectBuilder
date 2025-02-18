@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest'
 import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { entry } from '../../src/helpers/varios'
@@ -12,6 +12,26 @@ import { Propiedades } from '../../src/models'
 describe("debounce", function () {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
+
+  it("expects function call to set arg as 'store.nombre' value", () => {
+    const builder = new SchemaTaskResultBuilder()
+      .with({
+        schema: {
+          function: {
+            set: "nombre"
+          },
+          debounce: true
+        }
+      })
+
+    const debounceSet = builder.build()
+
+    debounceSet("Melany")
+    
+    vi.runAllTimers()
+
+    expect(builder.options.store.nombre).toBe("Melany")
+  })
 
   const cases = [true, 300, 1000] as const
   
