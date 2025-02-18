@@ -10,6 +10,6 @@
   "description": "",
   "devDependencies": {
     "@types/node": "^20.14.11",
-    "vitest": "^2.0.4"
+    "vitest": "^3.0.6"
   }
 }
