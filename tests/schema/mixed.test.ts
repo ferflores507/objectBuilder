@@ -589,7 +589,24 @@ test("array spread start", async () => {
   })
 })
 
-describe("array with", () => {
+describe("array patch and patchWith", () => {
+
+  test("expect patch to throw when original item is not found", () => {
+    const builder = new SchemaTaskResultBuilder()
+      .with({
+        schema: {
+          const: [...Array(5)].map((_, ix) => ({ id: ix + 1 })),
+          patch: {
+            const: {
+              id: 6
+            }
+          }
+        }
+      })
+
+    expect(() => builder.build()).toThrow()
+  })
+
   const cases: Case[] = [
     {
       initial: [1, 2, 3].map(id => ({ id, a: id, b: id })),

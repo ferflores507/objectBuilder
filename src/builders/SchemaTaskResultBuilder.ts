@@ -60,6 +60,14 @@ export class Operators {
     }
     patchWith = (array: any[], { key = "id", value } : { key?: string, value: any }) => {
         const index = array.findIndex(item => item[key] === value[key])
+
+        if(index === -1) {
+            throw {
+                msg: `Unable to patch. Item with ${key}: ${value[key]} was not found.`,
+                array,
+                value
+            }
+        }
         
         return array.with(index, { ...array[index], ...value })
     }
