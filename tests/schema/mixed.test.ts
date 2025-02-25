@@ -591,6 +591,8 @@ test("array spread start", async () => {
 
 describe("array patch and patchWith", () => {
 
+  const numbers = ["zero", "one", "two", "three"]
+
   test("expect patch to throw when original item is not found", () => {
     const builder = new SchemaTaskResultBuilder()
       .with({
@@ -684,6 +686,43 @@ describe("array patch and patchWith", () => {
         },
       },
       expected: [4, 6, 7]
+    },
+    {
+      initial: numbers.map((en, id) => ({ id, en })),
+      schema: {
+        patch: {
+          const: [
+            {
+              id: 1,
+              es: "uno"
+            },
+            {
+              id: 2,
+              es: "dos"
+            }
+          ]
+        }
+      },
+      expected: [
+        {
+          id: 0,
+          en: "zero"
+        },
+        {
+          id: 1,
+          en: "one",
+          es: "uno"
+        },
+        {
+          id: 2,
+          en: "two",
+          es: "dos"
+        },
+        {
+          id: 3,
+          en: "three"
+        }
+      ]
     }
   ]
 
