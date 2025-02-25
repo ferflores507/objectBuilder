@@ -589,7 +589,50 @@ test("array spread start", async () => {
   })
 })
 
-describe("array with", () => {
+describe("array patch and patchWith", () => {
+
+  const numbers = ["zero", "one", "two", "three"]
+
+  const casesThrow = [
+    {
+      const: {
+        id: 6
+      }
+    },
+    {
+      const: [
+        {
+          id: 6
+        },
+        {
+          id: 7
+        }
+      ]
+    },
+    {
+      const: [
+        {
+          id: 3
+        },
+        {
+          id: 6
+        },
+      ]
+    }
+  ]
+
+  test.each(casesThrow)("expect patch to throw when original item is not found", (patch) => {
+    const builder = new SchemaTaskResultBuilder()
+      .with({
+        schema: {
+          const: [...Array(5)].map((_, ix) => ({ id: ix + 1 })),
+          patch
+        }
+      })
+
+    expect(() => builder.build()).toThrow()
+  })
+
   const cases: Case[] = [
     {
       initial: [1, 2, 3].map(id => ({ id, a: id, b: id })),
@@ -667,6 +710,43 @@ describe("array with", () => {
         },
       },
       expected: [4, 6, 7]
+    },
+    {
+      initial: numbers.map((en, id) => ({ id, en })),
+      schema: {
+        patch: {
+          const: [
+            {
+              id: 1,
+              es: "uno"
+            },
+            {
+              id: 2,
+              es: "dos"
+            }
+          ]
+        }
+      },
+      expected: [
+        {
+          id: 0,
+          en: "zero"
+        },
+        {
+          id: 1,
+          en: "one",
+          es: "uno"
+        },
+        {
+          id: 2,
+          en: "two",
+          es: "dos"
+        },
+        {
+          id: 3,
+          en: "three"
+        }
+      ]
     }
   ]
 
