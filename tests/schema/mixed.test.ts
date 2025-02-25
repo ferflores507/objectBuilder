@@ -593,16 +593,40 @@ describe("array patch and patchWith", () => {
 
   const numbers = ["zero", "one", "two", "three"]
 
-  test("expect patch to throw when original item is not found", () => {
+  const casesThrow = [
+    {
+      const: {
+        id: 6
+      }
+    },
+    {
+      const: [
+        {
+          id: 6
+        },
+        {
+          id: 7
+        }
+      ]
+    },
+    {
+      const: [
+        {
+          id: 3
+        },
+        {
+          id: 6
+        },
+      ]
+    }
+  ]
+
+  test.each(casesThrow)("expect patch to throw when original item is not found", (patch) => {
     const builder = new SchemaTaskResultBuilder()
       .with({
         schema: {
           const: [...Array(5)].map((_, ix) => ({ id: ix + 1 })),
-          patch: {
-            const: {
-              id: 6
-            }
-          }
+          patch
         }
       })
 
