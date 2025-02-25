@@ -59,17 +59,32 @@ export class Operators {
         return this.patchWith(array, { key: "id", value })
     }
     patchWith = (array: any[], { key = "id", value } : { key?: string, value: any }) => {
-        const index = array.findIndex(item => item[key] === value[key])
+        const concreteValue = Array.isArray(value) ? value : [value]
+        const matchesToFind = [...concreteValue]
+        const resultArray = [...array]
 
-        if(index === -1) {
-            throw {
-                msg: `Unable to patch. Item with ${key}: ${value[key]} was not found.`,
-                array,
-                value
+        for(let i = 0; i <= array.length; i++) {
+            const index = matchesToFind.findIndex(matchToFind => matchToFind[key] === array[i][key])
+
+            if(index !== -1) {
+                resultArray[i] = { ...resultArray[i], ...matchesToFind[index] }
+                matchesToFind.splice(index, 1)
+
+                if(!matchesToFind.length) {
+                    break
+                }
             }
         }
-        
-        return array.with(index, { ...array[index], ...value })
+
+        if(matchesToFind.length) {
+            throw {
+                msg: `Unable to patch. One or more items were not found.`,
+                array,
+                itemsNotFound: matchesToFind
+            }
+        }
+
+        return resultArray
     }
     unpackAsGetters = (obj: {}, b: string[]) => varios.entry(obj).unpackAsGetters(b)
     spread = varios.spread
