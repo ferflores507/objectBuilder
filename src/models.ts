@@ -1,3 +1,5 @@
+import { Path } from "./helpers/varios"
+
 export type BuilderOptions = {
     store: Record<string, any>
     siblings: Record<string, any>
@@ -17,6 +19,7 @@ export type Builder = {
     withSchemaOrDefault(value: SchemaDefinition | SchemaPrimitive | undefined): Builder
     build: () => any
     buildAsync: () => Promise<any>
+    set: (path: Path, value: any) => any
 }
 
 export type SubsetOptions = {
