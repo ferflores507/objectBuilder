@@ -195,7 +195,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withBinary(schema: Schema | undefined) {
-        this.filterTasks(this.options.operators, schema)
+        this.filterTasks(this.options.operators ?? {}, schema)
             .forEach(({ definition, task }) => {
                 this.addMerge()
                     .withSchemaOrDefault(definition)
