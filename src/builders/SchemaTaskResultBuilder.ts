@@ -1,4 +1,4 @@
-import type { ArraySchema, Builder, BuilderOptions, Consulta, Propiedades, Schema, SchemaDefinition, SchemaPrimitive, WithTaskOptions } from "../models"
+import type { ArraySchema, Builder, BuilderOptions, Consulta, Propiedades, Schema, SchemaDefinition, SchemaPrimitive, TaskOptions, WithTaskOptions } from "../models"
 import * as varios from "../helpers/varios"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
@@ -9,7 +9,7 @@ import { assignAll, getterTrap, isNotPrimitive, Path } from "../helpers/varios"
 import { Operators } from "./Operators"
 import { ComparisonTasks } from "./ComparisonTasks"
 
-const comparisonTasks = new ComparisonTasks(new Operators())
+const comparisonTasks: WithTaskOptions<ComparisonTasks> = new ComparisonTasks(new Operators())
 const imported = new Map()
 
 export class SchemaTaskResultBuilder implements Builder {
@@ -173,7 +173,7 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    filterTasks<T>(tasks: WithTaskOptions<T>, schema: Schema | undefined) {
+    filterTasks(tasks: Record<string, TaskOptions>, schema: Schema | undefined) {
         return Object.entries(tasks)
             .map(([key, options]) => ({
                 options,
