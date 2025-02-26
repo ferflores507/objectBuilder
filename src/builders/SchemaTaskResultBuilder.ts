@@ -1,192 +1,15 @@
-import type { ArraySchema, Consulta, Propiedades, Schema, SchemaDefinition, SchemaPrimitive } from "../models"
+import type { ArraySchema, Builder, BuilderOptions, Consulta, Propiedades, Schema, SchemaDefinition, SchemaPrimitive, WithTaskOptions } from "../models"
 import * as varios from "../helpers/varios"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
-import { assignAll, formatSortOptions, getterTrap, isNotPrimitive, Path, sortCompare, SortOptions } from "../helpers/varios"
-
-export type OperatorTask = (current: any, previous: any, builder: SchemaTaskResultBuilder) => any
-
-type TaskOptions = OperatorTask | {
-    task: OperatorTask,
-    transform: (schema: Schema) => any
-}
-
-export type BuilderOptions = {
-    store: Record<string, any>
-    siblings: Record<string, any>
-    target: any
-    functions: Record<string, Function>
-    schema: SchemaDefinition
-    initial: any
-    operators: Record<string, TaskOptions>
-    arg: any
-    variables: Record<string, any>
-}
-
-export type Builder = {
-    options: Partial<BuilderOptions>
-    with: (options: Partial<BuilderOptions>) => Builder
-    withSchema: (schema: SchemaDefinition | undefined) => Builder
-    withSchemaOrDefault(value: SchemaDefinition | SchemaPrimitive | undefined): Builder
-    build: () => any
-    buildAsync: () => Promise<any>
-}
-
-type KeywordItem = string | string[]
-type SubsetOptions = {
-    container: any[]
-    match: (value: { item: string, containerItem : string }) => boolean
-}
-
-export class Operators {
-    constructor(otherOperators = {}) {
-        Object.assign(this, otherOperators)
-    }
-    assign : OperatorTask = (current, previous) => Object.assign(current, previous)
-    boolean = (value: any) => !!value
-    debounce = (fn: (...args: []) => any, ms: number | true) => {
-        return varios.createDebounce(fn, ms === true ? 500 : ms)
-    }
-    entries = varios.entries
-    spreadStart = (target: any[], value: any) => {        
-        return Array.isArray(value) ? [...value, ...target] : [value, ...target]
-    }
-    with = (array: any[], { index = 0, value } : { index?: number, value: any }) => {        
-        return array.with(index, value)
-    }
-    patch = (array: any[], value: any) => {        
-        return this.patchWith(array, { key: "id", value })
-    }
-    patchWith = (array: any[], { key = "id", value } : { key?: string, value: any }) => {
-        const concreteValue = Array.isArray(value) ? value : [value]
-        const matchesToFind = [...concreteValue]
-        const resultArray = [...array]
-
-        for(let i = 0; i <= array.length; i++) {
-            const index = matchesToFind.findIndex(matchToFind => matchToFind[key] === array[i][key])
-
-            if(index !== -1) {
-                resultArray[i] = { ...resultArray[i], ...matchesToFind[index] }
-                matchesToFind.splice(index, 1)
-
-                if(!matchesToFind.length) {
-                    break
-                }
-            }
-        }
-
-        if(matchesToFind.length) {
-            throw {
-                msg: `Unable to patch. One or more items were not found.`,
-                array,
-                itemsNotFound: matchesToFind
-            }
-        }
-
-        return resultArray
-    }
-    unpackAsGetters = (obj: {}, b: string[]) => varios.entry(obj).unpackAsGetters(b)
-    spread = varios.spread
-    spreadFlat = (a: any, b: any[]) => this.spread(a, b.flat())
-    join = {
-        task: (source: [], separator: any) => source.join(separator),
-        transform: (schema: any) => schema === true ? "" : schema
-    }
-    keywords = (value: string) => {
-        return value
-            .trim()
-            .split(/\s+/)
-            .map(word => this.removeAccents(word).toLowerCase())
-    }
-    keywordsOrDefault = (value: KeywordItem) => Array.isArray(value) ? value : this.keywords(value)
-    plus = (a: number, b: number) => a + b
-    minus = (a: number, b: number) => a - b
-    times = (a: number, b: number) => a * b
-    dividedBy = (a: number, b: number) => a / b
-    parse = JSON.parse
-    trim = (value: string) => value.trim()
-    removeAccents = varios.removeAccents
-    stringify = JSON.stringify
-    sort = (array: any[], option: true | "descending" = true) => {
-        return this.sortBy(array, { descending: option === "descending" })
-    }
-    sortBy = (array: any[], options: SortOptions | SortOptions[]) => {
-        const concreteOptions = varios.toArray(options).map(formatSortOptions)
-        
-        return array.toSorted((a, b) => {
-            let result = 0
-
-            for(const option of concreteOptions) {
-                result = sortCompare(a, b, option)
-
-                if(result !== 0) break
-            }
-
-            return result
-        })
-    }
-    values = (obj: any[]) => {
-        try {
-            return Array.isArray(obj) ? obj : Object.values(obj)
-        }
-        catch {
-            throw { 
-                mensaje: "Error al obtener los valores enumerables",
-                fuente: obj
-            }
-        }
-    }
-    unpack = (target: Record<string, any>, keys: string[]) => keys.reduce((obj, key) => {
-        return { ...obj, [key]: target[key] }
-    }, {})
-    UUID = () => crypto.randomUUID()
-    set: OperatorTask = (initial, value, builder) => {
-        const [path, arg] = varios.argsPair(value, initial)
-
-        return builder.set(path, arg)
-    }
-    log = (initial: any, current: any) => (console.log(current), initial)
-};
-
-class ComparisonTasks {
-    constructor(private operators: Operators) {}
-    
-    equals = varios.esIgual
-    allEqualTo = (obj: any[], value: any) => {
-        return this.operators.values(obj).every(item => this.equals(item, value))
-    }
-    allEqual = (obj: any[], allEqual: boolean) => {
-        const values = this.operators.values(obj)
-
-        return this.allEqualTo(values, values[0]) === allEqual
-    }
-    includes = (a: any[] | string, b: any) => a.includes(b)
-    isNullOrWhiteSpace = (value: any, boolValue: boolean | undefined) => {
-        return typeof(boolValue) == "boolean"
-            ? ((value as string ?? "").toString().trim() === "") === boolValue
-            : value
-    }
-    isSubsetOf = (array: any[], { container, match }: SubsetOptions) => {
-        return array.every(item => container.some(containerItem => match({ item, containerItem })))
-    }
-    isKeywordsOf = (keywords: KeywordItem, container: KeywordItem) => {
-        [keywords, container] = [keywords, container].map(this.operators.keywordsOrDefault)
-        
-        return this.isSubsetOf(keywords, {
-            container,
-            match: ({ item, containerItem }) => containerItem.includes(item)
-        })
-    }
-    not = (a: any, b: any) => !b
-    greaterThan = (a: any, b: any) => a > b
-    lessThan = (a: any, b: any) => a < b
-}
+import { assignAll, getterTrap, isNotPrimitive, Path } from "../helpers/varios"
+import { Operators } from "./Operators"
+import { ComparisonTasks } from "./ComparisonTasks"
 
 const comparisonTasks = new ComparisonTasks(new Operators())
-
 const imported = new Map()
 
 export class SchemaTaskResultBuilder implements Builder {
@@ -350,7 +173,7 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    filterTasks(tasks: Record<string, TaskOptions>, schema: Schema | undefined) {
+    filterTasks<T>(tasks: WithTaskOptions<T>, schema: Schema | undefined) {
         return Object.entries(tasks)
             .map(([key, options]) => ({
                 options,
