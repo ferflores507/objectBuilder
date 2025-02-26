@@ -1,3 +1,19 @@
+const argsPairFn = () => {
+    const options = {
+        string: (value: string, rightValue: any) : [string, any] => [value, rightValue],
+        object: (value: Record<string, any>) => Object.entries(value)[0],
+        array: (value: [string, any]) => value
+    }
+
+    return (leftValue: any, rightValue: any) => {
+        const type = (Array.isArray(leftValue) ? "array" : typeof leftValue) as keyof typeof options
+
+        return options[type](leftValue, rightValue)
+    }
+}
+
+export const argsPair = argsPairFn()
+
 export const createDebounce = (callback: (...args: any[]) => any, ms: number) => {
     let timeoutId: NodeJS.Timeout
 
