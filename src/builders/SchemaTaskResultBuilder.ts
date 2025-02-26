@@ -286,7 +286,6 @@ export class SchemaTaskResultBuilder implements Builder {
             reduceOrDefault,
             reduce,
             definitions,
-            checkout,
             schemaFrom,
             selectSet,
             increment,
@@ -585,7 +584,7 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withEndSchema(schema: Schema | undefined) {
-        const { set, use, call } = schema ?? {}
+        const { use, call } = schema ?? {}
 
         return this
             .withArraySchema(schema)

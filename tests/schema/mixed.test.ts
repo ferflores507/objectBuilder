@@ -3139,39 +3139,6 @@ describe("array", () => {
 })
 
 describe("mixed", () => {
-
-  test.todo("reduce, orderBy and filter", async () => {
-    const schema: Schema = {
-      const: [3, 10, 2, 4, 1].map(id => ({ id, nombre: [4, 10].includes(id) ? "Melany" : "Fernando" })),
-      reduce: [
-        {
-          // array: {
-          //   orderBy: "id"
-          // }
-        },
-        {
-          // array: {
-          //   filter: {
-          //     path: "inner.nombre",
-          //     comparacion: {
-          //       method: "equal",
-          //       schema: {
-          //         path: "outer.source.nombre"
-          //       }
-          //     }
-          //   }
-          // }
-        }
-      ]
-    }
-
-    await expectToEqualAsync({
-      store: { nombre: "Melany" },
-      schema,
-      expected: [4, 10].map(id => ({ id, nombre: "Melany" }))
-    })
-  })
-
   describe.todo("flat", () => {
 
     test("flat", async () => {
