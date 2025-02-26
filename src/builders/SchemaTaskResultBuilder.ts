@@ -5,7 +5,7 @@ import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
-import { assignAll, formatSortOptions, getterTrap, isNotPrimitive, sortCompare, SortOptions } from "../helpers/varios"
+import { assignAll, formatSortOptions, getterTrap, isNotPrimitive, Path, sortCompare, SortOptions } from "../helpers/varios"
 
 export type OperatorTask = (current: any, previous: any, builder: SchemaTaskResultBuilder) => any
 
@@ -262,8 +262,10 @@ export class SchemaTaskResultBuilder implements Builder {
         return schema ? builder.withSchema(schema) : builder
     }
 
-    set(path: string, value: any) {
-        const store = path.startsWith("stores") ? this.options : this.options.store
+    set(path: Path, value: any) {
+        const store = (typeof path == "string" && path.startsWith("stores")) 
+            ? this.options 
+            : this.options.store
 
         varios.entry(store).set(path, value)
 

@@ -132,7 +132,7 @@ const setPathValueFromPaths = (obj: Record<string, any>, path: string[], value: 
     }
 };
 
-type Path = string | string[]
+export type Path = string | string[]
 
 class Entry {
     constructor(private source: Record<string, any>) {

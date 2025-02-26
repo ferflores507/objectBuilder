@@ -9,6 +9,34 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("set array path", async () => {
+  await expectToEqualAsync({
+    store: {
+      key: "nombre"
+    },
+    schema: {
+      set: [
+        {
+          definitions: [
+            "detalles",
+            { 
+              const: "usuario" 
+            },
+            { 
+              path: "key"
+            }
+          ]
+        },
+        "Melany"
+      ],
+      reduce: {
+        path: "detalles.usuario.nombre"
+      }
+    },
+    expected: "Melany"
+  })
+})
+
 test("set propiedades", async () => {
   await expectToEqualAsync({
     schema: {
