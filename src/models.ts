@@ -1,3 +1,38 @@
+export type BuilderOptions = {
+    store: Record<string, any>
+    siblings: Record<string, any>
+    target: any
+    functions: Record<string, Function>
+    schema: SchemaDefinition
+    initial: any
+    operators: Record<string, TaskOptions>
+    arg: any
+    variables: Record<string, any>
+}
+
+export type Builder = {
+    options: Partial<BuilderOptions>
+    with: (options: Partial<BuilderOptions>) => Builder
+    withSchema: (schema: SchemaDefinition | undefined) => Builder
+    withSchemaOrDefault(value: SchemaDefinition | SchemaPrimitive | undefined): Builder
+    build: () => any
+    buildAsync: () => Promise<any>
+}
+
+export type SubsetOptions = {
+    container: any[]
+    match: (value: { item: string, containerItem : string }) => boolean
+}
+
+export type OperatorTask = (current: any, previous: any, builder: Builder) => any
+
+export type TaskOptions = OperatorTask | {
+    task: OperatorTask,
+    transform: (schema: Schema) => any
+}
+
+export type WithTaskOptions<T> = { [key in keyof T]: TaskOptions }
+
 export type Join = {
     items: Schema
     match: Schema
