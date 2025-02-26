@@ -9,6 +9,22 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("set propiedades", async () => {
+  await expectToEqualAsync({
+    schema: {
+      set: {
+        propiedades: {
+          nombre: "Melany"
+        }
+      },
+      reduce: {
+        path: "nombre"
+      }
+    },
+    expected: "Melany"
+  })
+})
+
 describe("debounce", function () {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
@@ -2278,13 +2294,17 @@ describe("add schema", () => {
 
   test("with value only, already containing an item and then reduce", () => {
     const schema: Schema = {
-      const: [4],
-      select: {
-        value: {
-          const: 3
+      set: [
+        "items",
+        {
+          const: [4],
+          select: {
+            value: {
+              const: 3
+            }
+          },
         }
-      },
-      set: "items",
+      ],
       reduce: { // same without reduce
         path: "items"
       }

@@ -37,7 +37,7 @@ export type Consulta = { url: string } & Partial<{
     headers: Record<string, any>
 }>
 
-export type SchemaDefinition = Schema | Schema[]
+export type SchemaDefinition = Schema | (Schema | SchemaPrimitive)[]
 
 export type SchemaPrimitive = string | number | bigint | boolean | null
 export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive>
@@ -95,7 +95,7 @@ export type Schema = Partial<{
     required: string[]
     schemaFrom: SchemaDefinition
     selectSet: string
-    set: string
+    set: SchemaDefinition | SchemaPrimitive
     schema: SchemaDefinition
     sibling: string
     some: any

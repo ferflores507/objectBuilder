@@ -7,8 +7,10 @@ import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
 import { assignAll, formatSortOptions, getterTrap, isNotPrimitive, sortCompare, SortOptions } from "../helpers/varios"
 
-type TaskOptions = Task | {
-    task: Task,
+export type OperatorTask = (current: any, previous: any, builder: SchemaTaskResultBuilder) => any
+
+type TaskOptions = OperatorTask | {
+    task: OperatorTask,
     transform: (schema: Schema) => any
 }
 
@@ -43,7 +45,7 @@ export class Operators {
     constructor(otherOperators = {}) {
         Object.assign(this, otherOperators)
     }
-    assign = Object.assign
+    assign : OperatorTask = (current, previous) => Object.assign(current, previous)
     boolean = (value: any) => !!value
     debounce = (fn: (...args: []) => any, ms: number | true) => {
         return varios.createDebounce(fn, ms === true ? 500 : ms)
@@ -141,6 +143,11 @@ export class Operators {
         return { ...obj, [key]: target[key] }
     }, {})
     UUID = () => crypto.randomUUID()
+    set: OperatorTask = (initial, value, builder) => {
+        const [path, arg] = varios.argsPair(value, initial)
+
+        return builder.set(path, arg)
+    }
     log = (initial: any, current: any) => (console.log(current), initial)
 };
 
@@ -368,7 +375,7 @@ export class SchemaTaskResultBuilder implements Builder {
             .forEach(({ definition, task }) => {
                 this.addMerge()
                     .withSchemaOrDefault(definition)
-                    .add((current, prev) => task(prev, current))
+                    .add((current, prev) => task(prev, current, this))
             })
 
         return this
@@ -583,7 +590,6 @@ export class SchemaTaskResultBuilder implements Builder {
             .withComparison(schema)
             .withCall(call)
             .withUse(use)
-            .withSet(set)
     }
 
     withReduceOrDefault(schema: SchemaDefinition | undefined): SchemaTaskResultBuilder {
