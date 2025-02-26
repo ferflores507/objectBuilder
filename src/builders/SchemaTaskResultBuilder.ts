@@ -71,7 +71,7 @@ export class SchemaTaskResultBuilder implements Builder {
         return this.taskBuilder.buildAsync()
     }
 
-    with(options: Partial<BuilderOptions>): SchemaTaskResultBuilder {
+    with(options: Partial<BuilderOptions>) {
         const { operators, schema, ...rest } = options
         const newOptions = assignAll(
             {}, 
@@ -374,7 +374,7 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withConditional(schema: Schema | undefined): SchemaTaskResultBuilder {
+    withConditional(schema: Schema | undefined) {
         const schemaOrPath = (value: string | SchemaDefinition) => {
             return typeof (value) == "string" ? { path: value } : value
         }
@@ -416,13 +416,13 @@ export class SchemaTaskResultBuilder implements Builder {
             .withUse(use)
     }
 
-    withReduceOrDefault(schema: SchemaDefinition | undefined): SchemaTaskResultBuilder {
+    withReduceOrDefault(schema: SchemaDefinition | undefined) {
         return schema
             ? this.withUnshift(initial => initial != null ? this.with({ initial, schema }) : initial)
             : this
     }
 
-    withReduce(schema: SchemaDefinition | undefined): SchemaTaskResultBuilder {
+    withReduce(schema: SchemaDefinition | undefined) {
         return schema ? this.add(current => this.target = current).withManySchemas(schema) : this
     }
 
@@ -505,7 +505,7 @@ export class SchemaTaskResultBuilder implements Builder {
             : this
     }
 
-    withSchemaFrom(source: SchemaDefinition | undefined): SchemaTaskResultBuilder {
+    withSchemaFrom(source: SchemaDefinition | undefined) {
         return source
             ? this
                 .addMerge()
