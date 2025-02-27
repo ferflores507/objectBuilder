@@ -23,16 +23,6 @@ export class Operators {
         return createDebounce(fn, ms === true ? 500 : ms)
     }
     entries = entries
-    filterPropiedades = {
-        transform: (schema: any) => ({ function: schema }),
-        task: (propiedades: Record<string, any>, filterFn: Function) => {
-            const filteredEntries = Object
-                .entries(propiedades)
-                .filter(([key, value]) => filterFn({ key, value }))
-    
-            return Object.fromEntries(filteredEntries)
-        }
-    }
     spreadStart = (target: any[], value: any) => {
         return Array.isArray(value) ? [...value, ...target] : [value, ...target]
     }
@@ -73,6 +63,16 @@ export class Operators {
     unpackAsGetters = (obj: {}, b: string[]) => entry(obj).unpackAsGetters(b)
     spread = spread
     spreadFlat = (a: any, b: any[]) => this.spread(a, b.flat())
+    filterPropiedades = {
+        transform: (schema: any) => ({ function: schema }),
+        task: (propiedades: Record<string, any>, filterFn: Function) => {
+            const filteredEntries = Object
+                .entries(propiedades)
+                .filter(([key, value]) => filterFn({ key, value }))
+    
+            return Object.fromEntries(filteredEntries)
+        }
+    }
     join = {
         task: (source: [], separator: any) => source.join(separator),
         transform: (schema: any) => schema === true ? "" : schema
