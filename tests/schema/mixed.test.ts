@@ -9,6 +9,80 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("patch with transform", async () => {
+  await expectToEqualAsync({
+    initial: [
+      {
+        id: 1,
+        en: "one"
+      },
+      {
+        id: 2,
+        en: "two"
+      },
+      {
+        id: 3,
+        en: "three"
+      }
+    ],
+    schema: {
+      patchWith: {
+        propiedades: {
+          value: {
+            const: [
+              {
+                id: 1,
+                es: "uno"
+              },
+              {
+                id: 2,
+                es: "dos"
+              },
+              {
+                id: 3,
+                es: "tres"
+              }
+            ]
+          },
+          transform: {
+            function: {
+              if: {
+                path: "arg.newValue.id",
+                lessThan: 3
+              },
+              then: {
+                path: "arg.previousValue",
+                spread: {
+                  path: "arg.newValue"
+                }
+              },
+              else: {
+                path: "arg.previousValue"
+              }
+            }
+          }
+        }
+      }
+    },
+    expected: [
+      {
+        id: 1,
+        en: "one",
+        es: "uno"
+      },
+      {
+        id: 2,
+        en: "two",
+        es: "dos"
+      },
+      {
+        id: 3,
+        en: "three"
+      }
+    ],
+  })
+})
+
 describe("filter propiedades", () => {
   
   test("truthy value", async () => {
