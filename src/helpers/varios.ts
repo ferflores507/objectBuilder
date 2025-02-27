@@ -1,3 +1,22 @@
+export const isEmpty = (value: string | Record<string, any> | any[]) => {
+    const type = Array.isArray(value) ? "array" : (value && typeof value)
+    let length
+
+    switch (type) {
+        case "string":
+        case "array":
+            length = value.length
+            break
+        case "object":
+            length = Object.keys(value).length 
+            break
+        default:
+            throw "Unable to check if object is empty. Object is not string, array or object."
+    }
+
+    return !length
+}
+
 const argsPairFn = () => {
     const options = {
         string: (value: string, rightValue: any) : [string, any] => [value, rightValue],

@@ -1,4 +1,4 @@
-import { esIgual, Path } from "../helpers/varios"
+import { esIgual, isEmpty, Path } from "../helpers/varios"
 import { SubsetOptions, WithTaskOptions } from "../models"
 import { Operators } from "./Operators"
 
@@ -31,8 +31,14 @@ export class ComparisonTasks implements WithTaskOptions<ComparisonTasks> {
             match: ({ item, containerItem }) => containerItem.includes(item)
         })
     }
+    isEmpty = (value: any, condition: boolean) => {
+        return isEmpty(value) === condition
+    }
     isNull = (value: any, condition: boolean) => {
         return (value == null) === condition
+    }
+    isNullOrEmpty = (value: any, condition: boolean) => {
+        return ((value == null) || isEmpty(value)) === condition
     }
     not = (a: any, b: any) => !b
     greaterThan = (a: any, b: any) => a > b
