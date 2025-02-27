@@ -16,9 +16,7 @@ describe("filter propiedades", () => {
       initial: { id: 0, name: "zero" },
       schema: {
         filterPropiedades: {
-          function: {
-            path: "current.value"
-          }
+          path: "current.value"
         }
       },
       expected: { name: "zero" }
@@ -30,10 +28,8 @@ describe("filter propiedades", () => {
       initial: { id: 0, title: "", name: null },
       schema: {
         filterPropiedades: {
-          function: {
-            path: "current.value",
-            isNull: false
-          }
+          path: "current.value",
+          isNull: false
         }
       },
       expected: { id: 0, title: "" }
@@ -45,10 +41,8 @@ describe("filter propiedades", () => {
       initial: { id: 0, title: "", details: [], items: [1] },
       schema: {
         filterPropiedades: {
-          function: {
-            path: "current.value",
-            isNullOrEmpty: false
-          }
+          path: "current.value",
+          isNullOrEmpty: false
         }
       },
       expected: { id: 0, items: [1] }
@@ -60,10 +54,8 @@ describe("filter propiedades", () => {
       initial: { title: "", users: [], items: [1] },
       schema: {
         filterPropiedades: {
-          function: {
-            path: "current.value",
-            isNullOrEmpty: false
-          }
+          path: "current.value",
+          isNullOrEmpty: false
         }
       },
       expected: { items: [1] }
@@ -75,10 +67,8 @@ describe("filter propiedades", () => {
       initial: { id: 0, title: null, details: [], items: [1] },
       schema: {
         filterPropiedades: {
-          function: {
-            path: "current.value",
-            isNullOrEmpty: true
-          }
+          path: "current.value",
+          isNullOrEmpty: true
         }
       },
       expected: { title: null, details: [] }
@@ -90,10 +80,8 @@ describe("filter propiedades", () => {
       initial: { id: undefined, title: "", users: [], items: [1] },
       schema: {
         filterPropiedades: {
-          function: {
-            path: "current.value",
-            isNullOrEmpty: true
-          }
+          path: "current.value",
+          isNullOrEmpty: true
         }
       },
       expected: { id: undefined, title: "", users: [] }
