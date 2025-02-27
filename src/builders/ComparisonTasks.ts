@@ -34,9 +34,6 @@ export class ComparisonTasks implements WithTaskOptions<ComparisonTasks> {
     isNull = (value: any, condition: boolean) => {
         return (value == null) === condition
     }
-    isNullOrEmpty = (value: any, condition: boolean) => {
-        return (value == null || value.length === 0) === condition
-    }
     not = (a: any, b: any) => !b
     greaterThan = (a: any, b: any) => a > b
     lessThan = (a: any, b: any) => a < b
