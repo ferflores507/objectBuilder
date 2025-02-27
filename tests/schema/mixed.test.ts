@@ -9,6 +9,118 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("is null or empty", () => {
+
+  const cases = [
+    {
+      initial: undefined,
+      condition: true,
+      expected: true
+    },
+    {
+      initial: null,
+      condition: true,
+      expected: true
+    },
+    {
+      initial: {},
+      condition: true,
+      expected: true
+    },
+    {
+      initial: [],
+      condition: true,
+      expected: true
+    },
+    {
+      initial: { id: 1 },
+      condition: true,
+      expected: false
+    },
+    {
+      initial: [1],
+      condition: true,
+      expected: false
+    },
+    {
+      initial: {},
+      condition: false,
+      expected: false
+    },
+    {
+      initial: [],
+      condition: false,
+      expected: false
+    },
+    {
+      initial: { id: 1 },
+      condition: false,
+      expected: true
+    },
+    {
+      initial: [1],
+      condition: false,
+      expected: true
+    },
+  ] as const
+
+  test.each(cases)("expect is null or empty", async ({ initial, condition, expected }) => {
+    await expectToEqualAsync({
+      initial,
+      schema: {
+        isNullOrEmpty: condition
+      },
+      expected
+    })
+  })
+})
+
+describe("is empty", () => {
+
+  const cases = [
+    [{}, true, true],
+    [{}, false, false],
+    [
+      { id: 1 }, 
+      true, 
+      false
+    ],
+    [
+      { id: undefined }, 
+      true, 
+      false
+    ],
+    [
+      { id: 1 }, 
+      false, 
+      true
+    ],
+    [
+      { id: undefined }, 
+      false, 
+      true
+    ],
+  ] as const
+
+  test.each(cases)("expect is empty", async (initial, isEmpty, expected) => {
+    await expectToEqualAsync({
+      initial,
+      schema: {
+        isEmpty
+      },
+      expected
+    })
+
+    await expectToEqualAsync({
+      initial,
+      schema: {
+        isEmpty: !isEmpty
+      },
+      expected: !expected
+    })
+  })
+})
+
 describe("isNull", () => {
   const cases = [
     undefined,
