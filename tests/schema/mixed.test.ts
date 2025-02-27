@@ -9,6 +9,99 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("filter propiedades", () => {
+  
+  test("truthy value", async () => {
+    await expectToEqualAsync({
+      initial: { id: 0, name: "zero" },
+      schema: {
+        filterPropiedades: {
+          function: {
+            path: "current.value"
+          }
+        }
+      },
+      expected: { name: "zero" }
+    })
+  })
+
+  test("not null value", async () => {
+    await expectToEqualAsync({
+      initial: { id: 0, title: "", name: null },
+      schema: {
+        filterPropiedades: {
+          function: {
+            path: "current.value",
+            isNull: false
+          }
+        }
+      },
+      expected: { id: 0, title: "" }
+    })
+  })
+
+  test("not empty value", async () => {
+    await expectToEqualAsync({
+      initial: { id: 0, title: "", details: [], items: [1] },
+      schema: {
+        filterPropiedades: {
+          function: {
+            path: "current.value",
+            isNullOrEmpty: false
+          }
+        }
+      },
+      expected: { id: 0, items: [1] }
+    })
+  })
+
+  test("not empty value", async () => {
+    await expectToEqualAsync({
+      initial: { title: "", users: [], items: [1] },
+      schema: {
+        filterPropiedades: {
+          function: {
+            path: "current.value",
+            isNullOrEmpty: false
+          }
+        }
+      },
+      expected: { items: [1] }
+    })
+  })
+
+  test("is null or empty", async () => {
+    await expectToEqualAsync({
+      initial: { id: 0, title: null, details: [], items: [1] },
+      schema: {
+        filterPropiedades: {
+          function: {
+            path: "current.value",
+            isNullOrEmpty: true
+          }
+        }
+      },
+      expected: { title: null, details: [] }
+    })
+  })
+
+  test("is null or empty", async () => {
+    await expectToEqualAsync({
+      initial: { id: undefined, title: "", users: [], items: [1] },
+      schema: {
+        filterPropiedades: {
+          function: {
+            path: "current.value",
+            isNullOrEmpty: true
+          }
+        }
+      },
+      expected: { id: undefined, title: "", users: [] }
+    })
+  })
+
+})
+
 describe("is null or empty", () => {
 
   const cases = [
