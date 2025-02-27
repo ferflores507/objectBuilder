@@ -1,6 +1,6 @@
 import { expect } from "vitest"
-import { BuilderOptions, SchemaTaskResultBuilder } from "../../src/builders/SchemaTaskResultBuilder"
-import { SchemaDefinition } from "../../src/models"
+import { SchemaTaskResultBuilder } from "../../src/builders/SchemaTaskResultBuilder"
+import { BuilderOptions, SchemaDefinition } from "../../src/models"
 
 type CaseOptions = Partial<BuilderOptions> & { schema: SchemaDefinition }
 
