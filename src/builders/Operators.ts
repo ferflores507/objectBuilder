@@ -13,6 +13,12 @@ import {
     toArray
 } from "../helpers/varios"
 
+type PatchOptions = { 
+    key?: string
+    value: any 
+    transform?: (options: { previousValue: any, newValue: any }) => any
+}
+
 export class Operators {
     constructor(otherOperators = {}) {
         Object.assign(this, otherOperators)
@@ -32,7 +38,13 @@ export class Operators {
     patch = (array: any[], value: any) => {
         return this.patchWith(array, { key: "id", value })
     }
-    patchWith = (array: any[], { key = "id", value }: { key?: string, value: any }) => {
+    patchWith = (array: any[], options: PatchOptions) => {
+        const { 
+            key = "id", 
+            value, 
+            transform = ({ previousValue, newValue }) => ({ ...previousValue, ...newValue })
+        } = options
+
         const concreteValue = Array.isArray(value) ? value : [value]
         const matchesToFind = [...concreteValue]
         const resultArray = [...array]
@@ -41,7 +53,10 @@ export class Operators {
             const index = matchesToFind.findIndex(matchToFind => matchToFind[key] === array[i][key])
 
             if (index !== -1) {
-                resultArray[i] = { ...resultArray[i], ...matchesToFind[index] }
+                resultArray[i] = transform({ 
+                    previousValue: resultArray[i],
+                    newValue: matchesToFind[index]
+                })
                 matchesToFind.splice(index, 1)
 
                 if (!matchesToFind.length) {
