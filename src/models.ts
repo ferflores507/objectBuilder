@@ -103,6 +103,7 @@ export type Schema = Partial<{
     else: SchemaDefinition
     entries: true
     equals: SchemaDefinition | SchemaPrimitive
+    filterPropiedades: SchemaDefinition | SchemaPrimitive
     flat: true
     function: SchemaDefinition
     greaterThan: SchemaDefinition | SchemaPrimitive

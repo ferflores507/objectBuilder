@@ -23,6 +23,13 @@ export class Operators {
         return createDebounce(fn, ms === true ? 500 : ms)
     }
     entries = entries
+    filterPropiedades = (propiedades: Record<string, any>, filterFn: Function) => {
+        const filteredEntries = Object
+            .entries(propiedades)
+            .filter(([key, value]) => filterFn({ key, value }))
+
+        return Object.fromEntries(filteredEntries)
+    }
     spreadStart = (target: any[], value: any) => {
         return Array.isArray(value) ? [...value, ...target] : [value, ...target]
     }
