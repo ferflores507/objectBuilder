@@ -109,6 +109,9 @@ export type Schema = Partial<{
     lessThan: SchemaDefinition | SchemaPrimitive
     if: SchemaDefinition | string
     isComputed: true
+    isEmpty: Schema | SchemaPrimitive
+    isNull: Schema | SchemaPrimitive
+    isNullOrEmpty: Schema | SchemaPrimitive
     isNullOrWhiteSpace: boolean
     includes: SchemaDefinition | SchemaPrimitive
     increment: string
