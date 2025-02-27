@@ -9,6 +9,43 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("isNull", () => {
+  const cases = [
+    undefined,
+    null,
+    NaN,
+    false,
+    true,
+    0,
+    1,
+    "",
+    " ",
+    "0",
+    "2",
+    {},
+    [],
+    [1, 2]
+  ].map(value => [value, value == null] as const)
+
+  test.each(cases)("expect is null", async (initial, isNull) => {
+    await expectToEqualAsync({
+      initial,
+      schema: {
+        isNull: true
+      },
+      expected: isNull
+    })
+
+    await expectToEqualAsync({
+      initial,
+      schema: {
+        isNull: false
+      },
+      expected: !isNull
+    })
+  })
+})
+
 test("set array path", async () => {
   await expectToEqualAsync({
     store: {
