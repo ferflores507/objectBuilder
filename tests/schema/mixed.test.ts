@@ -9,6 +9,94 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("patch todos", async () => {
+  await expectToEqualAsync({
+    initial: [
+      {
+        id: 1,
+        title: "one"
+      },
+      {
+        id: 2,
+        title: "two",
+        completed: 123
+      },
+      {
+        id: 3,
+        title: "three"
+      }
+    ],
+    schema: {
+      patchWith: {
+        propiedades: {
+          value: {
+            const: [
+              {
+                id: 1,
+                title: "one",
+                completed: true
+              },
+              {
+                id: 2,
+                title: "dos",
+                completed: 456
+              },
+              {
+                id: 3,
+                completed: false
+              }
+            ]
+          },
+          transform: {
+            function: {
+              path: "arg.previousValue",
+              spread: {
+                propiedades: {
+                  title: {
+                    path: "arg.newValue.title",
+                    default: "",
+                    trim: true,
+                  },
+                  completed: {
+                    path: "arg.newValue.completed",
+                    and: {
+                      path: "arg.previousValue.completed",
+                      or: {
+                        const: 456
+                      }
+                    }
+                  }
+                },
+                filterPropiedades: {
+                  path: "current.value",
+                  isNullOrEmpty: false
+                },
+              },
+            }
+          }
+        }
+      }
+    },
+    expected: [
+      {
+        id: 1,
+        title: "one",
+        completed: 456
+      },
+      {
+        id: 2,
+        title: "dos",
+        completed: 123
+      },
+      {
+        id: 3,
+        title: "three",
+        completed: false
+      }
+    ]
+  })
+})
+
 test("patch with transform", async () => {
   await expectToEqualAsync({
     initial: [
