@@ -9,6 +9,398 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("patch todos", async () => {
+  await expectToEqualAsync({
+    initial: [
+      {
+        id: 1,
+        title: "one"
+      },
+      {
+        id: 2,
+        title: "two",
+        completed: 123
+      },
+      {
+        id: 3,
+        title: "three"
+      }
+    ],
+    schema: {
+      patchWith: {
+        propiedades: {
+          value: {
+            const: [
+              {
+                id: 1,
+                title: "one",
+                completed: true
+              },
+              {
+                id: 2,
+                title: "dos",
+                completed: 456
+              },
+              {
+                id: 3,
+                completed: false
+              }
+            ]
+          },
+          transform: {
+            function: {
+              path: "arg.previousValue",
+              spread: {
+                propiedades: {
+                  title: {
+                    path: "arg.newValue.title",
+                    default: "",
+                    trim: true,
+                  },
+                  completed: {
+                    path: "arg.newValue.completed",
+                    and: {
+                      path: "arg.previousValue.completed",
+                      or: {
+                        const: 456
+                      }
+                    }
+                  }
+                },
+                filterPropiedades: {
+                  path: "current.value",
+                  isNullOrEmpty: false
+                },
+              },
+            }
+          }
+        }
+      }
+    },
+    expected: [
+      {
+        id: 1,
+        title: "one",
+        completed: 456
+      },
+      {
+        id: 2,
+        title: "dos",
+        completed: 123
+      },
+      {
+        id: 3,
+        title: "three",
+        completed: false
+      }
+    ]
+  })
+})
+
+test("patch with transform", async () => {
+  await expectToEqualAsync({
+    initial: [
+      {
+        id: 1,
+        en: "one"
+      },
+      {
+        id: 2,
+        en: "two"
+      },
+      {
+        id: 3,
+        en: "three"
+      }
+    ],
+    schema: {
+      patchWith: {
+        propiedades: {
+          value: {
+            const: [
+              {
+                id: 1,
+                es: "uno"
+              },
+              {
+                id: 2,
+                es: "dos"
+              },
+              {
+                id: 3,
+                es: "tres"
+              }
+            ]
+          },
+          transform: {
+            function: {
+              if: {
+                path: "arg.newValue.id",
+                lessThan: 3
+              },
+              then: {
+                path: "arg.previousValue",
+                spread: {
+                  path: "arg.newValue"
+                }
+              },
+              else: {
+                path: "arg.previousValue"
+              }
+            }
+          }
+        }
+      }
+    },
+    expected: [
+      {
+        id: 1,
+        en: "one",
+        es: "uno"
+      },
+      {
+        id: 2,
+        en: "two",
+        es: "dos"
+      },
+      {
+        id: 3,
+        en: "three"
+      }
+    ],
+  })
+})
+
+describe("filter propiedades", () => {
+  
+  test("truthy value", async () => {
+    await expectToEqualAsync({
+      initial: { id: 0, name: "zero" },
+      schema: {
+        filterPropiedades: {
+          path: "current.value"
+        }
+      },
+      expected: { name: "zero" }
+    })
+  })
+
+  test("not null value", async () => {
+    await expectToEqualAsync({
+      initial: { id: 0, title: "", name: null },
+      schema: {
+        filterPropiedades: {
+          path: "current.value",
+          isNull: false
+        }
+      },
+      expected: { id: 0, title: "" }
+    })
+  })
+
+  test("not empty value", async () => {
+    await expectToEqualAsync({
+      initial: { id: 0, title: "", details: [], items: [1] },
+      schema: {
+        filterPropiedades: {
+          path: "current.value",
+          isNullOrEmpty: false
+        }
+      },
+      expected: { id: 0, items: [1] }
+    })
+  })
+
+  test("not empty value", async () => {
+    await expectToEqualAsync({
+      initial: { title: "", users: [], items: [1] },
+      schema: {
+        filterPropiedades: {
+          path: "current.value",
+          isNullOrEmpty: false
+        }
+      },
+      expected: { items: [1] }
+    })
+  })
+
+  test("is null or empty", async () => {
+    await expectToEqualAsync({
+      initial: { id: 0, title: null, details: [], items: [1] },
+      schema: {
+        filterPropiedades: {
+          path: "current.value",
+          isNullOrEmpty: true
+        }
+      },
+      expected: { title: null, details: [] }
+    })
+  })
+
+  test("is null or empty", async () => {
+    await expectToEqualAsync({
+      initial: { id: undefined, title: "", users: [], items: [1] },
+      schema: {
+        filterPropiedades: {
+          path: "current.value",
+          isNullOrEmpty: true
+        }
+      },
+      expected: { id: undefined, title: "", users: [] }
+    })
+  })
+
+})
+
+describe("is null or empty", () => {
+
+  const cases = [
+    {
+      initial: undefined,
+      condition: true,
+      expected: true
+    },
+    {
+      initial: null,
+      condition: true,
+      expected: true
+    },
+    {
+      initial: {},
+      condition: true,
+      expected: true
+    },
+    {
+      initial: [],
+      condition: true,
+      expected: true
+    },
+    {
+      initial: { id: 1 },
+      condition: true,
+      expected: false
+    },
+    {
+      initial: [1],
+      condition: true,
+      expected: false
+    },
+    {
+      initial: {},
+      condition: false,
+      expected: false
+    },
+    {
+      initial: [],
+      condition: false,
+      expected: false
+    },
+    {
+      initial: { id: 1 },
+      condition: false,
+      expected: true
+    },
+    {
+      initial: [1],
+      condition: false,
+      expected: true
+    },
+  ] as const
+
+  test.each(cases)("expect is null or empty", async ({ initial, condition, expected }) => {
+    await expectToEqualAsync({
+      initial,
+      schema: {
+        isNullOrEmpty: condition
+      },
+      expected
+    })
+  })
+})
+
+describe("is empty", () => {
+
+  const cases = [
+    [{}, true, true],
+    [{}, false, false],
+    [
+      { id: 1 }, 
+      true, 
+      false
+    ],
+    [
+      { id: undefined }, 
+      true, 
+      false
+    ],
+    [
+      { id: 1 }, 
+      false, 
+      true
+    ],
+    [
+      { id: undefined }, 
+      false, 
+      true
+    ],
+  ] as const
+
+  test.each(cases)("expect is empty", async (initial, isEmpty, expected) => {
+    await expectToEqualAsync({
+      initial,
+      schema: {
+        isEmpty
+      },
+      expected
+    })
+
+    await expectToEqualAsync({
+      initial,
+      schema: {
+        isEmpty: !isEmpty
+      },
+      expected: !expected
+    })
+  })
+})
+
+describe("isNull", () => {
+  const cases = [
+    undefined,
+    null,
+    NaN,
+    false,
+    true,
+    0,
+    1,
+    "",
+    " ",
+    "0",
+    "2",
+    {},
+    [],
+    [1, 2]
+  ].map(value => [value, value == null] as const)
+
+  test.each(cases)("expect is null", async (initial, isNull) => {
+    await expectToEqualAsync({
+      initial,
+      schema: {
+        isNull: true
+      },
+      expected: isNull
+    })
+
+    await expectToEqualAsync({
+      initial,
+      schema: {
+        isNull: false
+      },
+      expected: !isNull
+    })
+  })
+})
+
 test("set array path", async () => {
   await expectToEqualAsync({
     store: {
@@ -3139,39 +3531,6 @@ describe("array", () => {
 })
 
 describe("mixed", () => {
-
-  test.todo("reduce, orderBy and filter", async () => {
-    const schema: Schema = {
-      const: [3, 10, 2, 4, 1].map(id => ({ id, nombre: [4, 10].includes(id) ? "Melany" : "Fernando" })),
-      reduce: [
-        {
-          // array: {
-          //   orderBy: "id"
-          // }
-        },
-        {
-          // array: {
-          //   filter: {
-          //     path: "inner.nombre",
-          //     comparacion: {
-          //       method: "equal",
-          //       schema: {
-          //         path: "outer.source.nombre"
-          //       }
-          //     }
-          //   }
-          // }
-        }
-      ]
-    }
-
-    await expectToEqualAsync({
-      store: { nombre: "Melany" },
-      schema,
-      expected: [4, 10].map(id => ({ id, nombre: "Melany" }))
-    })
-  })
-
   describe.todo("flat", () => {
 
     test("flat", async () => {

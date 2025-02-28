@@ -1,3 +1,22 @@
+export const isEmpty = (value: string | Record<string, any> | any[]) => {
+    const type = Array.isArray(value) ? "array" : (value != null ? typeof value : "null")
+    let result = false
+
+    switch (type) {
+        case "null":
+            result = true
+            break
+        case "string":
+        case "array":
+            result = !value.length
+            break
+        case "object":
+            result = !Object.keys(value).length
+    }
+
+    return result
+}
+
 const argsPairFn = () => {
     const options = {
         string: (value: string, rightValue: any) : [string, any] => [value, rightValue],
