@@ -450,7 +450,6 @@ export class SchemaTaskResultBuilder implements Builder {
 
         return entries.length
             ? this
-                .addMerge()
                 .withUnshiftArray(initial => {
                     return entries.map(({ definition, task }) => this
                         .with({ initial })
