@@ -3523,30 +3523,6 @@ describe("array", () => {
       expected: { total: source.length - 1 }
     })
   })
-
-  describe.todo("orderBy", () => {
-    const source = [
-      [[2, 3, 8, 10].map(id => ({ id })), true],
-      [[3, 2, 10, 8].map(id => ({ id })), false]
-    ]
-
-    test.each(source)("%o is ordered by id => %s", async (expectedItem, value) => {
-
-      const schema: Schema = {
-        const: [10, 2, 8, 3].map(id => ({ id })),
-        // array: {
-        //   orderBy: true
-        // }
-      }
-
-      const resultados = await buildResultsAsync({ store: {}, schema })
-      const expected = [expectedItem, expectedItem]
-
-      value
-        ? expect(resultados).toEqual(expected)
-        : expect(resultados).not.toEqual(expected)
-    })
-  })
 })
 
 describe("mixed", () => {
