@@ -1,4 +1,4 @@
-import { OperatorTask } from "../models"
+import { OperatorTask, WithTaskOptions } from "../models"
 
 import {
     argsPair,
@@ -19,7 +19,7 @@ type PatchOptions = {
     transform?: (options: { previousValue: any, newValue: any }) => any
 }
 
-export class Operators {
+export class Operators implements WithTaskOptions<Operators> {
     constructor(otherOperators = {}) {
         Object.assign(this, otherOperators)
     }
@@ -103,10 +103,10 @@ export class Operators {
     minus = (a: number, b: number) => a - b
     times = (a: number, b: number) => a * b
     dividedBy = (a: number, b: number) => a / b
-    parse = JSON.parse
+    parse = (text: string) => JSON.parse(text)
     trim = (value: string) => value.trim()
     removeAccents = removeAccents
-    stringify = JSON.stringify
+    stringify = (value: any) => JSON.stringify(value)
     sort = (array: any[], option: true | "descending" = true) => {
         return this.sortBy(array, { descending: option === "descending" })
     }
