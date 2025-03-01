@@ -9,6 +9,25 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("if with current", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: 2,
+      if: {
+        const: 1,
+        lessThan: 3,
+      },
+      then: {
+        path: "current"
+      },
+      else: {
+        const: "error"
+      }
+    },
+    expected: 2
+  })
+})
+
 test("patch todos", async () => {
   await expectToEqualAsync({
     initial: [
