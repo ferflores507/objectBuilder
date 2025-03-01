@@ -156,5 +156,6 @@ export type Schema = Partial<{
     unpackAsGetters: SchemaDefinition
     use: string
     UUID: true
+    values: true
     with: Schema
 }> & ArraySchema
