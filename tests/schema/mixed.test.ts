@@ -14,33 +14,25 @@ describe("format propiedades", () => {
     {
       path: "details",
       formatPropiedades: {
-        propiedades: {
+        propiedadesFunction: {
           nombre: {
-            function: {
-              trim: true,
-              removeAccents: true
-            }
+            trim: true,
+            removeAccents: true
           },
           keywords: {
-            function: {
-              path: "arg.target.nombre",
-              keywords: true
-            }
+            path: "arg.target.nombre",
+            keywords: true
           },
           size: {
-            function: {
-              and: {
-                path: "arg.target.nombre.length",
-              }
+            and: {
+              path: "arg.target.nombre.length",
             }
           },
           trimmed: {
-            function: {
-              path: "arg.source.nombre.length",
-              minus: {
-                path: "arg.target.nombre.length"
-              },
-            }
+            path: "arg.source.nombre.length",
+            minus: {
+              path: "arg.target.nombre.length"
+            },
           }
         }
       }

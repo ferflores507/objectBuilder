@@ -132,6 +132,7 @@ export type Schema = Partial<{
     patchWith: Schema
     propiedadesAsync: Propiedades
     propiedades: Propiedades
+    propiedadesFunction: Propiedades
     reduce: SchemaDefinition
     reduceOrDefault: SchemaDefinition
     removeAccents: true

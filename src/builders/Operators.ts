@@ -1,4 +1,4 @@
-import { OperatorTask, WithTaskOptions } from "../models"
+import { OperatorTask, Propiedades, WithTaskOptions } from "../models"
 
 import {
     argsPair,
@@ -78,6 +78,18 @@ export class Operators implements WithTaskOptions<Operators> {
     unpackAsGetters = (obj: {}, b: string[]) => entry(obj).unpackAsGetters(b)
     spread = spread
     spreadFlat = (a: any, b: any[]) => this.spread(a, b.flat())
+    propiedadesFunction = {
+        transform: (propiedades: Propiedades) => {
+            const target = { ...propiedades }
+
+            for(const key in target) {
+                target[key] = { function: target[key] }
+            }
+
+            return { propiedades: target }
+        },
+        task: (initial: Record<string, any>, current: Record<string, any>) => current
+    }
     formatPropiedades = (source: Record<string, any>, formatter: Record<string, Function>) => {
         const target = { ...source }
 
