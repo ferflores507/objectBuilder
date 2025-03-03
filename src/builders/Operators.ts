@@ -83,7 +83,7 @@ export class Operators implements WithTaskOptions<Operators> {
         task: (propiedades: Record<string, any>, filterFn: Function) => {
             const filteredEntries = Object
                 .entries(propiedades)
-                .filter(([key, value]) => filterFn({ key, value }))
+                .filter(([key, value]) => filterFn({ key, value }, { initial: value }))
     
             return Object.fromEntries(filteredEntries)
         }
