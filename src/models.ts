@@ -104,6 +104,7 @@ export type Schema = Partial<{
     entries: true
     equals: SchemaDefinition | SchemaPrimitive
     filterPropiedades: SchemaDefinition | SchemaPrimitive
+    formatPropiedades: Schema
     flat: true
     function: SchemaDefinition
     greaterThan: SchemaDefinition | SchemaPrimitive
@@ -131,6 +132,7 @@ export type Schema = Partial<{
     patchWith: Schema
     propiedadesAsync: Propiedades
     propiedades: Propiedades
+    propiedadesFunction: Propiedades
     reduce: SchemaDefinition
     reduceOrDefault: SchemaDefinition
     removeAccents: true

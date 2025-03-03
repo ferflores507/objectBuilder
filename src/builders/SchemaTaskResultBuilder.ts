@@ -308,10 +308,11 @@ export class SchemaTaskResultBuilder implements Builder {
         const targetSchema = asyncFunction ?? functionSchema
 
         return targetSchema
-            ? this.add(() => (initial: any) => {
+            ? this.add(() => (arg: any, options?: BuilderOptions) => {
                 const builder = this.with({
-                    initial,
-                    arg: initial,
+                    initial: arg,
+                    arg,
+                    ...options,
                     schema: targetSchema
                 })
 

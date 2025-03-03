@@ -9,6 +9,107 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("format propiedades", () => {
+  const schemas = [
+    {
+      path: "details",
+      formatPropiedades: {
+        propiedadesFunction: {
+          nombre: {
+            trim: true,
+            removeAccents: true
+          },
+          keywords: {
+            path: "arg.target.nombre",
+            keywords: true
+          },
+          size: {
+            and: {
+              path: "arg.target.nombre.length",
+            }
+          },
+          trimmed: {
+            path: "arg.source.nombre.length",
+            minus: {
+              path: "arg.target.nombre.length"
+            },
+          }
+        }
+      }
+    },
+    {
+      reduce: [
+        {
+          path: "details",
+        },
+        {
+          init: {
+            nombre: {
+              path: "current.nombre",
+              trim: true,
+              removeAccents: true
+            }
+          }
+        },
+        {
+          init: {
+            trimmed: {
+              path: "current.nombre.length",
+              minus: {
+                path: "$nombre.length"
+              },
+            }
+          }
+        },
+        {
+          spread: {
+            propiedades: {
+              nombre: {
+                path: "$nombre"
+              },
+              keywords: {
+                path: "$nombre",
+                keywords: true
+              },
+              size: {
+                path: "current.size",
+                and: {
+                  path: "$nombre.length"
+                }
+              },
+              trimmed: {
+                path: "$trimmed"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+
+  test.each(schemas)("format propiedades", async (schema) => {
+    await expectToEqualAsync({
+      store: {
+        details: {
+          id: 1,
+          nombre: "  Mélany  ",
+          lastName: "Flores",
+          size: true
+        }
+      },
+      schema,
+      expected: {
+        id: 1,
+        nombre: "Melany",
+        lastName: "Flores",
+        keywords: ["melany"],
+        size: 6,
+        trimmed: 4
+      }
+    })
+  })
+})
+
 test("if with current", async () => {
   await expectToEqualAsync({
     schema: {
@@ -87,7 +188,6 @@ test("patch todos", async () => {
                   }
                 },
                 filterPropiedades: {
-                  path: "current.value",
                   isNullOrEmpty: false
                 },
               },
@@ -197,7 +297,7 @@ describe("filter propiedades", () => {
       initial: { id: 0, name: "zero" },
       schema: {
         filterPropiedades: {
-          path: "current.value"
+          path: "current"
         }
       },
       expected: { name: "zero" }
@@ -209,7 +309,6 @@ describe("filter propiedades", () => {
       initial: { id: 0, title: "", name: null },
       schema: {
         filterPropiedades: {
-          path: "current.value",
           isNull: false
         }
       },
@@ -222,7 +321,6 @@ describe("filter propiedades", () => {
       initial: { id: 0, title: "", details: [], items: [1] },
       schema: {
         filterPropiedades: {
-          path: "current.value",
           isNullOrEmpty: false
         }
       },
@@ -235,7 +333,6 @@ describe("filter propiedades", () => {
       initial: { title: "", users: [], items: [1] },
       schema: {
         filterPropiedades: {
-          path: "current.value",
           isNullOrEmpty: false
         }
       },
@@ -248,7 +345,6 @@ describe("filter propiedades", () => {
       initial: { id: 0, title: null, details: [], items: [1] },
       schema: {
         filterPropiedades: {
-          path: "current.value",
           isNullOrEmpty: true
         }
       },
@@ -261,7 +357,6 @@ describe("filter propiedades", () => {
       initial: { id: undefined, title: "", users: [], items: [1] },
       schema: {
         filterPropiedades: {
-          path: "current.value",
           isNullOrEmpty: true
         }
       },
