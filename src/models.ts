@@ -104,6 +104,7 @@ export type Schema = Partial<{
     entries: true
     equals: SchemaDefinition | SchemaPrimitive
     filterPropiedades: SchemaDefinition | SchemaPrimitive
+    formatPropiedades: Schema
     flat: true
     function: SchemaDefinition
     greaterThan: SchemaDefinition | SchemaPrimitive

@@ -78,6 +78,15 @@ export class Operators implements WithTaskOptions<Operators> {
     unpackAsGetters = (obj: {}, b: string[]) => entry(obj).unpackAsGetters(b)
     spread = spread
     spreadFlat = (a: any, b: any[]) => this.spread(a, b.flat())
+    formatPropiedades = (source: Record<string, any>, formatter: Record<string, Function>) => {
+        const target = { ...source }
+
+        for(const key in formatter) {
+            target[key] = formatter[key]({ source, target, current: source[key] })
+        }
+
+        return target
+    }
     filterPropiedades = {
         transform: (schema: any) => ({ function: schema }),
         task: (propiedades: Record<string, any>, filterFn: Function) => {

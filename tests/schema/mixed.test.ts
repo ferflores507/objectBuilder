@@ -9,6 +9,117 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("format propiedades", () => {
+  const schemas = [
+    {
+      path: "details",
+      formatPropiedades: {
+        propiedades: {
+          nombre: {
+            function: {
+              path: "arg.current",
+              trim: true,
+              removeAccents: true
+            }
+          },
+          keywords: {
+            function: {
+              path: "arg.target.nombre",
+              keywords: true
+            }
+          },
+          size: {
+            function: {
+              path: "arg.current",
+              and: {
+                path: "arg.target.nombre.length",
+              }
+            }
+          },
+          trimmed: {
+            function: {
+              path: "arg.source.nombre.length",
+              minus: {
+                path: "arg.target.nombre.length"
+              },
+            }
+          }
+        }
+      }
+    },
+    {
+      reduce: [
+        {
+          path: "details",
+        },
+        {
+          init: {
+            nombre: {
+              path: "current.nombre",
+              trim: true,
+              removeAccents: true
+            }
+          }
+        },
+        {
+          init: {
+            trimmed: {
+              path: "current.nombre.length",
+              minus: {
+                path: "$nombre.length"
+              },
+            }
+          }
+        },
+        {
+          spread: {
+            propiedades: {
+              nombre: {
+                path: "$nombre"
+              },
+              keywords: {
+                path: "$nombre",
+                keywords: true
+              },
+              size: {
+                path: "current.size",
+                and: {
+                  path: "$nombre.length"
+                }
+              },
+              trimmed: {
+                path: "$trimmed"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+
+  test.each(schemas)("format propiedades", async (schema) => {
+    await expectToEqualAsync({
+      store: {
+        details: {
+          id: 1,
+          nombre: "  Mélany  ",
+          lastName: "Flores",
+          size: true
+        }
+      },
+      schema,
+      expected: {
+        id: 1,
+        nombre: "Melany",
+        lastName: "Flores",
+        keywords: ["melany"],
+        size: 6,
+        trimmed: 4
+      }
+    })
+  })
+})
+
 test("if with current", async () => {
   await expectToEqualAsync({
     schema: {
