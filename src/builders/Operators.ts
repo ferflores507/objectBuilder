@@ -82,7 +82,8 @@ export class Operators implements WithTaskOptions<Operators> {
         const target = { ...source }
 
         for(const key in formatter) {
-            target[key] = formatter[key]({ source, target, current: source[key] })
+            const arg = { source, target, current: source[key] }
+            target[key] = formatter[key](arg, { initial: arg.current })
         }
 
         return target

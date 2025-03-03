@@ -17,7 +17,6 @@ describe("format propiedades", () => {
         propiedades: {
           nombre: {
             function: {
-              path: "arg.current",
               trim: true,
               removeAccents: true
             }
@@ -30,7 +29,6 @@ describe("format propiedades", () => {
           },
           size: {
             function: {
-              path: "arg.current",
               and: {
                 path: "arg.target.nombre.length",
               }
