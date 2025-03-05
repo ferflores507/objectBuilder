@@ -95,6 +95,7 @@ export type Schema = Partial<{
     consulta: Consulta
     call: string | Propiedades | string[]
     const: any
+    date: Schema | SchemaPrimitive
     debounce: Schema | SchemaPrimitive
     decrement: string
     default: SchemaDefinition | SchemaPrimitive

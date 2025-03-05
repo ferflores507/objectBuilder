@@ -9,6 +9,26 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("schema date", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: new Date(2025, 2, 4, 18),
+      date: {
+        propiedades: {
+          locale: "es-US",
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          weekday: 'short',
+          hour: "numeric",
+          minute: "numeric"
+        }
+      }
+    },
+    expected: "mar, 4 de mar de 2025, 6:00 p.m."
+  })
+})
+
 test("expect toLocaleDateString to equal DateTimeFormat short month", () => {
   const date = new Date(2025, 2, 4, 18);
   const locale = "es-US";
