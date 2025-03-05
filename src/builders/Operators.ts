@@ -25,6 +25,9 @@ export class Operators implements WithTaskOptions<Operators> {
     }
     assign: OperatorTask = (current, previous) => Object.assign(current, previous)
     boolean = (value: any) => !!value
+    date = (value: any, options: Intl.DateTimeFormatOptions & { locale: string }) => {
+        return new Date(value).toLocaleString(options.locale, options)
+    }
     debounce = (fn: (...args: []) => any, ms: number | true) => {
         return createDebounce(fn, ms === true ? 500 : ms)
     }

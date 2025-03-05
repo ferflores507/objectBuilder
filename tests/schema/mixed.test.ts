@@ -9,6 +9,82 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("schema date", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: new Date(2025, 2, 4, 18),
+      date: {
+        propiedades: {
+          locale: "es-US",
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          weekday: 'short',
+          hour: "numeric",
+          minute: "numeric"
+        }
+      }
+    },
+    expected: "mar, 4 de mar de 2025, 6:00 p.m."
+  })
+})
+
+test("expect toLocaleDateString to equal DateTimeFormat short month", () => {
+  const date = new Date(2025, 2, 4, 18);
+  const locale = "es-US";
+
+  const formatOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    weekday: 'short',
+    hour: "numeric",
+    minute: "numeric"
+  }
+
+  // dateStyle and timeStyle can be used with each other, but not with other date-time component options (e.g. 
+  // weekday, hour, month, etc.).
+  const options: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle: "short" };
+
+  const result = date.toLocaleString(locale, formatOptions)
+
+  expect(result).toEqual("mar, 4 de mar de 2025, 6:00 p.m.")
+})
+
+test("expect toLocaleDateString to equal DateTimeFormat", () => { 
+  const date = new Date(2025, 2, 4, 18)
+  const locale = 'es-US' 
+  const options: Intl.DateTimeFormatOptions = { dateStyle: 'long', timeStyle: 'short' }
+  
+  const toLocaleResult = date.toLocaleString(locale, options)
+  const dtfResult = new Intl.DateTimeFormat(locale, options).format(date);
+
+  expect(dtfResult).toEqual(toLocaleResult)
+  expect(toLocaleResult).toEqual("4 de marzo de 2025, 6:00 p.m.")
+})
+
+test("date format with es-US", () => {  
+  const date = new Date(2025, 2, 4, 18)
+  
+  const dtf = new Intl.DateTimeFormat('es-US', { dateStyle: 'long', timeStyle: 'short' });
+  const result = dtf.format(date);
+
+  expect(result).toEqual("4 de marzo de 2025, 6:00 p.m.")
+})
+
+test("date format (strange character)", () => {  
+  const date = new Date(2025, 2, 4, 18)
+  
+  const dtf = new Intl.DateTimeFormat('es-PA', { dateStyle: 'long', timeStyle: 'short' });
+  const result = dtf.format(date);
+
+  const strangeSection = result.slice(result.lastIndexOf("p"))
+  const partialSplit = "4 de marzo de 2025, 6:00".split(" ")
+  const expected = [...partialSplit, strangeSection]
+
+  expect(result.split(" ")).toEqual(expected)
+})
+
 describe("format propiedades", () => {
   const schemas = [
     {
