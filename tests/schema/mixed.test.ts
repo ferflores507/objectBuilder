@@ -9,6 +9,23 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("patch with empty array throws cannot read properties of undefined", async () => {
+  const promise = expectToEqualAsync({
+    schema: {
+      const: [],
+      patch: {
+        const: {
+          id: 1,
+          title: "Uno"
+        }
+      }
+    },
+    expected: []
+  })
+
+  await expect(promise).rejects.toThrow("Cannot read properties of undefined (reading 'id')")
+})
+
 test("prepend with and", async () => {
   await expectToEqualAsync({
     schema: {
