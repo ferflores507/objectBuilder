@@ -52,7 +52,7 @@ export class Operators implements WithTaskOptions<Operators> {
         const matchesToFind = [...concreteValue]
         const resultArray = [...array]
 
-        for (let i = 0; i <= array.length; i++) {
+        for (let i = 0; i < array.length; i++) {
             const index = matchesToFind.findIndex(matchToFind => matchToFind[key] === array[i][key])
 
             if (index !== -1) {
