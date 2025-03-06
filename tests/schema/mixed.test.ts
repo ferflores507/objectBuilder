@@ -21,7 +21,7 @@ test("prepend with and", async () => {
   })
 })
 
-test.fails("prepend with and fails", async () => {
+test("prepend with and fails", async () => {
   await expectToEqualAsync({
     schema: {
       const: "como estas",
