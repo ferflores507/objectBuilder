@@ -17,7 +17,7 @@ type PatchOptions = {
     key?: string
     value: any 
     transform?: (options: { previousValue: any, newValue: any }) => any
-    checkNotFound?: true
+    checkNotFound?: boolean
 }
 
 export class Operators implements WithTaskOptions<Operators> {
@@ -41,6 +41,9 @@ export class Operators implements WithTaskOptions<Operators> {
     }
     patch = (array: any[], value: any) => {
         return this.patchWith(array, { key: "id", value })
+    }
+    patchOrAdd = (array: any[], value: any) => {
+        return this.patchWith(array, { key: "id", value, checkNotFound: false })
     }
     patchWith = (array: any[], options: PatchOptions) => {
         const { 
