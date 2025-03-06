@@ -208,10 +208,10 @@ export class SchemaTaskResultBuilder implements Builder {
     withLogical(schema: Schema, condition = true) {
         const operator = condition ? "and" : "or"
         return operator in schema
-            ? this.withUnshift((current, previous) => {
-                return !!current === condition
-                    ? this.with({ initial: previous }).withSchemaOrDefault(schema[operator])
-                    : current
+            ? this.withUnshift(initial => {
+                return !!initial === condition
+                    ? this.with({ initial }).withSchemaOrDefault(schema[operator])
+                    : initial
             })
             : this
     }
