@@ -131,6 +131,7 @@ export type Schema = Partial<{
     parse: true
     patch: Schema
     patchWith: Schema
+    prepend: Schema | SchemaPrimitive
     propiedadesAsync: Propiedades
     propiedades: Propiedades
     propiedadesFunction: Propiedades

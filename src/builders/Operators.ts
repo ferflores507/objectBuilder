@@ -129,6 +129,7 @@ export class Operators implements WithTaskOptions<Operators> {
     times = (a: number, b: number) => a * b
     dividedBy = (a: number, b: number) => a / b
     parse = (text: string) => JSON.parse(text)
+    prepend = (target: any, value: any) => value.toString() + target.toString()
     trim = (value: string) => value.trim()
     removeAccents = removeAccents
     stringify = (value: any) => JSON.stringify(value)

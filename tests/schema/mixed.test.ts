@@ -9,6 +9,40 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("prepend with and", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: 0,
+      and: {
+        prepend: "expected: 0"
+      }
+    },
+    expected: 0
+  })
+})
+
+test("prepend with and fails", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: "como estas",
+      and: {
+        prepend: "Hola "
+      }
+    },
+    expected: "Hola como estas"
+  })
+})
+
+test("prepend", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: "como estas",
+      prepend: "Hola "
+    },
+    expected: "Hola como estas"
+  })
+})
+
 test("schema date", async () => {
   await expectToEqualAsync({
     schema: {
