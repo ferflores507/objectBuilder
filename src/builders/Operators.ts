@@ -17,6 +17,7 @@ type PatchOptions = {
     key?: string
     value: any 
     transform?: (options: { previousValue: any, newValue: any }) => any
+    checkNotFound?: true
 }
 
 export class Operators implements WithTaskOptions<Operators> {
@@ -45,7 +46,8 @@ export class Operators implements WithTaskOptions<Operators> {
         const { 
             key = "id", 
             value, 
-            transform = ({ previousValue, newValue }) => ({ ...previousValue, ...newValue })
+            transform = ({ previousValue, newValue }) => ({ ...previousValue, ...newValue }),
+            checkNotFound = true
         } = options
 
         const concreteValue = Array.isArray(value) ? value : [value]
@@ -68,7 +70,7 @@ export class Operators implements WithTaskOptions<Operators> {
             }
         }
 
-        if (matchesToFind.length) {
+        if (matchesToFind.length && checkNotFound) {
             throw {
                 msg: `Unable to patch. One or more items were not found.`,
                 array,
@@ -76,7 +78,9 @@ export class Operators implements WithTaskOptions<Operators> {
             }
         }
 
-        return resultArray
+        return matchesToFind.length 
+            ? [...resultArray, ...matchesToFind]
+            : resultArray
     }
     unpackAsGetters = (obj: {}, b: string[]) => entry(obj).unpackAsGetters(b)
     spread = spread
