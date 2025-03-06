@@ -9,6 +9,34 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("expect patch with empty array to reject with object as error", async () => {
+  const promise = expectToEqualAsync({
+    schema: {
+      const: [],
+      patch: {
+        const: {
+          id: 1,
+          title: "Uno"
+        }
+      }
+    },
+    expected: []
+  })
+
+  await expect(promise).rejects.toMatchInlineSnapshot(`
+    {
+      "array": [],
+      "itemsNotFound": [
+        {
+          "id": 1,
+          "title": "Uno",
+        },
+      ],
+      "msg": "Unable to patch. One or more items were not found.",
+    }
+  `)
+})
+
 test("prepend with and", async () => {
   await expectToEqualAsync({
     schema: {
