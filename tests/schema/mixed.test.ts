@@ -9,6 +9,87 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("patch or add", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: [
+        {
+          id: 1,
+          en: "one"
+        },
+        {
+          id: 3,
+          en: "three"
+        }
+      ],
+      patchOrAdd: {
+        const: {
+          id: 2,
+          es: "dos"
+        }
+      }
+    },
+    expected: [
+      {
+        id: 1,
+        en: "one",
+      },
+      {
+        id: 3,
+        en: "three"
+      },
+      {
+        id: 2,
+        es: "dos"
+      }
+    ],
+  })
+})
+
+test("patch or add array", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: [
+        {
+          id: 1,
+          en: "one"
+        },
+        {
+          id: 3,
+          en: "three"
+        }
+      ],
+      patchOrAdd: {
+        const: [
+          {
+            id: 1,
+            es: "uno"
+          },
+          {
+            id: 2,
+            es: "dos"
+          }
+        ]
+      }
+    },
+    expected: [
+      {
+        id: 1,
+        en: "one",
+        es: "uno"
+      },
+      {
+        id: 3,
+        en: "three"
+      },
+      {
+        id: 2,
+        es: "dos"
+      }
+    ],
+  })
+})
+
 test("expect patch with empty array to reject with object as error", async () => {
   const promise = expectToEqualAsync({
     schema: {
