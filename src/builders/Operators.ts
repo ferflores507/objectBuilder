@@ -128,6 +128,7 @@ export class Operators implements WithTaskOptions<Operators> {
         return value
             .trim()
             .split(/\s+/)
+            .filter(Boolean)
             .map(word => this.removeAccents(word).toLowerCase())
     }
     keywordsOrDefault = (value: Path) => Array.isArray(value) ? value : this.keywords(value)

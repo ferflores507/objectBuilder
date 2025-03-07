@@ -9,7 +9,7 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
-test.fails("expect keywords to be empty array when string is empty (fails)", async () => {
+test("expect keywords to be empty array when string is empty", async () => {
   await expectToEqualAsync({
     schema: {
       const: "",
