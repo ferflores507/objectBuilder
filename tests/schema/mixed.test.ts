@@ -9,6 +9,24 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("spread true", async () => {
+  const details = { id: 1 }
+  const builder = new SchemaTaskResultBuilder()
+    .with({
+      store: {
+        details
+      },
+      schema: {
+        path: "details",
+        spread: true
+      }
+    })
+
+  const detailsCopy = await builder.buildAsync()
+
+  expect(details).not.toBe(detailsCopy)
+})
+
 test("expect keywords to be empty array when string is empty", async () => {
   await expectToEqualAsync({
     schema: {
