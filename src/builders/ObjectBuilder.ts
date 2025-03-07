@@ -12,7 +12,7 @@ import { ComparisonTasks } from "./ComparisonTasks"
 const comparisonTasks: WithTaskOptions<ComparisonTasks> = new ComparisonTasks(new Operators())
 const imported = new Map()
 
-export class SchemaTaskResultBuilder implements Builder {
+export class ObjectBuilder implements Builder {
     constructor(private target?: any, options?: Partial<BuilderOptions>) {
         this.options = options ?? {
             store: {},
@@ -44,14 +44,14 @@ export class SchemaTaskResultBuilder implements Builder {
     }
 
     withUnshift(task: Task) {
-        const isBuilder = (value: any) => value instanceof SchemaTaskResultBuilder
+        const isBuilder = (value: any) => value instanceof ObjectBuilder
 
         return this
             .add(task)
             .add(result => isBuilder(result) ? this.unshift(result) : result)
     }
 
-    withUnshiftArray(task: (a: any, b: any) => SchemaTaskResultBuilder[]) {
+    withUnshiftArray(task: (a: any, b: any) => ObjectBuilder[]) {
         return this
             .add(task)
             .add(result => this.taskBuilder.unshiftArray(result))
@@ -80,7 +80,7 @@ export class SchemaTaskResultBuilder implements Builder {
             { operators: operators ? new Operators(operators) : this.options.operators }
         )
 
-        const builder = new SchemaTaskResultBuilder(this.target, newOptions)
+        const builder = new ObjectBuilder(this.target, newOptions)
 
         return schema ? builder.withSchema(schema) : builder
     }
@@ -95,7 +95,7 @@ export class SchemaTaskResultBuilder implements Builder {
         return value
     }
 
-    withSchema(schema: Schema | Schema[] | undefined): SchemaTaskResultBuilder {
+    withSchema(schema: Schema | Schema[] | undefined): ObjectBuilder {
 
         schema = Array.isArray(schema) ? { definitions: schema } : schema
 

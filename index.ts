@@ -1,7 +1,7 @@
-import { SchemaTaskResultBuilder } from "./src/builders/SchemaTaskResultBuilder"
+import { ObjectBuilder } from "./src/builders/ObjectBuilder"
 import type { Schema } from "./src/models"
 
 export {
-    SchemaTaskResultBuilder,
+    ObjectBuilder,
     Schema,
 }

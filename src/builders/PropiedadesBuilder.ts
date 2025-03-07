@@ -1,6 +1,6 @@
 import { assignAll } from "../helpers/varios";
 import { Propiedades, Schema, SchemaDefinition, SchemaPrimitive } from "../models";
-import { Builder } from "./SchemaTaskResultBuilder";
+import { Builder } from "./ObjectBuilder";
 
 export class PropiedadesBuilder {
     constructor(propiedades: Propiedades, private readonly builder: Builder) {
