@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from "vitest"
-import { SchemaTaskResultBuilder } from "../src/builders/SchemaTaskResultBuilder"
+import { ObjectBuilder } from "../src/builders/ObjectBuilder"
 import { Consulta } from "../src/models"
 import useConsulta from "../src/helpers/useConsulta"
 import { setupServer } from "../src/helpers/schemaServer"
@@ -19,7 +19,7 @@ describe("schema con consulta", () => {
       }
     }
 
-    const builder = new SchemaTaskResultBuilder()
+    const builder = new ObjectBuilder()
       .with({ schema })
 
     const data = await builder.buildAsync()

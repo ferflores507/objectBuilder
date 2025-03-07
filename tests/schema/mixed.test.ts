@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest'
 import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync'
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { entry } from '../../src/helpers/varios'
-import { SchemaTaskResultBuilder } from '../../src/builders/SchemaTaskResultBuilder'
+import { ObjectBuilder } from '../../src/builders/ObjectBuilder'
 import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
@@ -11,7 +11,7 @@ import { Propiedades } from '../../src/models'
 
 test("spread true", async () => {
   const details = { id: 1 }
-  const builder = new SchemaTaskResultBuilder()
+  const builder = new ObjectBuilder()
     .with({
       store: {
         details
@@ -811,7 +811,7 @@ describe("debounce", function () {
   afterEach(() => vi.useRealTimers());
 
   it("expects function call to set arg as 'store.nombre' value", () => {
-    const builder = new SchemaTaskResultBuilder()
+    const builder = new ObjectBuilder()
       .with({
         schema: {
           function: {
@@ -833,7 +833,7 @@ describe("debounce", function () {
   const cases = [true, 300, 1000] as const
   
   test.each(cases)("expects function with debounce: %s to be called one time", (debounce) => {
-    const builder = new SchemaTaskResultBuilder()
+    const builder = new ObjectBuilder()
       .with({
         store: {
           total: 0
@@ -1033,7 +1033,7 @@ describe("sort by", () => {
 
 test("propiedadesAsync", async () => {
 
-  const result = await new SchemaTaskResultBuilder()
+  const result = await new ObjectBuilder()
     .with({
       schema: {
         init: {
@@ -1061,7 +1061,7 @@ test("propiedadesAsync", async () => {
 
 test("definitions with async call works", async () => {
 
-  const result = await new SchemaTaskResultBuilder()
+  const result = await new ObjectBuilder()
     .with({
       schema: {
         init: {
@@ -1089,7 +1089,7 @@ test("definitions with async call works", async () => {
 
 test.fails("propiedades fails with async call", async () => {
 
-  const result = await new SchemaTaskResultBuilder()
+  const result = await new ObjectBuilder()
     .with({
       schema: {
         init: {
@@ -1419,7 +1419,7 @@ describe("array patch and patchWith", () => {
   ]
 
   test.each(casesThrow)("expect patch to throw when original item is not found", (patch) => {
-    const builder = new SchemaTaskResultBuilder()
+    const builder = new ObjectBuilder()
       .with({
         schema: {
           const: [...Array(5)].map((_, ix) => ({ id: ix + 1 })),
@@ -1559,7 +1559,7 @@ test("unpack as getters", () => {
     id: 1
   }
 
-  const obj = new SchemaTaskResultBuilder()
+  const obj = new ObjectBuilder()
     .with({
       store: {
         user
@@ -1772,7 +1772,7 @@ describe("schema from async", () => {
   ]
 
   test.each(cases)("$message", async ({ schema }) => {
-    const result = await new SchemaTaskResultBuilder()
+    const result = await new ObjectBuilder()
       .with({
         schema: {
           schemaFrom: {
@@ -1819,7 +1819,7 @@ describe("schema string join", () => {
 
     test("dash with async fails on buildAsync", async () => {
       const separator = "-"
-      const result = await new SchemaTaskResultBuilder()
+      const result = await new ObjectBuilder()
         .with({
           schema: {
             const: values,
@@ -1861,7 +1861,7 @@ test("schema isComputed property", () => {
     nombre: "Fernando"
   }
 
-  const result = new SchemaTaskResultBuilder()
+  const result = new ObjectBuilder()
     .with({
       store,
       schema: {
@@ -1883,7 +1883,7 @@ test("schema isComputed property", () => {
 })
 
 describe("schema async function", async () => {
-  const store = new SchemaTaskResultBuilder()
+  const store = new ObjectBuilder()
     .withSchema({
       propiedades: {
         getSeven: {
@@ -1906,7 +1906,7 @@ describe("schema async function", async () => {
 })
 
 test("with bind arg", () => {
-  const func = new SchemaTaskResultBuilder()
+  const func = new ObjectBuilder()
     .with({
       schema: {
         function: {
@@ -1987,7 +1987,7 @@ describe("define property", () => {
 })
 
 test("object with function to set sibling", () => {
-  const obj = new SchemaTaskResultBuilder()
+  const obj = new ObjectBuilder()
     .with({
       schema: {
         propiedades: {
@@ -2181,10 +2181,10 @@ describe("schema with functions useFirst and useLast with source (a, b, c)", () 
   test.each(cases)("expects use$use to return $expected", async ({ use, expected }) => {
     await expectToEqualAsync({
       functions: {
-        useFirst: (items: any[], builder: SchemaTaskResultBuilder) => {
+        useFirst: (items: any[], builder: ObjectBuilder) => {
           builder.add(() => items[0])
         },
-        useLast: (items: any[], builder: SchemaTaskResultBuilder) => {
+        useLast: (items: any[], builder: ObjectBuilder) => {
           builder.add(() => items[items.length - 1])
         }
       },
@@ -2456,7 +2456,7 @@ test("schema array async", async () => {
 
 describe("withFunction", () => {
   test.each(["arg", "current"])("expect function call to return array with arg", async (path) => {
-    const func = new SchemaTaskResultBuilder()
+    const func = new ObjectBuilder()
       .with({
         schema: {
           function: [{ path }]
@@ -2663,7 +2663,7 @@ test("filter with source", async () => {
 test("map builder with undefined", async () => {
   const items = [1, undefined, 2, 3]
   const result = items.map(x => {
-    return new SchemaTaskResultBuilder()
+    return new ObjectBuilder()
       .with({
         initial: x,
         schema: {
@@ -2763,7 +2763,7 @@ test("path current", async () => {
 })
 
 test("not", () => {
-  const result = new SchemaTaskResultBuilder()
+  const result = new ObjectBuilder()
     .withSchema({
       const: { activated: true },
       not: {
@@ -2790,7 +2790,7 @@ test("array builder with schema with find", () => {
     { nombre: "Melany" }
   ]
 
-  const builder = new SchemaTaskResultBuilder()
+  const builder = new ObjectBuilder()
   const result = new ArrayBuilder(items, builder).build(schema)
 
   expect(result).toEqual({ nombre: "Melany" })
@@ -2904,7 +2904,7 @@ describe("increment or decrement", () => {
         path: "total"
       }
     }
-    const builder = new SchemaTaskResultBuilder()
+    const builder = new ObjectBuilder()
       .with({
         store,
         schema
@@ -3010,7 +3010,7 @@ describe("not", () => {
 
     test.each(schemas)("schema: $schema", async (schema: Schema) => {
       const store = { activated: false }
-      const builder = new SchemaTaskResultBuilder()
+      const builder = new ObjectBuilder()
         .with({ store })
 
       const results = [
@@ -3091,7 +3091,7 @@ describe("add schema", () => {
       }
     }
 
-    const result = new SchemaTaskResultBuilder()
+    const result = new ObjectBuilder()
       .withSchema(schema)
       .build()
     const expected = [3]
@@ -3174,7 +3174,7 @@ test("getPathValue throws on null source", () => {
 })
 
 describe("select", () => {
-  const builder = new SchemaTaskResultBuilder()
+  const builder = new ObjectBuilder()
     .with({
       store: {
         selected: [2]
@@ -3214,7 +3214,7 @@ describe("propiedades builder", () => {
 
   const expectResultsAsync = async (options: CaseOptions) => {
     const { propiedades, expected, ...rest } = options
-    const builder = new SchemaTaskResultBuilder()
+    const builder = new ObjectBuilder()
       .with(rest)
       
     const propiedadesBuilder = new PropiedadesBuilder(propiedades, builder)

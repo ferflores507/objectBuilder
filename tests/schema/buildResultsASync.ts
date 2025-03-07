@@ -1,12 +1,12 @@
 import { expect } from "vitest"
-import { SchemaTaskResultBuilder } from "../../src/builders/SchemaTaskResultBuilder"
+import { ObjectBuilder } from "../../src/builders/ObjectBuilder"
 import { BuilderOptions, SchemaDefinition } from "../../src/models"
 
 type CaseOptions = Partial<BuilderOptions> & { schema: SchemaDefinition }
 
 export const buildResultsAsync = async (options: CaseOptions) => {
 
-    const builder = new SchemaTaskResultBuilder()
+    const builder = new ObjectBuilder()
 
     return [builder.with(options).build(), await builder.with(options).buildAsync()]
 }
