@@ -311,5 +311,8 @@ export const esIgual = (a: any, b: any) => {
     if (a === undefined && b === undefined) {
         console.warn("Ambos valores a comparar son undefined")
     }
-    return JSON.stringify(a) === JSON.stringify(b)
+
+    return typeof (b) != "object" || b == null
+        ? a == b
+        : JSON.stringify(a) === JSON.stringify(b)
 }
