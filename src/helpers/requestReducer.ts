@@ -1,18 +1,22 @@
-export type Request = {
+export type ActiveRequest = {
     id: any
+    controller: AbortController
     inProgress: boolean
     error: any
 }
 
-export const reducer = (requests: Request[], requestId: any) => {
+export const reducer = (requests: ActiveRequest[], requestId: any) => {
 
-    const patch = (value: Partial<Request>) => {
+    const patch = (value: Partial<ActiveRequest>) => {
         return requests.map(request => request.id === value.id ? { ...request, ...value } : request)
     }
 
-    const requestStarted = () => {
+    const requestStarted = (controller: AbortController) => {
         const existingRequest = requests.find(req => req.id === requestId)
-        const patchValue = { inProgress: true, error: null }
+
+        existingRequest?.controller.abort("restarted")
+
+        const patchValue = { controller, inProgress: true, error: null }
 
         return existingRequest
             ? patch(patchValue)
@@ -24,7 +28,7 @@ export const reducer = (requests: Request[], requestId: any) => {
     }
 
     const requestFailed = (error: any) => {
-        return patch({ inProgress: false, error })
+        return error === "restarted" ? requests : patch({ inProgress: false, error })
     }
 
     return {

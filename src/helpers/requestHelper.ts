@@ -1,18 +1,19 @@
-import { reducer, Request } from "./requestReducer"
+import { reducer, ActiveRequest } from "./requestReducer"
 
 type Options = {
     requests: [],
-    dispatch: (requests: Request[]) => any
+    dispatch: (requests: ActiveRequest[]) => any
 }
 
-export const reduceRequest = async (request: Promise<any>, requestId: any, { requests, dispatch } : Options) => {
+export const reduceRequest = async (request: Request, requestId: any, { requests, dispatch } : Options) => {
     
     const actions = reducer(requests, requestId)
+    const controller = new AbortController()
 
-    dispatch(actions.requestStarted())
+    dispatch(actions.requestStarted(controller))
 
     try {
-        const result = await request
+        const result = await fetch(request, { signal: controller.signal })
 
         dispatch(actions.requestFinished())
 
