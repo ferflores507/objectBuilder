@@ -1,32 +1,26 @@
-import { reducer, ActiveRequest } from "./requestReducer"
-import { RequestInitWithUrl, RequestWithUrl } from "./varios"
+import { reducer, type RequestBaseInfo, type ActiveRequest } from "./requestReducer"
+
+export type RequestInfo = RequestBaseInfo & {
+    promise: () => Promise<any>
+}
 
 type Options = {
-    requests: [],
+    state: any,
     dispatch: (requests: ActiveRequest[]) => any
 }
 
-export const reduceRequest = async (request: RequestInitWithUrl, requestId: any, { requests, dispatch } : Options) => {
+export const reduceRequest = async (requestInfo: RequestInfo, { state, dispatch } : Options) => {
     
-    const actions = reducer(requests, requestId)
-    const controller = new AbortController()
+    const actions = reducer(state, requestInfo)
 
-    dispatch(actions.requestStarted(controller))
+    dispatch(actions.requestStarted())
 
     try {
-        // Verify if its ok to add signal in 2nd param object or spread to request
-        const response = await fetch(new RequestWithUrl(request), { signal: controller.signal })
-
-        if(!response.ok) {
-            throw {
-                status: response.status,
-                statusText: response.statusText
-            }
-        }
+        const result = await requestInfo.promise()
 
         dispatch(actions.requestFinished())
 
-        return response.json()
+        return result
     }
     catch (error) {
         dispatch(actions.requestFailed(error))
