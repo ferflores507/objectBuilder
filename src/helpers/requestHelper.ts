@@ -9,8 +9,8 @@ type Options = {
     dispatch: (requests: ActiveRequest[]) => any
 }
 
-export const reduceRequest = async (requestInfo: RequestInfo, { state, dispatch } : Options) => {
-    
+export const reduceRequest = async (requestInfo: RequestInfo, options: Options) => {
+    const { state, dispatch } = options
     const actions = reducer(state, requestInfo)
 
     dispatch(actions.requestStarted())

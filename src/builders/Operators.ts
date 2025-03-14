@@ -1,13 +1,16 @@
-import { OperatorTask, Propiedades, WithTaskOptions } from "../models"
+import { Builder, OperatorTask, Propiedades, WithTaskOptions } from "../models"
+import { reduceRequest, type RequestInfo } from "../helpers/requestHelper"
 
 import {
     argsPair,
     buildRequest,
     createDebounce,
     entries, entry,
+    fetchHelper,
     formatSortOptions,
     Path,
     removeAccents,
+    RequestInitWithUrl,
     type RequestPlainOptions,
     sortCompare,
     type SortOptions,
@@ -108,6 +111,24 @@ export class Operators implements WithTaskOptions<Operators> {
     }
     request = (initial: any, options: RequestPlainOptions) => {
         return buildRequest(options)
+    }
+    reduceFetch = (requestInit: RequestInitWithUrl, id: any, builder: Builder) => {
+        const requestInfo: RequestInfo = {
+            id,
+            controller: new AbortController(),
+            promise() { 
+                return fetchHelper(requestInit, { signal: this.controller.signal }) 
+            }
+        }
+
+        return reduceRequest(requestInfo, { 
+            state: builder.options.store, 
+            dispatch: (requests) => {
+                // builder.set("requests", requests)
+                builder.options.store.requests = requests
+                // this.state.requests = requests // doesnt work
+            }
+        })
     }
     formatPropiedades = (source: Record<string, any>, formatter: Record<string, Function>) => {
         const target = { ...source }
