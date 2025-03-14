@@ -10,6 +10,42 @@ beforeAll(() => {
   server.listen()
 })
 
+test("reduce fetch expects to update store/requests with 1 item", async () => {
+  const store = { requests: [] }
+  const builder = new ObjectBuilder()
+    .with({ store })
+    .withSchema({
+      request: {
+        propiedades: {
+          url: "http://localhost:8000/numeros2"
+        }
+      },
+      reduceFetch: 1
+    })
+
+  await Promise.allSettled([builder.build()])
+
+  expect(store.requests.length).toEqual(1)
+})
+
+test("reduce fetch", async () => {
+  const result = await new ObjectBuilder()
+    .with({ store: { requests: [] } })
+    .withSchema({
+      request: {
+        propiedades: {
+          url: "http://localhost:8000/numeros"
+        }
+      },
+      reduceFetch: 1
+    })
+    .build()
+
+  const expected = [...Array(10).keys()]
+
+  expect(result).toEqual(expected)
+})
+
 test("schema request", async () => {
   const request = new ObjectBuilder()
     .withSchema({
