@@ -1,6 +1,20 @@
 type Modify<T, R> = Omit<T, keyof R> & R;
 const applicationJson = "application/json"
 
+export const fetchHelper = async (request: RequestInitWithUrl, init?: RequestInit) => {
+    // Verify if its ok to add signal in 2nd param object or spread to request
+    const response = await fetch(new RequestWithUrl(request), init)
+
+    if (!response.ok) {
+        throw {
+            status: response.status,
+            statusText: response.statusText
+        }
+    }
+
+    return response.json()
+}
+
 export type RequestPlainOptions = Modify<Partial<Request>, {
     url: string
     contentType?: typeof applicationJson
