@@ -2,11 +2,13 @@ import { OperatorTask, Propiedades, WithTaskOptions } from "../models"
 
 import {
     argsPair,
+    buildRequest,
     createDebounce,
     entries, entry,
     formatSortOptions,
     Path,
     removeAccents,
+    type RequestPlainOptions,
     sortCompare,
     type SortOptions,
     spread,
@@ -103,6 +105,9 @@ export class Operators implements WithTaskOptions<Operators> {
             return { propiedades: target }
         },
         task: (initial: Record<string, any>, current: Record<string, any>) => current
+    }
+    request = (initial: any, options: RequestPlainOptions) => {
+        return buildRequest(options)
     }
     formatPropiedades = (source: Record<string, any>, formatter: Record<string, Function>) => {
         const target = { ...source }

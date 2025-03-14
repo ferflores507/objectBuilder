@@ -3,10 +3,29 @@ import { ObjectBuilder } from "../src/builders/ObjectBuilder"
 import { Consulta } from "../src/models"
 import useConsulta from "../src/helpers/useConsulta"
 import { setupServer } from "../src/helpers/schemaServer"
+import { RequestWithUrl } from "../src/helpers/varios"
 
 beforeAll(() => {
   const server = setupServer()
   server.listen()
+})
+
+test("schema request", async () => {
+  const request = new ObjectBuilder()
+    .withSchema({
+      request: {
+        propiedades: {
+          url: "http://localhost:8000/numeros"
+        }
+      }
+    })
+    .build()
+  
+  const response = await fetch(new RequestWithUrl(request))
+  const data = await response.json()
+  const expected = [...Array(10).keys()]
+
+  expect(data).toEqual(expected)
 })
 
 describe("schema con consulta", () => {

@@ -139,6 +139,7 @@ export type Schema = Partial<{
     reduce: SchemaDefinition
     reduceOrDefault: SchemaDefinition
     removeAccents: true
+    request: Schema
     required: string[]
     schemaFrom: SchemaDefinition
     selectSet: string
