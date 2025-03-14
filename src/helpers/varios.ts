@@ -1,3 +1,45 @@
+type Modify<T, R> = Omit<T, keyof R> & R;
+
+export type RequestPlainOptions = Modify<Request, {
+    body: Record<string, any>
+    contentType: "application/json"
+    isFormData: true
+    query: Record<string, any>
+}>
+
+export const urlWithCleanQueryString = (url: string, query: Record<string, any>) => {
+    const queryString = new URLSearchParams(removeNullOrUndefined(query)).toString()
+    
+    return url + (queryString && "?") + queryString
+}
+
+export const buildRequest = (options: RequestPlainOptions) => {
+    const {
+        url,
+        method,
+        isFormData,
+        contentType = "application/json",
+        query = {},
+        body,
+        headers
+    } = options
+
+    const requestInit: RequestInit = {
+        method,
+        headers: {
+            ...(isFormData ? {} : { "Content-Type": contentType }),
+            ...headers
+        },
+        body: body 
+            ? (isFormData ? getFormData(body) : JSON.stringify(body)) 
+            : null
+    }
+
+    const fullUrl = urlWithCleanQueryString(url, query)
+
+    return new Request(fullUrl, requestInit)
+}
+
 export const isEmpty = (value: string | Record<string, any> | any[]) => {
     const type = Array.isArray(value) ? "array" : (value != null ? typeof value : "null")
     let result = false
