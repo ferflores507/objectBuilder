@@ -3,7 +3,7 @@ import { ObjectBuilder } from "../src/builders/ObjectBuilder"
 import { Consulta } from "../src/models"
 import useConsulta from "../src/helpers/useConsulta"
 import { setupServer } from "../src/helpers/schemaServer"
-import { RequestInitWithUrl } from "../src/helpers/varios"
+import { RequestWithUrl } from "../src/helpers/varios"
 
 beforeAll(() => {
   const server = setupServer()
@@ -11,7 +11,7 @@ beforeAll(() => {
 })
 
 test("schema request", async () => {
-  const requestInit = new ObjectBuilder()
+  const request = new ObjectBuilder()
     .withSchema({
       request: {
         propiedades: {
@@ -19,9 +19,9 @@ test("schema request", async () => {
         }
       }
     })
-    .build() as RequestInitWithUrl
+    .build()
   
-  const response = await fetch(requestInit.url, requestInit)
+  const response = await fetch(new RequestWithUrl(request))
   const data = await response.json()
   const expected = [...Array(10).keys()]
 

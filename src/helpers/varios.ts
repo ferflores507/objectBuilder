@@ -17,6 +17,12 @@ export const urlWithCleanQueryString = (url: string, query: Record<string, any>)
 
 export type RequestInitWithUrl = Modify<RequestInit, { url: string }>
 
+export class RequestWithUrl extends Request {
+    constructor(input: RequestInitWithUrl) {
+        super(input.url, input)
+    }
+}
+
 const findFirstAndFormat = (items: [any, (val: any) => any][]) => {
     return items.find(([val, format]) => val && format(val))
 }
