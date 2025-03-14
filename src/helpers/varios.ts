@@ -1,10 +1,12 @@
 type Modify<T, R> = Omit<T, keyof R> & R;
+const applicationJson = "application/json"
 
-export type RequestPlainOptions = Modify<Request, {
-    body: Record<string, any>
-    contentType: "application/json"
-    isFormData: true
-    query: Record<string, any>
+export type RequestPlainOptions = Modify<Partial<Request>, {
+    url: string
+    contentType?: typeof applicationJson
+    query?: Record<string, any>
+    body?: Record<string, any>
+    formData?: Record<string, any>
 }>
 
 export const urlWithCleanQueryString = (url: string, query: Record<string, any>) => {
@@ -13,31 +15,35 @@ export const urlWithCleanQueryString = (url: string, query: Record<string, any>)
     return url + (queryString && "?") + queryString
 }
 
-export const buildRequest = (options: RequestPlainOptions) => {
+export type RequestInitWithUrl = Modify<RequestInit, { url: string }>
+
+const findFirstAndFormat = (items: [any, (val: any) => any][]) => {
+    return items.find(([val, format]) => val && format(val))
+}
+
+export const buildRequest = (options: RequestPlainOptions) : RequestInitWithUrl => {
     const {
         url,
         method,
-        isFormData,
-        contentType = "application/json",
+        contentType = applicationJson,
+        headers = {},
         query = {},
         body,
-        headers
+        formData
     } = options
 
-    const requestInit: RequestInit = {
+    return {
+        url: urlWithCleanQueryString(url, query),
         method,
         headers: {
-            ...(isFormData ? {} : { "Content-Type": contentType }),
+            ...(formData ? {} : { "Content-Type": contentType }),
             ...headers
         },
-        body: body 
-            ? (isFormData ? getFormData(body) : JSON.stringify(body)) 
-            : null
+        body: findFirstAndFormat([
+            [body, JSON.stringify],
+            [formData, getFormData]
+        ])
     }
-
-    const fullUrl = urlWithCleanQueryString(url, query)
-
-    return new Request(fullUrl, requestInit)
 }
 
 export const isEmpty = (value: string | Record<string, any> | any[]) => {
