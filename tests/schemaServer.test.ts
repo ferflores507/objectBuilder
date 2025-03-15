@@ -17,29 +17,53 @@ describe("reduce fetch check requests length after each request", async () => {
       id: 1,
       description: "wrong url",
       url: "http://localhost:8000/numeros2",
-      length: 1
+      expected: {
+        length: 1,
+        response: {
+          status: "rejected",
+          reason: { statusText: "Not Found" }
+        }
+      }
     },
     {
       id: 2,
       description: "saludo url",
       url: "http://localhost:8000/saludo",
-      length: 1
+      expected: {
+        length: 1,
+        response: {
+          status: "fulfilled",
+          value: { message: "Hola" }
+        }
+      }
     },
     {
       id: 1,
       description: "wrong url",
       url: "http://localhost:8000/numeros2",
-      length: 1 
+      expected: {
+        length: 1,
+        response: {
+          status: "rejected",
+          reason: { statusText: "Not Found" }
+        }
+      }
     },
     {
       id: 1,
       description: "correct url",
       url: "http://localhost:8000/numeros",
-      length: 0
+      expected: {
+        length: 0,
+        response: {
+          value: Array.from(Array(10).keys())
+        }
+      }
     }
   ]
 
-  test.each(cases)("expect length to equal: $length with id: $id and $description", async ({ id, url, length }) => {
+  test.each(cases)("expect length to equal: $length with id: $id and $description", async (options) => {
+    const { id, url, expected } = options
     const promise = new ObjectBuilder()
       .with({ 
         store,
@@ -52,9 +76,13 @@ describe("reduce fetch check requests length after each request", async () => {
       })
       .build()
 
-    await Promise.allSettled([promise])
+    const [response] = await Promise.allSettled([promise])
+    const result = {
+      length: store.requests.length,
+      response
+    }
 
-    expect(store.requests).lengthOf(length)
+    expect(result).toMatchObject(expected)
   })
 })
 
