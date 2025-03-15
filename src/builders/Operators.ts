@@ -121,13 +121,11 @@ export class Operators implements WithTaskOptions<Operators> {
             }
         }
 
+        const { store } = builder.options
+
         return reduceRequest(requestInfo, { 
-            state: builder.options.store, 
-            dispatch: (requests) => {
-                // builder.set("requests", requests)
-                builder.options.store.requests = requests
-                // this.state.requests = requests // doesnt work
-            }
+            state: store, 
+            dispatch: (requests) => store.requests = requests
         })
     }
     formatPropiedades = (source: Record<string, any>, formatter: Record<string, Function>) => {
