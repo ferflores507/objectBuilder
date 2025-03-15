@@ -17,7 +17,13 @@ describe("reduce fetch check requests length after each request", async () => {
       id: 1,
       description: "wrong url",
       url: "http://localhost:8000/numeros2",
-      length: 1 
+      length: 1
+    },
+    {
+      id: 2,
+      description: "saludo url",
+      url: "http://localhost:8000/saludo",
+      length: 1
     },
     {
       id: 1,
@@ -48,7 +54,7 @@ describe("reduce fetch check requests length after each request", async () => {
 
     await Promise.allSettled([promise])
 
-    expect(store.requests.length).toEqual(length)
+    expect(store.requests).lengthOf(length)
   })
 })
 
