@@ -10,22 +10,46 @@ beforeAll(() => {
   server.listen()
 })
 
-test("reduce fetch expects to update store/requests with 1 item", async () => {
+describe("reduce fetch check requests length after each request", async () => {
   const store: Record<string, any> = {}
-  const builder = new ObjectBuilder()
-    .with({ store })
-    .withSchema({
-      request: {
-        propiedades: {
-          url: "http://localhost:8000/numeros2"
+  const cases = [
+    {
+      id: 1,
+      description: "wrong url",
+      url: "http://localhost:8000/numeros2",
+      length: 1 
+    },
+    {
+      id: 1,
+      description: "wrong url",
+      url: "http://localhost:8000/numeros2",
+      length: 1 
+    },
+    {
+      id: 1,
+      description: "correct url",
+      url: "http://localhost:8000/numeros",
+      length: 0
+    }
+  ]
+
+  test.each(cases)("expect length to equal: $length with id: $id and $description", async ({ id, url, length }) => {
+    const promise = new ObjectBuilder()
+      .with({ 
+        store,
+        schema: {
+          request: {
+            propiedades: { url }
+          },
+          reduceFetch: id
         }
-      },
-      reduceFetch: 1
-    })
+      })
+      .build()
 
-  await Promise.allSettled([builder.build()])
+    await Promise.allSettled([promise])
 
-  expect(store.requests.length).toEqual(1)
+    expect(store.requests.length).toEqual(length)
+  })
 })
 
 test("reduce fetch", async () => {
