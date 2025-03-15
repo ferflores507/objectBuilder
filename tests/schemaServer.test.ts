@@ -11,7 +11,7 @@ beforeAll(() => {
 })
 
 test("reduce fetch expects to update store/requests with 1 item", async () => {
-  const store = { requests: [] }
+  const store: Record<string, any> = {}
   const builder = new ObjectBuilder()
     .with({ store })
     .withSchema({
@@ -30,7 +30,6 @@ test("reduce fetch expects to update store/requests with 1 item", async () => {
 
 test("reduce fetch", async () => {
   const result = await new ObjectBuilder()
-    .with({ store: { requests: [] } })
     .withSchema({
       request: {
         propiedades: {
