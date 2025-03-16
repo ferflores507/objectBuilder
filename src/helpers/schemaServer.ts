@@ -21,6 +21,10 @@ const useRouter = () => {
         "/numeros": (res) => {
             const value = JSON.stringify([...Array(10).keys()])
             res.end(value)
+        },
+        "/saludo": (res) => {
+            const value = JSON.stringify({ message: "Hola" })
+            res.end(value)
         }
     }
 

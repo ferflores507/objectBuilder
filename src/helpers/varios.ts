@@ -1,3 +1,71 @@
+type Modify<T, R> = Omit<T, keyof R> & R;
+const applicationJson = "application/json"
+
+export const fetchHelper = async (request: RequestInitWithUrl, init?: RequestInit) => {
+    // Verify if its ok to add signal in 2nd param object or spread to request
+    const response = await fetch(new RequestWithUrl(request), init)
+
+    if (!response.ok) {
+        throw {
+            status: response.status,
+            statusText: response.statusText
+        }
+    }
+
+    return response.json()
+}
+
+export type RequestPlainOptions = Modify<Partial<Request>, {
+    url: string
+    contentType?: typeof applicationJson
+    query?: Record<string, any>
+    body?: Record<string, any>
+    formData?: Record<string, any>
+}>
+
+export const urlWithCleanQueryString = (url: string, query: Record<string, any>) => {
+    const queryString = new URLSearchParams(removeNullOrUndefined(query)).toString()
+    
+    return url + (queryString && "?") + queryString
+}
+
+export type RequestInitWithUrl = Modify<RequestInit, { url: string }>
+
+export class RequestWithUrl extends Request {
+    constructor(input: RequestInitWithUrl) {
+        super(input.url, input)
+    }
+}
+
+const findFirstAndFormat = (items: [any, (val: any) => any][]) => {
+    return items.find(([val, format]) => val && format(val))
+}
+
+export const buildRequest = (options: RequestPlainOptions) : RequestInitWithUrl => {
+    const {
+        url,
+        method,
+        contentType = applicationJson,
+        headers = {},
+        query = {},
+        body,
+        formData
+    } = options
+
+    return {
+        url: urlWithCleanQueryString(url, query),
+        method,
+        headers: {
+            ...(formData ? {} : { "Content-Type": contentType }),
+            ...headers
+        },
+        body: findFirstAndFormat([
+            [body, JSON.stringify],
+            [formData, getFormData]
+        ])
+    }
+}
+
 export const isEmpty = (value: string | Record<string, any> | any[]) => {
     const type = Array.isArray(value) ? "array" : (value != null ? typeof value : "null")
     let result = false
