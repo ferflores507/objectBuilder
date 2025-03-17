@@ -173,21 +173,29 @@ export class Operators implements WithTaskOptions<Operators> {
 
         arrays = this.values(arrays) as [any, any]
 
-        if(arrays.length !== 2) {
-            throw {
-                operator: "Merge by keys",
-                msg: "Expected an array of 2 elements.",
-                value: arrays
+        const validateOrThrow = (operator: string, items: any[]) => {
+            const firstInvalid = items.find(item => !item.isValid)
+
+            if(firstInvalid) {
+                throw {
+                    operator,
+                    ...firstInvalid
+                }
             }
         }
 
-        if(!keys) {
-            throw {
-                operator: "Merge by keys",
+        validateOrThrow("Merge by keys", [
+            {
+                isValid: arrays.length === 2,
+                msg: "Expected an array of 2 elements.",
+                value: arrays
+            },
+            {
+                isValid: keys,
                 msg: "Expected a 'true' value for keys.",
-                value: keys
+                value: keys,
             }
-        }
+        ])
 
         const [array1, array2] = arrays
         const concreteKeys = Array.isArray(keys) 
