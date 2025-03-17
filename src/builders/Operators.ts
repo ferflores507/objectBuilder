@@ -169,6 +169,55 @@ export class Operators implements WithTaskOptions<Operators> {
     trim = (value: string) => value.trim()
     removeAccents = removeAccents
     stringify = (value: any) => JSON.stringify(value)
+    mergeByKeys = (arrays: [any, any], keys?: [string, string] | true) => {
+
+        arrays = this.values(arrays) as [any, any]
+
+        const validateOrThrow = (operator: string, items: any[]) => {
+            const firstInvalid = items.find(item => !item.isValid)
+
+            if(firstInvalid) {
+                throw {
+                    operator,
+                    ...firstInvalid
+                }
+            }
+        }
+
+        validateOrThrow("Merge by keys", [
+            {
+                isValid: arrays.length === 2,
+                msg: "Expected an array of 2 elements.",
+                value: arrays
+            },
+            {
+                isValid: keys,
+                msg: "Expected a 'true' value for keys.",
+                value: keys,
+            }
+        ])
+
+        const [array1, array2] = arrays
+        const concreteKeys = Array.isArray(keys) 
+            ? keys 
+            : [1, 2].map(_ => typeof keys == "string" ? keys : "id")
+
+        if (concreteKeys.length !== 2) {
+            throw {
+                operator: "Merge by keys",
+                msg: "Expected 2 keys.",
+                value: concreteKeys
+            }
+        }
+        
+        const map = new Map()
+        const [key1, key2] = concreteKeys
+
+        array1.forEach((item: any) => map.set(item[key1], item))
+        array2.forEach((item: any) => map.set(item[key2], {...map.get(item[key2]), ...item}))
+        
+        return  Array.from(map.values());
+    }
     sort = (array: any[], option: true | "descending" = true) => {
         return this.sortBy(array, { descending: option === "descending" })
     }

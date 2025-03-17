@@ -125,6 +125,7 @@ export type Schema = Partial<{
     join: SchemaDefinition | SchemaPrimitive
     keywords: true
     log: SchemaDefinition | SchemaPrimitive
+    mergeByKeys: SchemaDefinition | SchemaPrimitive
     not: SchemaDefinition
     or: SchemaDefinition | SchemaPrimitive
     path: string

@@ -9,6 +9,473 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("expect merge by keys with id or true to equal the same", () => {
+
+  test.each(["id", true])("merge by %s", async (val) => {
+    await expectToEqualAsync({
+      schema: {
+        const: [
+          [
+            { 
+              id: 1, 
+              en: "one"
+            }, 
+            { 
+              id: 3, 
+              nombre: "tres" 
+            }
+          ],
+          [
+            { 
+              id: 1, 
+              nombre: "uno" 
+            }, 
+            { 
+              id: 2, 
+              en: "two" 
+            }
+          ]
+        ],
+        mergeByKeys: val
+      },
+      expected: [
+        {
+          id: 1,
+          nombre: "uno",
+          en: "one"
+        },
+        {
+          id: 3,
+          nombre: "tres"
+        },
+        {
+          id: 2,
+          en: "two"
+        }
+      ]
+    })
+  })
+
+})
+
+describe("merge by keys (string)", async () => {
+
+  test.each(["num", "code"])("merge by %s", async (key) => {
+    await expectToEqualAsync({
+      schema: {
+        const: [
+          [
+            { 
+              [key]: 1, 
+              en: "one"
+            }, 
+            { 
+              [key]: 3, 
+              nombre: "tres" 
+            }
+          ],
+          [
+            { 
+              [key]: 1, 
+              nombre: "uno" 
+            }, 
+            { 
+              [key]: 2, 
+              en: "two" 
+            }
+          ]
+        ],
+        mergeByKeys: key
+      },
+      expected: [
+        {
+          [key]: 1,
+          nombre: "uno",
+          en: "one"
+        },
+        {
+          [key]: 3,
+          nombre: "tres"
+        },
+        {
+          [key]: 2,
+          en: "two"
+        }
+      ]
+    })
+  })
+})
+
+test("merge by keys", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: [
+        [
+          { 
+            id: 1, 
+            en: "one"
+          }, 
+          { 
+            id: 3, 
+            nombre: "tres" 
+          }
+        ],
+        [
+          { 
+            codeId: 1, 
+            nombre: "uno" 
+          }, 
+          { 
+            codeId: 2, 
+            en: "two" 
+          }
+        ]
+      ],
+      mergeByKeys: ["id", "codeId"]
+    },
+    expected: [
+      {
+        id: 1,
+        codeId: 1,
+        nombre: "uno",
+        en: "one"
+      },
+      {
+        id: 3,
+        nombre: "tres"
+      },
+      {
+        codeId: 2,
+        en: "two"
+      }
+    ]
+  })
+})
+
+test.skip("expect api response", async () => {
+  const response = await new ObjectBuilder()
+    .withSchema({
+      reduce: [
+        {
+          request: {
+            propiedades: {
+              url: "https://api.the-odds-api.com/v4/sports",
+              query: {
+                propiedades: {
+                  apiKey: process.env.ODDS_API_KEY!
+                }
+              }
+            }
+          },
+          reduceFetch: 1,
+        },
+        {
+          map: {
+            unpack: ["group", "description"]
+          }
+        }
+      ]
+    })
+    .buildAsync()
+
+  expect(response).toMatchInlineSnapshot(`
+    [
+      {
+        "description": "US College Football",
+        "group": "American Football",
+      },
+      {
+        "description": "US College Football Championship Winner",
+        "group": "American Football",
+      },
+      {
+        "description": "Super Bowl Winner 2025/2026",
+        "group": "American Football",
+      },
+      {
+        "description": "Aussie Football",
+        "group": "Aussie Rules",
+      },
+      {
+        "description": "Major League Baseball",
+        "group": "Baseball",
+      },
+      {
+        "description": "Major League Baseball",
+        "group": "Baseball",
+      },
+      {
+        "description": "World Series Winner 2025",
+        "group": "Baseball",
+      },
+      {
+        "description": "US College Baseball",
+        "group": "Baseball",
+      },
+      {
+        "description": "US Basketball",
+        "group": "Basketball",
+      },
+      {
+        "description": "Championship Winner 2024/2025",
+        "group": "Basketball",
+      },
+      {
+        "description": "AU National Basketball League",
+        "group": "Basketball",
+      },
+      {
+        "description": "US College Basketball",
+        "group": "Basketball",
+      },
+      {
+        "description": "US College Basketball Championship Winner",
+        "group": "Basketball",
+      },
+      {
+        "description": "Boxing Bouts",
+        "group": "Boxing",
+      },
+      {
+        "description": "International Twenty20",
+        "group": "Cricket",
+      },
+      {
+        "description": "Indian Premier League",
+        "group": "Cricket",
+      },
+      {
+        "description": "2025 Winner",
+        "group": "Golf",
+      },
+      {
+        "description": "2025 Winner",
+        "group": "Golf",
+      },
+      {
+        "description": "2025 Winner",
+        "group": "Golf",
+      },
+      {
+        "description": "2025 Winner",
+        "group": "Golf",
+      },
+      {
+        "description": "Finnish SM League",
+        "group": "Ice Hockey",
+      },
+      {
+        "description": "Finnish Mestis League",
+        "group": "Ice Hockey",
+      },
+      {
+        "description": "US Ice Hockey",
+        "group": "Ice Hockey",
+      },
+      {
+        "description": "Stanley Cup Winner 2024/2025",
+        "group": "Ice Hockey",
+      },
+      {
+        "description": "Swedish Hockey Allsvenskan",
+        "group": "Ice Hockey",
+      },
+      {
+        "description": "Swedish Hockey League",
+        "group": "Ice Hockey",
+      },
+      {
+        "description": "College Lacrosse",
+        "group": "Lacrosse",
+      },
+      {
+        "description": "Mixed Martial Arts",
+        "group": "Mixed Martial Arts",
+      },
+      {
+        "description": "2028 US Presidential Election Winner",
+        "group": "Politics",
+      },
+      {
+        "description": "Aussie Rugby League",
+        "group": "Rugby League",
+      },
+      {
+        "description": "Argentine Primera División",
+        "group": "Soccer",
+      },
+      {
+        "description": "Aussie Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Austrian Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Belgian First Division A",
+        "group": "Soccer",
+      },
+      {
+        "description": "Brasileirão Série A",
+        "group": "Soccer",
+      },
+      {
+        "description": "Campeonato Brasileiro Série B",
+        "group": "Soccer",
+      },
+      {
+        "description": "Campeonato Chileno",
+        "group": "Soccer",
+      },
+      {
+        "description": "Danish Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "EFL Championship",
+        "group": "Soccer",
+      },
+      {
+        "description": "League Cup",
+        "group": "Soccer",
+      },
+      {
+        "description": "EFL League 1",
+        "group": "Soccer",
+      },
+      {
+        "description": "EFL League 2 ",
+        "group": "Soccer",
+      },
+      {
+        "description": "English Premier League",
+        "group": "Soccer",
+      },
+      {
+        "description": "Football Association Challenge Cup",
+        "group": "Soccer",
+      },
+      {
+        "description": "FIFA World Cup Winner 2026",
+        "group": "Soccer",
+      },
+      {
+        "description": "French Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "German Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "German Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "German Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Greek Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Italian Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Italian Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Japan Soccer League",
+        "group": "Soccer",
+      },
+      {
+        "description": "Korean Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Mexican Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Dutch Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Norwegian Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Polish Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Portugese Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Spanish Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Spanish Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Scottish Premiership",
+        "group": "Soccer",
+      },
+      {
+        "description": "Swedish Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Swedish Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Swiss Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Turkish Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "European Champions League",
+        "group": "Soccer",
+      },
+      {
+        "description": "UEFA Europa Conference League",
+        "group": "Soccer",
+      },
+      {
+        "description": "European Europa League",
+        "group": "Soccer",
+      },
+      {
+        "description": "UEFA Nations League",
+        "group": "Soccer",
+      },
+      {
+        "description": "Major League Soccer",
+        "group": "Soccer",
+      },
+      {
+        "description": "Men's Singles",
+        "group": "Tennis",
+      },
+      {
+        "description": "Women's Singles",
+        "group": "Tennis",
+      },
+    ]
+  `)
+})
+
 test("spread true", async () => {
   const details = { id: 1 }
   const builder = new ObjectBuilder()
