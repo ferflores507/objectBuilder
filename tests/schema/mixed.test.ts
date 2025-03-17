@@ -9,6 +9,149 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("expect merge by keys with id or true to equal the same", () => {
+
+  test.each(["id", true])("merge by %s", async (val) => {
+    await expectToEqualAsync({
+      schema: {
+        const: [
+          [
+            { 
+              id: 1, 
+              en: "one"
+            }, 
+            { 
+              id: 3, 
+              nombre: "tres" 
+            }
+          ],
+          [
+            { 
+              id: 1, 
+              nombre: "uno" 
+            }, 
+            { 
+              id: 2, 
+              en: "two" 
+            }
+          ]
+        ],
+        mergeByKeys: val
+      },
+      expected: [
+        {
+          id: 1,
+          nombre: "uno",
+          en: "one"
+        },
+        {
+          id: 3,
+          nombre: "tres"
+        },
+        {
+          id: 2,
+          en: "two"
+        }
+      ]
+    })
+  })
+
+})
+
+describe("merge by keys (string)", async () => {
+
+  test.each(["num", "code"])("merge by %s", async (key) => {
+    await expectToEqualAsync({
+      schema: {
+        const: [
+          [
+            { 
+              [key]: 1, 
+              en: "one"
+            }, 
+            { 
+              [key]: 3, 
+              nombre: "tres" 
+            }
+          ],
+          [
+            { 
+              [key]: 1, 
+              nombre: "uno" 
+            }, 
+            { 
+              [key]: 2, 
+              en: "two" 
+            }
+          ]
+        ],
+        mergeByKeys: key
+      },
+      expected: [
+        {
+          [key]: 1,
+          nombre: "uno",
+          en: "one"
+        },
+        {
+          [key]: 3,
+          nombre: "tres"
+        },
+        {
+          [key]: 2,
+          en: "two"
+        }
+      ]
+    })
+  })
+})
+
+test("merge by keys", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: [
+        [
+          { 
+            id: 1, 
+            en: "one"
+          }, 
+          { 
+            id: 3, 
+            nombre: "tres" 
+          }
+        ],
+        [
+          { 
+            codeId: 1, 
+            nombre: "uno" 
+          }, 
+          { 
+            codeId: 2, 
+            en: "two" 
+          }
+        ]
+      ],
+      mergeByKeys: ["id", "codeId"]
+    },
+    expected: [
+      {
+        id: 1,
+        codeId: 1,
+        nombre: "uno",
+        en: "one"
+      },
+      {
+        id: 3,
+        nombre: "tres"
+      },
+      {
+        codeId: 2,
+        en: "two"
+      }
+    ]
+  })
+})
+
 test.skip("expect api response", async () => {
   const response = await new ObjectBuilder()
     .withSchema({
