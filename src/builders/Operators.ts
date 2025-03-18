@@ -220,6 +220,35 @@ export class Operators implements WithTaskOptions<Operators> {
         
         return target.map(item => ({ ...item, ...map.get(item[targetKey]) }))
     }
+    mapObject = {
+        transform: (propiedades: Record<string, any>) => ({ propiedades }),
+        task: (array: any[], options: Record<string, any>) => {
+            const { key, ...rest } = options
+            const [name, source] = Object.entries(rest)[0]
+            const index = key ?? name
+    
+            if(index === "$") {
+                throw {
+                    operator: "merge object",
+                    msg: "name can't not be '$' if key is not defined."
+                }
+            }
+
+            if(Array.isArray(array)) {
+                return array.map(item => ({
+                    ...item, 
+                    ...(name === "$" ? source[item[index]] : { [name]: source[item[index]] })
+                }))
+            }
+
+            return Object.entries(array).reduce((prev, [key, val]) => {
+                return {
+                    ...prev,
+                    [key]: { ...val, ...(name === "$" ? source[val[index]] : { [name]: source[val[index]] }) } 
+                }
+            }, {})
+        }
+    }
     mergeItemsWithSameKey = (array: any[], key = "id") => {
         const map = new Map()
         array.forEach(item => map.set(item[key], { ...map.get(item[key]), ...item }))
