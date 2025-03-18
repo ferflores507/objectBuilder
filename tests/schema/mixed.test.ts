@@ -9,6 +9,179 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("merge by keys with empty array from is equals to mergeItemsWithSameKey", async () => {
+  const source = [
+    {
+      id: 1,
+      title: "Odd number",
+      group: "odd"
+    },
+    {
+      id: 2,
+      title: "Even number",
+      group: "even"
+    },
+    {
+      id: 3,
+      title: "Odd number",
+      group: "odd"
+    },
+    {
+      id: 4,
+      en: "four"
+    }
+  ]
+
+  const expected = [
+    {
+      id: 3,
+      title: "Odd number",
+      group: "odd"
+    },
+    {
+      id: 2,
+      title: "Even number",
+      group: "even"
+    },
+    {
+      id: 4,
+      en: "four"
+    }
+  ]
+
+  await expectToEqualAsync({
+    schema: {
+      const: [
+        source,
+        []
+      ],
+      mergeByKeys: "group"
+    },
+    expected
+  })
+
+  await expectToEqualAsync({
+    schema: {
+      const: source,
+      mergeItemsWithSameKey: "group"
+    },
+    expected
+  })
+})
+
+test("left join with string", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: [
+        [
+          {
+            id: 1,
+            group: "odd"
+          },
+          {
+            id: 2,
+            group: "even"
+          },
+          {
+            id: 3,
+            group: "odd"
+          },
+          {
+            id: 4,
+            en: "four"
+          }
+        ],
+        [
+          {
+            title: "Odd number",
+            group: "odd",
+          },
+          {
+            title: "Even number",
+            group: "even",
+          }
+        ]
+      ],
+      leftJoin: "group"
+    },
+    expected: [
+      {
+        id: 1,
+        title: "Odd number",
+        group: "odd"
+      },
+      {
+        id: 2,
+        title: "Even number",
+        group: "even"
+      },
+      {
+        id: 3,
+        title: "Odd number",
+        group: "odd"
+      },
+      {
+        id: 4,
+        en: "four"
+      }
+    ]
+  })
+})
+
+test("left join", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: [
+        [
+          {
+            id: 1,
+            group: "odd"
+          },
+          {
+            id: 2,
+            group: "even"
+          },
+          {
+            id: 3,
+            group: "odd"
+          }
+        ],
+        [
+          {
+            title: "Odd number",
+            groupName: "odd",
+          },
+          {
+            title: "Even number",
+            groupName: "even",
+          }
+        ]
+      ],
+      leftJoin: ["group", "groupName"]
+    },
+    expected: [
+      {
+        id: 1,
+        title: "Odd number",
+        group: "odd",
+        groupName: "odd"
+      },
+      {
+        id: 2,
+        title: "Even number",
+        group: "even",
+        groupName: "even"
+      },
+      {
+        id: 3,
+        title: "Odd number",
+        group: "odd",
+        groupName: "odd"
+      }
+    ]
+  })
+})
+
 describe("expect merge by keys with id or true to equal the same", () => {
 
   test.each(["id", true])("merge by %s", async (val) => {
