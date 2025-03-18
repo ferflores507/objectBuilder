@@ -169,7 +169,7 @@ export class Operators implements WithTaskOptions<Operators> {
     trim = (value: string) => value.trim()
     removeAccents = removeAccents
     stringify = (value: any) => JSON.stringify(value)
-    mergeByKeys = (arrays: [any, any], keys?: [string, string] | true) => {
+    formatArraysMerge = (arrays: [any[], any[]], keys?: [string, string] | true) => {
 
         arrays = this.values(arrays) as [any, any]
 
@@ -197,7 +197,6 @@ export class Operators implements WithTaskOptions<Operators> {
             }
         ])
 
-        const [array1, array2] = arrays
         const concreteKeys = Array.isArray(keys) 
             ? keys 
             : [1, 2].map(_ => typeof keys == "string" ? keys : "id")
@@ -209,12 +208,31 @@ export class Operators implements WithTaskOptions<Operators> {
                 value: concreteKeys
             }
         }
-        
-        const map = new Map()
-        const [key1, key2] = concreteKeys
 
-        array1.forEach((item: any) => map.set(item[key1], item))
-        array2.forEach((item: any) => map.set(item[key2], {...map.get(item[key2]), ...item}))
+        return [new Map(), ...concreteKeys] as const
+    }
+    leftJoin = (arrays: [any[], any[]], keys?: [string, string] | true) => {
+        
+        const [target, source] = arrays
+        const [map, targetKey, sourceKey] = this.formatArraysMerge(arrays, keys)
+
+        source.forEach(item => map.set(item[sourceKey], item))
+        
+        return target.map(item => ({ ...item, ...map.get(item[targetKey]) }))
+    }
+    mergeItemsWithSameKey = (array: any[], key = "id") => {
+        const map = new Map()
+        array.forEach(item => map.set(item[key], { ...map.get(item[key]), ...item }))
+
+        return Array.from(map.values())
+    }
+    mergeByKeys = (arrays: [any[], any[]], keys?: [string, string] | true) => {
+        
+        const [array1, array2] = arrays
+        const [map, key1, key2] = this.formatArraysMerge(arrays, keys)
+
+        array1.forEach(item => map.set(item[key1], item))
+        array2.forEach(item => map.set(item[key2], { ...map.get(item[key2]), ...item }))
         
         return  Array.from(map.values());
     }
