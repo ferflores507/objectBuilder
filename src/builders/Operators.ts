@@ -234,19 +234,20 @@ export class Operators implements WithTaskOptions<Operators> {
                 }
             }
 
-            if(Array.isArray(array)) {
-                return array.map(item => ({
+            const callback = (item: any) => {
+                const value = source[item[index]]
+
+                return { 
                     ...item, 
-                    ...(name === "$" ? source[item[index]] : { [name]: source[item[index]] })
-                }))
+                    ...(name === "$" ? value : { [name]: value }) 
+                }
             }
 
-            return Object.entries(array).reduce((prev, [key, val]) => {
-                return {
-                    ...prev,
-                    [key]: { ...val, ...(name === "$" ? source[val[index]] : { [name]: source[val[index]] }) } 
-                }
-            }, {})
+            return Array.isArray(array) 
+                ? array.map(callback) 
+                : Object
+                    .entries(array)
+                    .reduce((prev, [key, val]) => ({ ...prev, [key]: callback(val) }), {})
         }
     }
     mergeItemsWithSameKey = (array: any[], key = "id") => {

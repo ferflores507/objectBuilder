@@ -126,6 +126,7 @@ export type Schema = Partial<{
     keywords: true
     log: SchemaDefinition | SchemaPrimitive
     leftJoin: SchemaDefinition | SchemaPrimitive
+    mapObject: Propiedades
     mergeItemsWithSameKey: Schema | SchemaPrimitive
     mergeByKeys: SchemaDefinition | SchemaPrimitive
     not: SchemaDefinition

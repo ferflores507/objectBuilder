@@ -9,7 +9,7 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
-test.only("merge object", async () => {
+test("map object", async () => {
   await expectToEqualAsync({
     store: {
       countries: {
