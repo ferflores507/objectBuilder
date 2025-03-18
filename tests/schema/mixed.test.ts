@@ -9,6 +9,88 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("map object", async () => {
+  await expectToEqualAsync({
+    store: {
+      countries: {
+        us: {
+          name: "Usa",
+          flag: "https://www.svgrepo.com/show/365950/usa.svg"
+        },
+        br: {
+          name: "Brazil",
+          flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+        }
+      },
+      sportsDetails: {
+        americanfootball_ncaaf: {
+          country: "us"
+        },
+        soccer_brazil_campeonato: {
+          country: "br"
+        }
+      },
+      sports: [
+        {
+          key: "americanfootball_ncaaf",
+          title: "American Football"
+        },
+        {
+          key: "soccer_brazil_campeonato",
+          title: "Liga de Brazil"
+        }
+      ]
+    },
+    schema: {
+      path: "sports",
+      mapObject: {
+        key: "key",
+        $: {
+          path: "sportsDetails",
+          mapObject: {
+            country: { // key is missing use country (would throw if $)
+              path: "countries"
+            }
+          }
+        }
+      }
+    },
+    expected: [
+      {
+        key: "americanfootball_ncaaf",
+        title: "American Football",
+        country: {
+          name: "Usa",
+          flag: "https://www.svgrepo.com/show/365950/usa.svg"
+        }
+      },
+      {
+        key: "soccer_brazil_campeonato",
+        title: "Liga de Brazil",
+        country: {
+          name: "Brazil",
+          flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+        }
+      }
+    ]
+  })
+
+  const mapSportsDetailsCountries = {
+    americanfootball_ncaaf: {
+      country: {
+        name: "Usa",
+        flag: "https://www.svgrepo.com/show/365950/usa.svg"
+      }
+    },
+    baseball_mlb: {
+      country: {
+        name: "Brazil",
+        flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+      }
+    }
+  }
+})
+
 test("merge by keys with empty array from is equals to mergeItemsWithSameKey", async () => {
   const source = [
     {
