@@ -2859,7 +2859,7 @@ test("init search then map with filter", async () => {
       map: {
         propiedades: {
           id: {
-            path: "current"
+            path: "arg"
           }
         }
       },
@@ -2883,7 +2883,7 @@ test("map then filter", async () => {
       map: {
         propiedades: {
           id: {
-            path: "current"
+            path: "arg"
           }
         }
       },
@@ -3489,25 +3489,6 @@ describe("includes", () => {
   })
 })
 
-test("path current", async () => {
-
-  const items = [1, 2, 3]
-
-  await expectToEqualAsync({
-    schema: {
-      const: items,
-      map: {
-        propiedades: {
-          id: {
-            path: "current"
-          }
-        }
-      }
-    },
-    expected: items.map(id => ({ id }))
-  })
-})
-
 test("not", () => {
   const result = new ObjectBuilder()
     .withSchema({
@@ -3719,7 +3700,9 @@ describe("not", () => {
     await expectToEqualAsync({
       schema: {
         map: {
-          not: {}
+          not: {
+            path: "arg"
+          }
         }
       },
       initial: source,
@@ -4372,12 +4355,13 @@ describe("array", () => {
             }
           ],
           map: {
-            init: {
-              temp: {
-                path: "current"
-              }
-            },
+            path: "arg",
             spread: {
+              init: {
+                temp: {
+                  path: "current"
+                }
+              },
               const: [
                 {
                   nombre: "nombre",
@@ -4493,12 +4477,13 @@ describe("array", () => {
     const schema = {
       const: [{ id: 1 }, ...ids],
       map: {
-        init: {
-          temp: {
-            path: "current"
-          }
-        },
+        path: "arg",
         spread: {
+          init: {
+            temp: {
+              path: "current"
+            }
+          },
           const: [
             {
               id: 1,
@@ -4525,7 +4510,6 @@ describe("array", () => {
   })
 
   test("map", async () => {
-
     const numbers = [1, 2, 3, 4]
 
     await expectToEqualAsync({
@@ -4534,11 +4518,26 @@ describe("array", () => {
         const: numbers,
         map: {
           propiedades: {
-            id: {}
+            id: {
+              path: "arg"
+            }
           }
         }
       },
       expected: numbers.map(id => ({ id }))
+    })
+  })
+
+  test("map with empty value returns array of arrays", async () => {
+
+    const items = [1, 2, 3]
+  
+    await expectToEqualAsync({
+      schema: {
+        const: items,
+        map: {}
+      },
+      expected: items.map(() => items)
     })
   })
 
