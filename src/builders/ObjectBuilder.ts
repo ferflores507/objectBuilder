@@ -310,7 +310,6 @@ export class ObjectBuilder implements Builder {
         return targetSchema
             ? this.add(() => (arg: any, options?: BuilderOptions) => {
                 const builder = this.with({
-                    initial: arg,
                     arg,
                     ...options,
                     schema: targetSchema
