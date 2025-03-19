@@ -7,9 +7,17 @@ export class PropiedadesBuilder {
         const allEntries = Object.entries(propiedades)
         const { entries = [], computedEntries = [] } = this.groupByComputed(allEntries)
 
-        this.entries = entries
+        this.entries = entries.filter(([key]) => key !== "$bind")
         this.result = assignAll({}, ...this.getGetters(computedEntries))
         this.builder = builder.with({ siblings: this.result })
+
+        const bindEntry = entries.find(([key]) => key === "$bind")
+
+        if(bindEntry) {
+            const [key, val] = bindEntry
+
+            Object.assign(this.result, this.builder.with({ schema: val }).build())
+        }
     }
 
     private readonly result: Record<string, any>

@@ -9,6 +9,28 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+test("propiedades $bind", async () => {
+  await expectToEqualAsync({
+    store: {
+      details: {
+        id: 1,
+        en: "one"
+      }
+    },
+    schema: {
+      propiedades: {
+        $bind: {
+          path: "details"
+        }
+      }
+    },
+    expected: {
+      id: 1,
+      en: "one"
+    }
+  })
+})
+
 test("map object", async () => {
   await expectToEqualAsync({
     store: {
