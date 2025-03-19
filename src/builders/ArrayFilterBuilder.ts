@@ -32,7 +32,7 @@ export class ArrayFilterBuilder extends ArrayBuilderBase {
         const { max, min } = this
 
         const matchFn = this.builder
-            .with({})
+            .with({ initial: this.items })
             .withFunction({ function: this.schema })
             .build()
 
