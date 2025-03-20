@@ -7,9 +7,9 @@ import { PropiedadesBuilder } from "./PropiedadesBuilder"
 export class ArrayFilterResultBuilder extends ArrayBuilderBase {
 
     validar(schema: ArraySchema | undefined) {
-        const { filter, find, items, contains } = schema ?? {}
+        const { filter, items, contains } = schema ?? {}
 
-        const isEmpty = [filter, find, items, contains].every(x => x == null)
+        const isEmpty = [filter, items, contains].every(x => x == null)
         const isArray = Array.isArray(this.items)
 
         return isArray || isEmpty
@@ -20,20 +20,16 @@ export class ArrayFilterResultBuilder extends ArrayBuilderBase {
             throw "El elemento debe ser de tipo arreglo o contener algun filtro"
         }
 
-        const { find } = schema ?? {}
-        const result = Array.isArray(this.items) ? this.filter(schema) : this.items
-
-        return find ? (result as any[])[0] : result
+        return Array.isArray(this.items) ? this.filter(schema) : this.items
     }
 
     filter(schema: ArraySchema | undefined) {
-        const { filter, find, items, contains } = schema ?? {}
+        const { filter, items, contains } = schema ?? {}
 
         return new ArrayFilterBuilder(this.items, this.builder)
             .withValidation(items)
             .withContains(contains)
             .withFilter(filter)
-            .withFind(find)
             // .withMin(minMatches)
             // .withMax(maxMatches)
             .build()

@@ -3,7 +3,6 @@ import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { entry } from '../../src/helpers/varios'
 import { ObjectBuilder } from '../../src/builders/ObjectBuilder'
-import { ArrayBuilder } from '../../src/builders/ArrayBuilder'
 import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
@@ -3519,27 +3518,6 @@ test("not", () => {
   expect(result).toBe(false)
 })
 
-test("array builder with schema with find", () => {
-  const schema = {
-    find: {
-      path: "current.nombre",
-      equals: "Melany"
-    }
-  }
-
-  const items = [
-    1,
-    "dos",
-    { nombre: "Mari" },
-    { nombre: "Melany" }
-  ]
-
-  const builder = new ObjectBuilder()
-  const result = new ArrayBuilder(items, builder).build(schema)
-
-  expect(result).toEqual({ nombre: "Melany" })
-})
-
 describe("array filter property 'keywords' contains string", () => {
 
   const items = [
@@ -4432,6 +4410,18 @@ describe("array", () => {
           { nombre: "Melany" }
         ],
         expected: { nombre: "Melany" }
+      },
+      {
+        name: "find with array as value expects first boolean value",
+        schema: {
+          find: [
+            "",
+            null,
+            "0",
+            3
+          ]
+        },
+        expected: "0"
       },
       {
         name: "some are true: from inner definition",

@@ -87,15 +87,6 @@ export class ArrayFilterBuilder extends ArrayBuilderBase {
         return this
     }
 
-    withFind(schema: Schema | undefined) {
-        if(schema) {
-            this.withFilter(schema)
-                .withMax(1)
-        }
-        
-        return this
-    }
-
     withContains(schema: Schema | undefined) {
         if(schema) {
             this.withValidation(schema)
