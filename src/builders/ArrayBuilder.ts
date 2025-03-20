@@ -5,12 +5,10 @@ import { ArrayFilterResultBuilder, ArrayResultBuilder } from "./ArrayResultBuild
 export class ArrayBuilder extends ArrayBuilderBase {
 
     validar(schema: ArraySchema | undefined) {
-        const { filter, find, items, contains, map, groupJoin } = schema ?? {}
+        const keys: (keyof Schema)[] = ["filter", "items", "contains", "map", "groupJoin"]
+        const isEmpty = keys.every(x => schema?.[x] == null)
 
-        const isEmpty = [filter, find, items, contains, map, groupJoin].every(x => x == null)
-        const isArray = Array.isArray(this.items)
-
-        return isArray || isEmpty
+        return Array.isArray(this.items) || isEmpty
     }
 
     build(schema: ArraySchema | undefined) {

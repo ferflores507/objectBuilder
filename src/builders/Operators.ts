@@ -1,4 +1,4 @@
-import { Builder, OperatorTask, Propiedades, WithTaskOptions } from "../models"
+import { Builder, OperatorTask, Propiedades, Schema, SchemaDefinition, WithTaskOptions } from "../models"
 import { reduceRequest, type RequestInfo } from "../helpers/requestHelper"
 
 import {
@@ -293,6 +293,16 @@ export class Operators implements WithTaskOptions<Operators> {
                 mensaje: "Error al obtener los valores enumerables",
                 fuente: obj
             }
+        }
+    }
+    find = {
+        task: (array: [], current: ((item: any) => any) | any[]) => {
+            return typeof current == "function"
+                ? array.find(current)
+                : current.find(Boolean)
+        },
+        transform: (schema: SchemaDefinition) => {
+            return Array.isArray(schema) ? schema : { function: schema }
         }
     }
     unpack = (target: Record<string, any>, keys: string[]) => keys.reduce((obj, key) => {
