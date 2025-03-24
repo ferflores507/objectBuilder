@@ -8,6 +8,126 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("children schema", () => {
+  const cases = [
+    {
+      path: ["a"],
+      expected: [
+        {
+          path: "a setup"
+        },
+        {
+          path: "a path"
+        }
+      ]
+    },
+    {
+      path: ["a", "a1"],
+      expected: [
+        {
+          path: "a setup"
+        },
+        {
+          path: "a1 path"
+        }
+      ]
+    }
+  ]
+
+  test.each(cases)("children schema path: $path", async ({ path, expected }) => {
+    await expectToEqualAsync({
+      schema: {
+        const: {
+          a: {
+            setup: {
+              path: "a setup"
+            },
+            schema: {
+              path: "a path"
+            },
+            children: {
+              a1: {
+                schema: {
+                  path: "a1 path"
+                }
+              }
+            }
+          }
+        },
+        childrenSchema: {
+          const: path
+        }
+      },
+      expected
+    })
+  })
+})
+
+test("children schema", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: {
+        a: {
+          setup: {
+            path: "a setup",
+            trim: true
+          },
+          schema: {
+            path: "a path"
+          }
+        }
+      },
+      childrenSchema: {
+        const: ["a"]
+      }
+    },
+    expected: [
+      {
+        path: "a setup",
+        trim: true
+      },
+      {
+        path: "a path"
+      }
+    ]
+  })
+})
+
+test("children schema", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: {
+        a: {
+          setup: {
+            path: "a setup"
+          },
+          schema: {
+            path: "a path"
+          },
+          children: {
+            a1: {
+              schema: {
+                path: "a1 path"
+              }
+            }
+          }
+        }
+      },
+      childrenSchema: {
+        const: ["a", "a1"]
+      }
+    },
+    expected: [
+      {
+        path: "a setup"
+      },
+      {
+        path: "a1 path"
+      }
+    ]
+  })
+})
+
 test("propiedades $bind", async () => {
   await expectToEqualAsync({
     store: {

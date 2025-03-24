@@ -31,6 +31,25 @@ export class Operators implements WithTaskOptions<Operators> {
     }
     assign: OperatorTask = (current, previous) => Object.assign(current, previous)
     boolean = (value: any) => !!value
+    childrenSchema = (childrenSchema: Record<string, any>, path: Path) => {
+        const schemas = []
+        let schema = null
+        
+        for(const name of path) {
+            const { setup, schema: currentSchema, children } = childrenSchema[name]
+            
+            if(setup) {
+                schemas.push(setup)
+            }
+
+            schema = currentSchema
+            childrenSchema = children
+        }
+
+        schemas.push(schema)
+
+        return schemas
+    }
     date = (value: any, options: Intl.DateTimeFormatOptions & { locale: string }) => {
         return new Date(value).toLocaleString(options.locale, options)
     }
