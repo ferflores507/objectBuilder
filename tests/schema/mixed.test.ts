@@ -9,122 +9,83 @@ import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
 describe("children schema", () => {
+  const childrenSchema = {
+    a: {
+      setup: {
+        init: {
+          details: {
+            const: {
+              id: 1,
+              name: "  one  " 
+            }
+          }
+        }
+      },
+      schema: {
+        const: "path a"
+      },
+      children: {
+        a1: {
+          schema: {
+            path: "$details.name",
+            trim: true
+          }
+        },
+        a2: {
+          schema: {
+            path: "$details.name"
+          }
+        }
+      }
+    }
+  }
+
+  const a = childrenSchema.a
+
   const cases = [
     {
       path: ["a"],
       expected: [
-        {
-          path: "a setup"
-        },
-        {
-          path: "a path"
-        }
-      ]
+        a.setup,
+        a.schema
+      ],
+      expectedResult: "path a"
     },
     {
       path: ["a", "a1"],
       expected: [
-        {
-          path: "a setup"
-        },
-        {
-          path: "a1 path"
-        }
-      ]
+        a.setup,
+        a.children.a1.schema
+      ],
+      expectedResult: "one"
+    },
+    {
+      path: ["a", "a2"],
+      expected: [
+        a.setup,
+        a.children.a2.schema
+      ],
+      expectedResult: a.setup.init.details.const.name
     }
   ]
 
-  test.each(cases)("children schema path: $path", async ({ path, expected }) => {
-    await expectToEqualAsync({
-      schema: {
-        const: {
-          a: {
-            setup: {
-              path: "a setup"
-            },
-            schema: {
-              path: "a path"
-            },
-            children: {
-              a1: {
-                schema: {
-                  path: "a1 path"
-                }
-              }
-            }
-          }
-        },
-        childrenSchema: {
-          const: path
-        }
-      },
-      expected
-    })
-  })
-})
-
-test("children schema", async () => {
-  await expectToEqualAsync({
-    schema: {
-      const: {
-        a: {
-          setup: {
-            path: "a setup",
-            trim: true
-          },
-          schema: {
-            path: "a path"
-          }
-        }
-      },
+  test.each(cases)("children schema path: $path", async ({ path, expected, expectedResult }) => {
+    const schema = {
+      const: childrenSchema,
       childrenSchema: {
-        const: ["a"]
+        const: path
       }
-    },
-    expected: [
-      {
-        path: "a setup",
-        trim: true
-      },
-      {
-        path: "a path"
-      }
-    ]
-  })
-})
+    }
 
-test("children schema", async () => {
-  await expectToEqualAsync({
-    schema: {
-      const: {
-        a: {
-          setup: {
-            path: "a setup"
-          },
-          schema: {
-            path: "a path"
-          },
-          children: {
-            a1: {
-              schema: {
-                path: "a1 path"
-              }
-            }
-          }
-        }
-      },
-      childrenSchema: {
-        const: ["a", "a1"]
-      }
-    },
-    expected: [
-      {
-        path: "a setup"
-      },
-      {
-        path: "a1 path"
-      }
-    ]
+    await expectToEqualAsync({ schema, expected })
+
+    const builder = new ObjectBuilder().withSchema(schema)
+
+    const result = builder
+      .withSchema({ reduce: builder.build() })
+      .build()
+
+    expect(result).toEqual(expectedResult)
   })
 })
 
