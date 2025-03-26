@@ -1,4 +1,4 @@
-import { Builder, OperatorTask, Propiedades, Schema, SchemaDefinition, WithTaskOptions } from "../models"
+import { Builder, ChildrenSchema, OperatorTask, Propiedades, Schema, SchemaDefinition, WithTaskOptions } from "../models"
 import { reduceRequest, type RequestInfo } from "../helpers/requestHelper"
 
 import {
@@ -31,24 +31,27 @@ export class Operators implements WithTaskOptions<Operators> {
     }
     assign: OperatorTask = (current, previous) => Object.assign(current, previous)
     boolean = (value: any) => !!value
-    childrenSchema = (childrenSchema: Record<string, any>, path: Path) => {
-        const schemas = []
-        let schema = null
-        
-        for(const name of path) {
-            const { setup, schema: currentSchema, children } = childrenSchema[name]
-            
-            if(setup) {
-                schemas.push(setup)
+    childrenSchema = (childrenSchema: Record<string, ChildrenSchema>, path: string[]) => {
+        const schemas: any[] = []
+        const push = (val: any, condition = val) => condition && schemas.push(val)
+
+        for (const [i, name] of path.entries()) {
+            const next = childrenSchema[name]
+
+            if (!next) {
+                schemas.length = 0
+                break
             }
 
-            schema = currentSchema
+            const { setup, schema, children = {} } = next
+
+            push(setup)
+            push(schema, i === path.length - 1)
+
             childrenSchema = children
         }
 
-        schemas.push(schema)
-
-        return schemas
+        return schemas.length ? schemas : null
     }
     date = (value: any, options: Intl.DateTimeFormatOptions & { locale: string }) => {
         return new Date(value).toLocaleString(options.locale, options)
