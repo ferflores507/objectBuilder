@@ -66,6 +66,16 @@ describe("children schema", () => {
         a.children.a2.schema
       ],
       expectedResult: a.setup.init.details.const.name
+    },
+    {
+      path: ["a", "a3"],
+      expected: null,
+      expectedResult: undefined
+    },
+    {
+      path: ["a", "a2", "a21"],
+      expected: null,
+      expectedResult: undefined
     }
   ]
 
@@ -79,10 +89,10 @@ describe("children schema", () => {
 
     await expectToEqualAsync({ schema, expected })
 
-    const builder = new ObjectBuilder().withSchema(schema)
-
-    const result = builder
-      .withSchema({ reduce: builder.build() })
+    const result = new ObjectBuilder()
+      .withSchema({ 
+        reduce: new ObjectBuilder().withSchema(schema).build() 
+      })
       .build()
 
     expect(result).toEqual(expectedResult)

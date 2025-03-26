@@ -1,5 +1,11 @@
 import { Path } from "./helpers/varios"
 
+export type ChildrenSchema = Partial<{
+    setup: SchemaDefinition
+    schema: SchemaDefinition
+    children: Record<string, ChildrenSchema>
+}>
+
 export type BuilderOptions = {
     store: Record<string, any>
     siblings: Record<string, any>
