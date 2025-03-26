@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
         "strict": true,
-        "lib": ["es2024"]
+        "target": "ES2024"
     }
 }
