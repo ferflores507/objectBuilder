@@ -170,6 +170,25 @@ export class Operators implements WithTaskOptions<Operators> {
             return Object.fromEntries(filteredEntries)
         }
     }
+    validate = {
+        transform: (schema: SchemaDefinition, builder: Builder) : Schema => {
+            const newSchema = Array.isArray(schema)
+                ? schema 
+                : builder.with({ schema }).build()
+
+            return {
+                const: {
+                    result: builder.with({ schema: newSchema }).build(),
+                    schema: newSchema
+                }
+            }
+        },
+        task: (initial: any, { result, schema }: { result: any, schema: SchemaDefinition }) => {
+            const [results, schemas] = [result, schema].map(toArray)
+
+            return results.every(Boolean) || schemas.filter((el, i) => !results[i])
+        }
+    }
     join = {
         task: (source: [], separator: any) => source.join(separator),
         transform: (schema: any) => schema === true ? "" : schema

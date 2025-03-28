@@ -37,7 +37,7 @@ export type OperatorTask = (current: any, previous: any, builder: Builder) => an
 
 export type TaskOptions = OperatorTask | {
     task: OperatorTask,
-    transform: (schema: Schema) => any
+    transform: (schema: Schema, builder: Builder) => any
 }
 
 export type WithTaskOptions<T> = { [key in keyof T]: TaskOptions }
@@ -174,6 +174,7 @@ export type Schema = Partial<{
     unpackAsGetters: SchemaDefinition
     use: string
     UUID: true
+    validate: SchemaDefinition
     values: true
     with: Schema
 }> & ArraySchema
