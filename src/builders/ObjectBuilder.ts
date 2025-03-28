@@ -184,7 +184,7 @@ export class ObjectBuilder implements Builder {
                 ? { definition, task: options }
                 : {
                     ...options,
-                    definition: options.transform(definition),
+                    definition: options.transform(definition, this),
                 })
     }
 
