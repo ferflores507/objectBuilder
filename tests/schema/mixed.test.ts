@@ -8,6 +8,66 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("validate", () => {
+  const validate = [
+    {
+      path: "id",
+      greaterThan: 6,
+      lessThan: 8
+    },
+    {
+      path: "name.length",
+      greaterThan: 4,
+      lessThan: 10
+    }
+  ]
+
+  test("validate with explicit schema", async () => {
+    await expectToEqualAsync({
+      store: {
+        id: 6,
+        name: "Mel",
+        age: 5
+      },
+      schema: {
+        validate: {
+          const: validate
+        }
+      },
+      expected: validate
+    })
+  })
+
+  test("validate returns array of failed schemas", async () => {
+    await expectToEqualAsync({
+      store: {
+        id: 6,
+        name: "Mel",
+        age: 5
+      },
+      schema: {
+        validate
+      },
+      expected: validate
+    })
+  })
+
+  test("validate returns true", async () => {
+    await expectToEqualAsync({
+      store: {
+        id: 7,
+        name: "Melany",
+        age: 5
+      },
+      schema: {
+        validate
+      },
+      expected: true
+    })
+  })
+  
+})
+
 describe("children schema", () => {
   const childrenSchema = {
     a: {
