@@ -1,6 +1,6 @@
 {
   "name": "@ferflores507/object-builder",
-  "version": "9.7.1",
+  "version": "9.8.0",
   "main": "index.js",
   "scripts": {
     "test": "vitest"
