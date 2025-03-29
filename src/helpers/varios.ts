@@ -1,5 +1,4 @@
 type Modify<T, R> = Omit<T, keyof R> & R;
-const applicationJson = "application/json"
 
 export const fetchHelper = async (request: RequestInitWithUrl, init?: RequestInit) => {
     // Verify if its ok to add signal in 2nd param object or spread to request
@@ -44,8 +43,7 @@ const findFirstAndFormat = (items: [any, (val: any) => any][]) => {
 export const buildRequest = (options: RequestPlainOptions) : RequestInitWithUrl => {
     const {
         url,
-        method,
-        contentType = applicationJson,
+        method = "GET",
         headers = {},
         query = {},
         body,
@@ -56,7 +54,7 @@ export const buildRequest = (options: RequestPlainOptions) : RequestInitWithUrl 
         url: urlWithCleanQueryString(url, query),
         method,
         headers: {
-            ...(formData ? {} : { "Content-Type": contentType }),
+            ...((formData || method === "GET") ? {} : { "content-type": "application/json" }),
             ...headers
         },
         body: findFirstAndFormat([
