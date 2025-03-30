@@ -1,4 +1,4 @@
-import { Builder, ChildrenSchema, DebounceOptions, DebounceSchema, OperatorTask, Propiedades, Schema, SchemaDefinition, WithTaskOptions } from "../models"
+import { Builder, ChildrenSchema, DebounceOptions, DebounceSchema, OperatorTask, Propiedades, RequestInitWithUrl, RequestPlainOptions, Schema, SchemaDefinition, WithTaskOptions } from "../models"
 import { reduceRequest, type RequestInfo } from "../helpers/requestHelper"
 
 import {
@@ -10,8 +10,6 @@ import {
     formatSortOptions,
     Path,
     removeAccents,
-    RequestInitWithUrl,
-    type RequestPlainOptions,
     sortCompare,
     type SortOptions,
     spread,
@@ -149,8 +147,9 @@ export class Operators implements WithTaskOptions<Operators> {
         },
         task: (initial: Record<string, any>, current: Record<string, any>) => current
     }
-    request = (initial: any, options: RequestPlainOptions) => {
-        return buildRequest(options)
+    request = {
+        transform: (propiedades: Propiedades) => ({ propiedades }),
+        task: (initial: any, options: RequestPlainOptions) => buildRequest(options)
     }
     reduceFetch = (requestInit: RequestInitWithUrl, id: any, builder: Builder) => {
         const requestInfo: RequestInfo = {

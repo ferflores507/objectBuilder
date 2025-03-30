@@ -585,12 +585,10 @@ test.skip("expect api response", async () => {
       reduce: [
         {
           request: {
-            propiedades: {
-              url: "https://api.the-odds-api.com/v4/sports",
-              query: {
-                propiedades: {
-                  apiKey: process.env.ODDS_API_KEY!
-                }
+            url: "https://api.the-odds-api.com/v4/sports",
+            query: {
+              propiedades: {
+                apiKey: process.env.ODDS_API_KEY!
               }
             }
           },

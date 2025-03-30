@@ -1,4 +1,4 @@
-type Modify<T, R> = Omit<T, keyof R> & R;
+import { RequestInitWithUrl, RequestPlainOptions } from "../models"
 
 export const fetchHelper = async (request: RequestInitWithUrl, init?: RequestInit) => {
     // Verify if its ok to add signal in 2nd param object or spread to request
@@ -14,21 +14,11 @@ export const fetchHelper = async (request: RequestInitWithUrl, init?: RequestIni
     return response.json()
 }
 
-export type RequestPlainOptions = Modify<Partial<Request>, {
-    url: string
-    contentType?: typeof applicationJson
-    query?: Record<string, any>
-    body?: Record<string, any>
-    formData?: Record<string, any>
-}>
-
 export const urlWithCleanQueryString = (url: string, query: Record<string, any>) => {
     const queryString = new URLSearchParams(removeNullOrUndefined(query)).toString()
     
     return url + (queryString && "?") + queryString
 }
-
-export type RequestInitWithUrl = Modify<RequestInit, { url: string }>
 
 export class RequestWithUrl extends Request {
     constructor(input: RequestInitWithUrl) {
