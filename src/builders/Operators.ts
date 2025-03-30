@@ -1,4 +1,4 @@
-import { Builder, ChildrenSchema, OperatorTask, Propiedades, Schema, SchemaDefinition, WithTaskOptions } from "../models"
+import { Builder, ChildrenSchema, DebounceOptions, DebounceSchema, OperatorTask, Propiedades, Schema, SchemaDefinition, WithTaskOptions } from "../models"
 import { reduceRequest, type RequestInfo } from "../helpers/requestHelper"
 
 import {
@@ -63,6 +63,19 @@ export class Operators implements WithTaskOptions<Operators> {
         }
 
         return createDebounce(fn, typeof ms == "number" ? ms : 500)
+    }
+    debounceWith = {
+        transform: ({ function: fn, ms, target }: DebounceSchema) => {
+            return {
+                propiedades: {
+                    function: target ? target : { function: fn },
+                    ms
+                }
+            }
+        },
+        task: (initial: any, { function: fn, ms }: DebounceOptions) => {
+            return this.debounce(fn, ms)
+        }
     }
     entries = entries
     spreadStart = (target: any[], value: any) => {

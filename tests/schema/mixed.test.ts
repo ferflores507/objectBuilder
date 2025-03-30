@@ -1718,6 +1718,36 @@ describe("debounce", function () {
           set: "nombre"
         },
         debounce: true
+      },
+      {
+        debounceWith: {
+          ms: 1000,
+          function: {
+            set: "nombre"
+          }
+        }
+      },
+      {
+        reduce: [
+          {
+            set: [
+              "setNombre",
+              {
+                function: {
+                  set: "nombre"
+                }
+              }
+            ]
+          },
+          {
+            debounceWith: {
+              ms: 1000,
+              target: {
+                path: "setNombre"
+              }
+            }
+          }
+        ]
       }
     ]
 

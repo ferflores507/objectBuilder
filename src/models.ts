@@ -85,6 +85,20 @@ export type SchemaDefinition = Schema | { [n: number]: Schema | SchemaPrimitive 
 
 export type SchemaPrimitive = string | number | bigint | boolean | null
 export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive>
+export type DebounceOptions = {
+    function: Function
+    ms: number
+}
+
+export type DebounceSchema = {
+    ms: SchemaDefinition | number
+} & ({
+    function: SchemaDefinition
+    target?: undefined
+} | {
+    function?: undefined
+    target: SchemaDefinition
+})
 
 export type Schema = Partial<{
     allEqual: boolean
@@ -104,6 +118,7 @@ export type Schema = Partial<{
     const: any
     date: Schema | SchemaPrimitive
     debounce: Schema | SchemaPrimitive
+    debounceWith: DebounceSchema
     decrement: string
     default: SchemaDefinition | SchemaPrimitive
     definitions: (Schema | SchemaPrimitive)[]
