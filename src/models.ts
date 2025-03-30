@@ -1,5 +1,35 @@
 import { Path } from "./helpers/varios"
 
+type Modify<T, R> = Omit<T, keyof R> & R;
+
+export type RequestInitWithUrl = Modify<RequestInit, { url: string }>
+
+export type RequestPlainOptions = { url: string } & Partial<Modify<Request, {
+    contentType: string
+    query: Record<string, any>
+    body: Record<string, any>
+    formData: Record<string, any>
+}>>
+
+export type RequestPlainOptionsSchema = { url: Schema }
+    & {
+        [P in keyof RequestPlainOptions]: Schema
+    }
+    & Partial<{
+        body: SchemaDefinition
+        formData: SchemaDefinition
+    }>
+
+export type RequestSchema = {
+    [P in keyof RequestPlainOptionsSchema]: RequestPlainOptions[P] | RequestPlainOptionsSchema[P]
+}
+
+const requestTest: RequestSchema = {
+    url: "",
+    contentType: "",
+    query: [],
+}
+
 export type ChildrenSchema = Partial<{
     setup: SchemaDefinition
     schema: SchemaDefinition
@@ -150,7 +180,7 @@ export type Schema = Partial<{
     reduce: SchemaDefinition
     reduceOrDefault: SchemaDefinition
     removeAccents: true
-    request: Schema
+    request: RequestSchema
     reduceFetch: Schema | SchemaPrimitive
     required: string[]
     schemaFrom: SchemaDefinition

@@ -1,4 +1,4 @@
-import { Builder, ChildrenSchema, OperatorTask, Propiedades, Schema, SchemaDefinition, WithTaskOptions } from "../models"
+import { Builder, ChildrenSchema, OperatorTask, Propiedades, RequestInitWithUrl, RequestPlainOptions, Schema, SchemaDefinition, WithTaskOptions } from "../models"
 import { reduceRequest, type RequestInfo } from "../helpers/requestHelper"
 
 import {
@@ -10,8 +10,6 @@ import {
     formatSortOptions,
     Path,
     removeAccents,
-    RequestInitWithUrl,
-    type RequestPlainOptions,
     sortCompare,
     type SortOptions,
     spread,
