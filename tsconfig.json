@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "strict": true,
-        "target": "ES2024"
+        "target": "ES2024",
+        "moduleResolution": "node"
     }
 }
