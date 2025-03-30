@@ -56,8 +56,13 @@ export class Operators implements WithTaskOptions<Operators> {
     date = (value: any, options: Intl.DateTimeFormatOptions & { locale: string }) => {
         return new Date(value).toLocaleString(options.locale, options)
     }
-    debounce = (fn: (...args: []) => any, ms: number | true) => {
-        return createDebounce(fn, ms === true ? 500 : ms)
+    debounce = (fn: Function, ms: number | true | Function) => {
+        if(typeof ms == "function") {
+            fn = ms
+            ms = true
+        }
+
+        return createDebounce(fn, typeof ms == "number" ? ms : 500)
     }
     entries = entries
     spreadStart = (target: any[], value: any) => {

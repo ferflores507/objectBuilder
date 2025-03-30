@@ -99,7 +99,7 @@ const argsPairFn = () => {
 
 export const argsPair = argsPairFn()
 
-export const createDebounce = (callback: (...args: any[]) => any, ms: number) => {
+export const createDebounce = (callback: Function, ms: number) => {
     let timeoutId: NodeJS.Timeout
 
     return (...args: any[]) => {
