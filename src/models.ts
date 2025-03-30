@@ -22,6 +22,8 @@ export type RequestPlainOptionsSchema = { url: Schema }
 
 export type RequestSchema = {
     [P in keyof RequestPlainOptionsSchema]: RequestPlainOptions[P] | RequestPlainOptionsSchema[P]
+} & { 
+    $bind?: Schema 
 }
 
 const requestTest: RequestSchema = {
