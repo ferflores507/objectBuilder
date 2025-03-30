@@ -6,7 +6,7 @@ export type RequestInitWithUrl = Modify<RequestInit, { url: string }>
 
 export type RequestPlainOptions = { url: string } & Partial<Modify<Request, {
     contentType: string
-    query: Record<string, any>
+    query: Record<string, unknown>
     body: Record<string, any>
     formData: Record<string, any>
 }>>
@@ -24,12 +24,6 @@ export type RequestSchema = {
     [P in keyof RequestPlainOptionsSchema]: RequestPlainOptions[P] | RequestPlainOptionsSchema[P]
 } & { 
     $bind?: Schema 
-}
-
-const requestTest: RequestSchema = {
-    url: "",
-    contentType: "",
-    query: [],
 }
 
 export type ChildrenSchema = Partial<{
