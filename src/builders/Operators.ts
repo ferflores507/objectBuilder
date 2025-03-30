@@ -129,8 +129,9 @@ export class Operators implements WithTaskOptions<Operators> {
         },
         task: (initial: Record<string, any>, current: Record<string, any>) => current
     }
-    request = (initial: any, options: RequestPlainOptions) => {
-        return buildRequest(options)
+    request = {
+        transform: (propiedades: Propiedades) => ({ propiedades }),
+        task: (initial: any, options: RequestPlainOptions) => buildRequest(options)
     }
     reduceFetch = (requestInit: RequestInitWithUrl, id: any, builder: Builder) => {
         const requestInfo: RequestInfo = {

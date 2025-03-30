@@ -69,7 +69,7 @@ describe("reduce fetch check requests length after each request", async () => {
         store,
         schema: {
           request: {
-            propiedades: { url }
+            url
           },
           reduceFetch: id
         }
@@ -90,9 +90,7 @@ test("reduce fetch", async () => {
   const result = await new ObjectBuilder()
     .withSchema({
       request: {
-        propiedades: {
-          url: "http://localhost:8000/numeros"
-        }
+        url: "http://localhost:8000/numeros"
       },
       reduceFetch: 1
     })
@@ -107,9 +105,7 @@ test("schema request", async () => {
   const request = new ObjectBuilder()
     .withSchema({
       request: {
-        propiedades: {
-          url: "http://localhost:8000/numeros"
-        }
+        url: "http://localhost:8000/numeros"
       }
     })
     .build()
