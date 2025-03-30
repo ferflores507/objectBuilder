@@ -1,5 +1,31 @@
 import { Path } from "./helpers/varios"
 
+type Modify<T, R> = Omit<T, keyof R> & R;
+
+export type RequestInitWithUrl = Modify<RequestInit, { url: string }>
+
+export type RequestPlainOptions = { url: string } & Partial<Modify<Request, {
+    contentType: string
+    query: Record<string, unknown>
+    body: Record<string, any>
+    formData: Record<string, any>
+}>>
+
+export type RequestPlainOptionsSchema = { url: Schema }
+    & {
+        [P in keyof RequestPlainOptions]: Schema
+    }
+    & Partial<{
+        body: SchemaDefinition
+        formData: SchemaDefinition
+    }>
+
+export type RequestSchema = {
+    [P in keyof RequestPlainOptionsSchema]: RequestPlainOptions[P] | RequestPlainOptionsSchema[P]
+} & { 
+    $bind?: Schema 
+}
+
 export type ChildrenSchema = Partial<{
     setup: SchemaDefinition
     schema: SchemaDefinition
@@ -85,6 +111,20 @@ export type SchemaDefinition = Schema | { [n: number]: Schema | SchemaPrimitive 
 
 export type SchemaPrimitive = string | number | bigint | boolean | null
 export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive>
+export type DebounceOptions = {
+    function: Function
+    ms: number
+}
+
+export type DebounceSchema = {
+    ms: SchemaDefinition | number
+} & ({
+    function: SchemaDefinition
+    target?: undefined
+} | {
+    function?: undefined
+    target: SchemaDefinition
+})
 
 export type Schema = Partial<{
     allEqual: boolean
@@ -104,6 +144,7 @@ export type Schema = Partial<{
     const: any
     date: Schema | SchemaPrimitive
     debounce: Schema | SchemaPrimitive
+    debounceWith: DebounceSchema
     decrement: string
     default: SchemaDefinition | SchemaPrimitive
     definitions: (Schema | SchemaPrimitive)[]
@@ -150,7 +191,7 @@ export type Schema = Partial<{
     reduce: SchemaDefinition
     reduceOrDefault: SchemaDefinition
     removeAccents: true
-    request: Schema
+    request: RequestSchema
     reduceFetch: Schema | SchemaPrimitive
     required: string[]
     schemaFrom: SchemaDefinition

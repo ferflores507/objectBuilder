@@ -585,12 +585,10 @@ test.skip("expect api response", async () => {
       reduce: [
         {
           request: {
-            propiedades: {
-              url: "https://api.the-odds-api.com/v4/sports",
-              query: {
-                propiedades: {
-                  apiKey: process.env.ODDS_API_KEY!
-                }
+            url: "https://api.the-odds-api.com/v4/sports",
+            query: {
+              propiedades: {
+                apiKey: process.env.ODDS_API_KEY!
               }
             }
           },
@@ -1704,24 +1702,63 @@ describe("debounce", function () {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  it("expects function call to set arg as 'store.nombre' value", () => {
-    const builder = new ObjectBuilder()
-      .with({
-        schema: {
+  describe("function call", () => {
+    const schemas: Schema[] = [
+      {
+        debounce: {
           function: {
             set: "nombre"
-          },
-          debounce: true
+          }
         }
-      })
+      },
+      {
+        function: {
+          set: "nombre"
+        },
+        debounce: true
+      },
+      {
+        debounceWith: {
+          ms: 1000,
+          function: {
+            set: "nombre"
+          }
+        }
+      },
+      {
+        reduce: [
+          {
+            set: [
+              "setNombre",
+              {
+                function: {
+                  set: "nombre"
+                }
+              }
+            ]
+          },
+          {
+            debounceWith: {
+              ms: 1000,
+              target: {
+                path: "setNombre"
+              }
+            }
+          }
+        ]
+      }
+    ]
 
-    const debounceSet = builder.build()
-
-    debounceSet("Melany")
-    
-    vi.runAllTimers()
-
-    expect(builder.options.store.nombre).toBe("Melany")
+    it.each(schemas)("expects function call to set arg as 'store.nombre' value", schema => {
+      const builder = new ObjectBuilder().with({ schema })
+      const debounceSet = builder.build()
+  
+      debounceSet("Melany")
+      
+      vi.runAllTimers()
+  
+      expect(builder.options.store.nombre).toBe("Melany")
+    })
   })
 
   const cases = [true, 300, 1000] as const
