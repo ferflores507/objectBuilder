@@ -1,9 +1,8 @@
-import type { ArraySchema, Builder, BuilderOptions, Consulta, Propiedades, Schema, SchemaDefinition, SchemaPrimitive, TaskOptions, WithTaskOptions } from "../models"
+import type { ArraySchema, Builder, BuilderOptions, Propiedades, Schema, SchemaDefinition, SchemaPrimitive, TaskOptions, WithTaskOptions } from "../models"
 import * as varios from "../helpers/varios"
 import { PropiedadesBuilder } from "./PropiedadesBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
-import useConsulta from "../helpers/useConsulta"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
 import { assignAll, getterTrap, isNotPrimitive, Path } from "../helpers/varios"
 import { Operators } from "./Operators"
@@ -137,7 +136,6 @@ export class ObjectBuilder implements Builder {
                 .withSelectSet(selectSet)
                 .withIncrement(increment)
                 .withDecrement(decrement)
-                .withConsulta(consulta)
                 .withDefinitions(definitions)
                 .withPropiedadesAsync(propiedadesAsync)
                 .withPropiedades(propiedades)
@@ -336,18 +334,6 @@ export class ObjectBuilder implements Builder {
         }
 
         return this
-    }
-
-    withConsulta(consulta: Consulta | undefined) {
-        return consulta
-            ? this.add(async () => {
-                const { cargar } = useConsulta()
-                const response = await cargar(consulta, new AbortController().signal)
-                const { ok, data } = response
-
-                return ok ? data : (() => { throw response })
-                })
-            : this
     }
 
     withDelay(ms: number | undefined) {
