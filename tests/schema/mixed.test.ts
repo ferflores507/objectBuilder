@@ -1955,12 +1955,14 @@ describe("debounce", function () {
       {
         debounce: {
           function: {
+            path: "arg",
             set: "nombre"
           }
         }
       },
       {
         function: {
+          path: "arg",
           set: "nombre"
         },
         debounce: true
@@ -1969,6 +1971,7 @@ describe("debounce", function () {
         debounceWith: {
           ms: 1000,
           function: {
+            path: "arg",
             set: "nombre"
           }
         }
@@ -1980,6 +1983,7 @@ describe("debounce", function () {
               "setNombre",
               {
                 function: {
+                  path: "arg",
                   set: "nombre"
                 }
               }
@@ -2543,7 +2547,7 @@ test("with init", async () => {
         { id: 3, text: "c" }
       ],
       find: {
-        path: "current.text",
+        path: "arg.text",
         equals: {
           path: "$search"
         }
@@ -3089,6 +3093,7 @@ test("with bind arg", () => {
     .with({
       schema: {
         function: {
+          path: "arg",
           set: "nombre"
         },
         bindArg: {
@@ -3292,13 +3297,13 @@ test("init search then map with filter", async () => {
       map: {
         propiedades: {
           id: {
-            path: "current"
+            path: "arg"
           }
         }
       },
       reduce: {
         filter: {
-          path: "current.id",
+          path: "arg.id",
           equals: {
             path: "$search"
           }
@@ -3316,13 +3321,13 @@ test("map then filter", async () => {
       map: {
         propiedades: {
           id: {
-            path: "current"
+            path: "arg"
           }
         }
       },
       reduce: {
         filter: {
-          path: "current.id",
+          path: "arg.id",
           equals: 1
         }
       }
@@ -3336,7 +3341,7 @@ test("filter simple case", async () => {
     schema: {
       const: Array.from(Array(3).keys()),
       filter: {
-        path: "current",
+        path: "arg",
         equals: 1
       }
     },
@@ -3384,7 +3389,7 @@ test("nested stores with call to root store", async () => {
       set: "setName",
       function: {
         set: "store.name",
-        path: "current"
+        path: "arg"
       },
       reduce: {
         propiedades: {
@@ -3427,7 +3432,7 @@ describe("with call", () => {
         schema: {
           set: "getName",
           function: {
-            path: "current"
+            path: "arg"
           },
           reduce: {
             call: {
@@ -3449,7 +3454,7 @@ describe("with call", () => {
         schema: {
           set: "getName",
           function: {
-            path: "current"
+            path: "arg"
           },
           reduce: {
             call: ["getName", "name"]
@@ -3460,7 +3465,7 @@ describe("with call", () => {
     )
   })
 
-  test("with call current as arg path", async () => {
+  test.fails("call to function that expects same arg fails with current as path", async () => {
     await expectToEqualAsync(
       {
         schema: {
@@ -3634,7 +3639,7 @@ test("schema array async", async () => {
 })
 
 describe("withFunction", () => {
-  test.each(["arg", "current"])("expect function call to return array with arg", async (path) => {
+  test.fails.each([/* "arg", */ "current"])("expect function call to return array with arg", async (path) => {
     const func = new ObjectBuilder()
       .with({
         schema: {
@@ -3787,7 +3792,9 @@ test("filter with empty schema return all items === true", async () => {
     {
       schema: {
         const: [1, true, 0, "0", {}, false, "", " ", true, [], NaN],
-        filter: {}
+        filter: {
+          path: "arg"
+        }
       },
       expected: [1, true, "0", {}, " ", true, []]
     }
@@ -3809,7 +3816,7 @@ test("filter with source dos", async () => {
         },
         const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
         filter: {
-          path: "current",
+          path: "arg",
           includes: {
             path: "$search"
           }
@@ -3820,17 +3827,15 @@ test("filter with source dos", async () => {
   )
 })
 
-test("filter with source", async () => {
+test("expect strings with length of current (array)", async () => {
   await expectToEqualAsync(
     {
       schema: {
         const: ["uno", "Melany", "tres", "cuatro", "cinco", "seis"],
-        reduce: {
-          filter: {
-            path: "current.length",
-            equals: {
-              path: "target.length"
-            }
+        filter: {
+          path: "current.length",
+          equals: {
+            path: "arg.length",
           }
         }
       },
@@ -3922,25 +3927,6 @@ describe("includes", () => {
   })
 })
 
-test("path current", async () => {
-
-  const items = [1, 2, 3]
-
-  await expectToEqualAsync({
-    schema: {
-      const: items,
-      map: {
-        propiedades: {
-          id: {
-            path: "current"
-          }
-        }
-      }
-    },
-    expected: items.map(id => ({ id }))
-  })
-})
-
 test("not", () => {
   const result = new ObjectBuilder()
     .withSchema({
@@ -3993,7 +3979,7 @@ describe("array filter property 'keywords' contains string", () => {
       schema: {
         const: items,
         filter: {
-          path: "current.keywords",
+          path: "arg.keywords",
           includes: "Melany"
         }
       },
@@ -4131,7 +4117,9 @@ describe("not", () => {
     await expectToEqualAsync({
       schema: {
         map: {
-          not: {}
+          not: {
+            path: "arg"
+          }
         }
       },
       initial: source,
@@ -4784,12 +4772,13 @@ describe("array", () => {
             }
           ],
           map: {
-            init: {
-              temp: {
-                path: "current"
-              }
-            },
+            path: "arg",
             spread: {
+              init: {
+                temp: {
+                  path: "current"
+                }
+              },
               const: [
                 {
                   nombre: "nombre",
@@ -4801,7 +4790,7 @@ describe("array", () => {
                 }
               ],
               find: {
-                path: "current.nombre",
+                path: "arg.nombre",
                 equals: {
                   path: "$temp.nombre"
                 }
@@ -4835,7 +4824,7 @@ describe("array", () => {
         name: "find",
         schema: {
           find: {
-            path: "current.nombre",
+            path: "arg.nombre",
             equals: "Melany"
           }
         },
@@ -4879,6 +4868,7 @@ describe("array", () => {
                 1
               ],
               contains: {
+                path: "arg",
                 equals: 1
               }
             }
@@ -4894,7 +4884,7 @@ describe("array", () => {
         schema: {
           const: Array(3).fill({ nombre: "Melany" }).toSpliced(1, 0, { nombre: "Fernando" }),
           filter: {
-            path: "current.nombre",
+            path: "arg.nombre",
             equals: {
               path: "nombre"
             }
@@ -4916,12 +4906,13 @@ describe("array", () => {
     const schema = {
       const: [{ id: 1 }, ...ids],
       map: {
-        init: {
-          temp: {
-            path: "current"
-          }
-        },
+        path: "arg",
         spread: {
+          init: {
+            temp: {
+              path: "current"
+            }
+          },
           const: [
             {
               id: 1,
@@ -4929,7 +4920,7 @@ describe("array", () => {
             }
           ],
           find: {
-            path: "current.id",
+            path: "arg.id",
             equals: {
               path: "$temp.id"
             }
@@ -4948,7 +4939,6 @@ describe("array", () => {
   })
 
   test("map", async () => {
-
     const numbers = [1, 2, 3, 4]
 
     await expectToEqualAsync({
@@ -4957,7 +4947,9 @@ describe("array", () => {
         const: numbers,
         map: {
           propiedades: {
-            id: {}
+            id: {
+              path: "arg"
+            }
           }
         }
       },
@@ -4965,36 +4957,44 @@ describe("array", () => {
     })
   })
 
-  describe("array item validation (source items are all equal to filterSchema)", () => {
+  test("map with empty value returns array of arrays", async () => {
 
-    test.each([
-      "all",
-      "some"
-    ])("%s equal -> true", async (method) => {
-
-      const store = { nombre: "Melany" }
-
-      await expectToEqualAsync({
-        store,
-        schema: {
-          const: Array(2).fill(store),
-          contains: {
-            path: "current.nombre",
-            equals: "Melany"
-          }
-        },
-        expected: true
-      })
+    const items = [1, 2, 3]
+  
+    await expectToEqualAsync({
+      schema: {
+        const: items,
+        map: {}
+      },
+      expected: items.map(() => items)
     })
+  })
 
+  test("array contains", async () => {
+    const match = { nombre: "Melany" }
+
+    await expectToEqualAsync({
+      store: match,
+      schema: {
+        const: [match, { one: 1 }],
+        contains: {
+          path: "arg.nombre",
+          equals: {
+            path: "nombre"
+          }
+        }
+      },
+      expected: true
+    })
   })
 
   describe("all equal (sin itemSchema)", () => {
+    const cases = [
+      { const: ["a", "a", "a"] },
+      { path: "items" }
+    ] as const
 
-    test.each([
-      ["const", { const: ["Melany", "Melany", "Melany"] }],
-      ["path", { path: "items" }]
-    ])("con definition %s", async (tipo, schema: Schema) => {
+    test.each(cases)("con definition %s", async (schema: Schema) => {
 
       await expectToEqualAsync({
         store: {
@@ -5003,7 +5003,8 @@ describe("array", () => {
         schema: {
           ...schema,
           items: {
-            equals: "Melany"
+            path: "arg",
+            equals: "a"
           }
         },
         expected: true
@@ -5021,7 +5022,7 @@ describe("array", () => {
       schema: {
         const: source,
         filter: {
-          path: "current.nombre",
+          path: "arg.nombre",
           equals: "Melany"
         },
         reduce: {

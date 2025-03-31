@@ -27,14 +27,14 @@ export class ArrayMapBuilder extends ArrayBuilderBase {
 
     withMap(schema: Schema | undefined) {
         if(schema) {
-            this.items = this.items.map(x => {
-                return this.builder
-                    .with({
-                        initial: x,
-                        schema
-                    })
-                    .build()
-            })
+            const matchFunction = this.builder
+                .with({
+                    initial: this.items,
+                    schema: { function: schema }
+                })
+                .build()
+
+            this.items = this.items.map(matchFunction)
         }
 
         return this
