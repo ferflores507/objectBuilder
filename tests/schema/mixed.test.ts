@@ -8,6 +8,254 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("map reduce", () => {
+  const catalog = {
+    sports: [
+      {
+        key: "americanfootball_ncaaf",
+        group: "American Football"
+      },
+      {
+        key: "soccer_brazil_campeonato",
+        group: "Soccer"
+      }
+    ],
+    sportsDetails: {
+      americanfootball_ncaaf: {
+        country: "us"
+      },
+      soccer_brazil_campeonato: {
+        country: "br"
+      }
+    },
+    groups: [
+      {
+        titleEs: "Futbol",
+        key: "Soccer",
+        avatar: "https://www.svgrepo.com/show/484685/soccer-ball-illustration.svg"
+      },
+      {
+        titleEs: "Futbol Americano",
+        key: "American Football",
+        avatar: "https://www.svgrepo.com/show/395762/american-football.svg"
+      },
+    ],
+    countries: {
+      us: {
+        name: "Usa",
+        flag: "https://www.svgrepo.com/show/365950/usa.svg"
+      },
+      br: {
+        name: "Brazil",
+        flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+      }
+    },
+    expected: [
+      {
+        key: "americanfootball_ncaaf",
+        country: {
+          name: "Usa",
+          flag: "https://www.svgrepo.com/show/365950/usa.svg"
+        },
+        group: {
+          titleEs: "Futbol Americano",
+          key: "American Football",
+          avatar: "https://www.svgrepo.com/show/395762/american-football.svg"
+        }
+      },
+      {
+        key: "soccer_brazil_campeonato",
+        country: {
+          name: "Brazil",
+          flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+        },
+        group: {
+          titleEs: "Futbol",
+          key: "Soccer",
+          avatar: "https://www.svgrepo.com/show/484685/soccer-ball-illustration.svg"
+        }
+      }
+    ]
+  }
+
+  test("map reduce 4 arrays", async () => {
+    await expectToEqualAsync({
+      store: catalog,
+      schema: {
+        mapReduce: [
+          {
+            rightKey: "key",
+            items: {
+              mapReduce: [
+                {
+                  rightKey: "country",
+                  target: "country",
+                  items: {
+                    path: "countries"
+                  }
+                },
+                {
+                  items: {
+                    path: "sportsDetails"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            items: {
+              mapReduce: [
+                {
+                  key: "key",
+                  rightKey: "group",
+                  target: "group",
+                  items: {
+                    path: "groups"
+                  }
+                },
+                {
+                  items: {
+                    path: "sports"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      expected: catalog.expected
+    })
+  })
+
+  test("map reduce", async () => {
+    await expectToEqualAsync({
+      schema: {
+        mapReduce: [
+          {
+            items: {
+              const: {
+                us: {
+                  flag: "https://www.svgrepo.com/show/365950/usa.svg"
+                },
+                br: {
+                  flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+                }
+              }
+            }
+          },
+          {
+            items: {
+              const: {
+                us: {
+                  name: "Usa"
+                },
+                br: {
+                  name: "Brazil"
+                }
+              }
+            }
+          }
+        ]
+      },
+      expected: catalog.countries
+    })
+  })
+
+  test("map reduce", async () => {
+    await expectToEqualAsync({
+      schema: {
+        mapReduce: [
+          {
+            target: "country",
+            rightKey: "country",
+            items: {
+              const: catalog.countries
+            }
+          },
+          {
+            items: {
+              const: catalog.sportsDetails
+            }
+          }
+        ]
+      },
+      expected: {
+        americanfootball_ncaaf: {
+          country: {
+            name: "Usa",
+            flag: "https://www.svgrepo.com/show/365950/usa.svg"
+          },
+        },
+        soccer_brazil_campeonato: {
+          country: {
+            name: "Brazil",
+            flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+          }
+        }
+      }
+    })
+  })
+
+})
+
+test("map reduce", async () => {
+  await expectToEqualAsync({
+    schema: {
+      mapReduce: [
+        {
+          key: "countryCode",
+          rightKey: "code",
+          target: "flag",
+          items: {
+            const: [
+              {
+                url: "panama.png",
+                countryCode: "pa"
+              },
+              {
+                url: "us.png",
+                countryCode: "us"
+              }
+            ]
+          }
+        },
+        {
+          items: {
+            const: [
+              {
+                name: "Panama",
+                code: "pa"
+              },
+              {
+                name: "Usa",
+                code: "us"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    expected: [
+      {
+        name: "Panama",
+        code: "pa",
+        flag: {
+          url: "panama.png",
+          countryCode: "pa"
+        }
+      },
+      {
+        name: "Usa",
+        code: "us",
+        flag: {
+          url: "us.png",
+          countryCode: "us"
+        }
+      }
+    ]
+  })
+})
+
 describe("validate", () => {
   const validate = [
     {

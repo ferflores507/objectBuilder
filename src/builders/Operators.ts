@@ -1,4 +1,4 @@
-import { Builder, ChildrenSchema, DebounceOptions, DebounceSchema, OperatorTask, Propiedades, RequestInitWithUrl, RequestPlainOptions, Schema, SchemaDefinition, WithTaskOptions } from "../models"
+import { Builder, ChildrenSchema, DebounceOptions, DebounceSchema, MapReduceOptions, OperatorTask, Propiedades, RequestInitWithUrl, RequestPlainOptions, Schema, SchemaDefinition, WithTaskOptions } from "../models"
 import { reduceRequest, type RequestInfo } from "../helpers/requestHelper"
 
 import {
@@ -277,6 +277,52 @@ export class Operators implements WithTaskOptions<Operators> {
         source.forEach(item => map.set(item[sourceKey], item))
         
         return target.map(item => ({ ...item, ...map.get(item[targetKey]) }))
+    }
+    mapReduce = {
+        transform: (schema: SchemaDefinition) => {
+            return Array.isArray(schema)
+                ? schema.map(propiedades => ({ propiedades }))
+                : schema
+        },
+        task: (initial: any, options: MapReduceOptions[]) => {
+            const result = options.reduce((prev, curr) => {
+                const { key, rightKey, target } = prev
+                let map = new Map()
+    
+                if (key) {
+                    (prev.items as []).forEach(item => map.set(item[key], item))
+                }
+                else {
+                    map = new Map(Object.entries(prev.items))
+                }
+    
+                const spreadValue = (val: any, index: any) => {
+                    const result = map.get(rightKey ? val[rightKey] : index)
+    
+                    return { 
+                        ...val, 
+                        ...(target ? { [target]: result } : result) 
+                    }
+                }
+    
+                const { items } = curr
+    
+                return {
+                    ...curr,
+                    items: Array.isArray(items)
+                        ? items.map(spreadValue)
+                        : Object
+                            .entries(items)
+                            .reduce((prev, [key, val]) => ({
+                                ...prev,
+                                [key]: spreadValue(val, key)
+                            }), {})
+                }
+            })
+    
+            return result.items
+        }
+
     }
     mapObject = {
         transform: (propiedades: Record<string, any>) => ({ propiedades }),

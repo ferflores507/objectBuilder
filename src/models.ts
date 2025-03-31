@@ -126,6 +126,14 @@ export type DebounceSchema = {
     target: SchemaDefinition
 })
 
+export type MapReduceOptions = Partial<{
+    key: string
+    rightKey: string
+    target: string
+}> & { 
+    items: any[] | Record<string, unknown> 
+}
+
 export type Schema = Partial<{
     allEqual: boolean
     allEqualTo: SchemaDefinition | SchemaPrimitive
@@ -175,6 +183,7 @@ export type Schema = Partial<{
     log: SchemaDefinition | SchemaPrimitive
     leftJoin: SchemaDefinition | SchemaPrimitive
     mapObject: Propiedades
+    mapReduce: SchemaDefinition
     mergeItemsWithSameKey: Schema | SchemaPrimitive
     mergeByKeys: SchemaDefinition | SchemaPrimitive
     not: SchemaDefinition
