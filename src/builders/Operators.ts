@@ -269,15 +269,6 @@ export class Operators implements WithTaskOptions<Operators> {
 
         return [new Map(), ...concreteKeys] as const
     }
-    leftJoin = (arrays: [any[], any[]], keys?: [string, string] | true) => {
-        
-        const [target, source] = arrays
-        const [map, targetKey, sourceKey] = this.formatArraysMerge(arrays, keys)
-
-        source.forEach(item => map.set(item[sourceKey], item))
-        
-        return target.map(item => ({ ...item, ...map.get(item[targetKey]) }))
-    }
     mapReduce = {
         transform: (schema: SchemaDefinition) => {
             return Array.isArray(schema)

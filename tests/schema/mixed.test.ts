@@ -571,40 +571,49 @@ test("merge by keys with empty array from is equals to mergeItemsWithSameKey", a
   })
 })
 
-test("left join with string", async () => {
+test("map reduce odd and even numbers", async () => {
   await expectToEqualAsync({
     schema: {
-      const: [
-        [
-          {
-            id: 1,
-            group: "odd"
-          },
-          {
-            id: 2,
-            group: "even"
-          },
-          {
-            id: 3,
-            group: "odd"
-          },
-          {
-            id: 4,
-            en: "four"
+      mapReduce: [
+        {
+          key: "group",
+          rightKey: "group",
+          items: {
+            const: [
+              {
+                title: "Odd number",
+                group: "odd",
+              },
+              {
+                title: "Even number",
+                group: "even",
+              }
+            ]
           }
-        ],
-        [
-          {
-            title: "Odd number",
-            group: "odd",
-          },
-          {
-            title: "Even number",
-            group: "even",
+        },
+        {
+          items: {
+            const: [
+              {
+                id: 1,
+                group: "odd"
+              },
+              {
+                id: 2,
+                group: "even"
+              },
+              {
+                id: 3,
+                group: "odd"
+              },
+              {
+                id: 4,
+                en: "four"
+              }
+            ]
           }
-        ]
-      ],
-      leftJoin: "group"
+        }
+      ]
     },
     expected: [
       {
@@ -630,36 +639,45 @@ test("left join with string", async () => {
   })
 })
 
-test("left join", async () => {
+test("map reduce odd and even numbers by keys: group, groupName", async () => {
   await expectToEqualAsync({
     schema: {
-      const: [
-        [
-          {
-            id: 1,
-            group: "odd"
-          },
-          {
-            id: 2,
-            group: "even"
-          },
-          {
-            id: 3,
-            group: "odd"
+      mapReduce: [
+        {
+          key: "groupName",
+          rightKey: "group",
+          items: {
+            const: [
+              {
+                title: "Odd number",
+                groupName: "odd",
+              },
+              {
+                title: "Even number",
+                groupName: "even",
+              }
+            ]
           }
-        ],
-        [
-          {
-            title: "Odd number",
-            groupName: "odd",
-          },
-          {
-            title: "Even number",
-            groupName: "even",
+        },
+        {
+          items: {
+            const: [
+              {
+                id: 1,
+                group: "odd"
+              },
+              {
+                id: 2,
+                group: "even"
+              },
+              {
+                id: 3,
+                group: "odd"
+              }
+            ]
           }
-        ]
-      ],
-      leftJoin: ["group", "groupName"]
+        }
+      ]
     },
     expected: [
       {

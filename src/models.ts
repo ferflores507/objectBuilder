@@ -173,7 +173,6 @@ export type Schema = Partial<{
     join: SchemaDefinition | SchemaPrimitive
     keywords: true
     log: SchemaDefinition | SchemaPrimitive
-    leftJoin: SchemaDefinition | SchemaPrimitive
     mapObject: Propiedades
     mapReduce: SchemaDefinition
     mergeItemsWithSameKey: Schema | SchemaPrimitive
