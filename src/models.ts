@@ -127,6 +127,14 @@ export type MapReduceOptions = Partial<{
     items: any[] | Record<string, unknown> 
 }
 
+type MapReduceOptionsSchema = Partial<{
+    key: MapReduceOptions["key"] | Schema
+    rightKey: MapReduceOptions["rightKey"] | Schema
+    target: MapReduceOptions["target"] | Schema
+}> & { 
+    items: SchemaDefinition
+}
+
 export type Schema = Partial<{
     allEqual: boolean
     allEqualTo: SchemaDefinition | SchemaPrimitive
@@ -175,7 +183,7 @@ export type Schema = Partial<{
     log: SchemaDefinition | SchemaPrimitive
     mapKeyValue: SchemaDefinition | true
     mapObject: Propiedades
-    mapReduce: SchemaDefinition
+    mapReduce: MapReduceOptionsSchema[]
     mergeItemsWithSameKey: Schema | SchemaPrimitive
     mergeByKeys: SchemaDefinition | SchemaPrimitive
     not: SchemaDefinition
