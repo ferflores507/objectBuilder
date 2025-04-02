@@ -8,6 +8,41 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades } from '../../src/models'
 
+describe("map key value", () => {
+
+  const expected = [
+    { key: "one", value: 1 }, 
+    { key: "two", value: 2 }
+  ]
+
+  test("with object", async () => {
+    await expectToEqualAsync({
+      schema: {
+        mapKeyValue: {
+          const: {
+            one: 1,
+            two: 2
+          }
+        }
+      },
+      expected
+    })
+  })
+
+  test("with true", async () => {
+    await expectToEqualAsync({
+      schema: {
+        const: {
+          one: 1,
+          two: 2
+        },
+        mapKeyValue: true
+      },
+      expected
+    })
+  })
+})
+
 describe("map reduce", () => {
   const catalog = {
     sports: [

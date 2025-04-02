@@ -227,6 +227,11 @@ export class Operators implements WithTaskOptions<Operators> {
     trim = (value: string) => value.trim()
     removeAccents = removeAccents
     stringify = (value: any) => JSON.stringify(value)
+    mapKeyValue = (current: any, initial: any[] | true) => {
+        const target: Record<string, any> = initial === true ? current : initial
+
+        return Object.entries(target).map(([key, value]) => ({ key, value }))
+    }
     formatArraysMerge = (arrays: [any[], any[]], keys?: [string, string] | true) => {
 
         arrays = this.values(arrays) as [any, any]
