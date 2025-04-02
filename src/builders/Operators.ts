@@ -28,7 +28,10 @@ export class Operators implements WithTaskOptions<Operators> {
         Object.assign(this, otherOperators)
     }
     assign: OperatorTask = (current, previous) => Object.assign(current, previous)
-    boolean = (value: any) => !!value
+    boolean = {
+        transform: (schema: any) => schema === true ? { path: "current" } : schema,
+        task: (initial: any, current: any) => !!current
+    }
     childrenSchema = (childrenSchema: Record<string, ChildrenSchema>, path: string[]) => {
         const schemas: any[] = []
         const push = (val: any, condition = val) => condition && schemas.push(val)

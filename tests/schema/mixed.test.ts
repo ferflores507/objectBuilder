@@ -2548,9 +2548,21 @@ describe("with boolean", () => {
 
   test.each(cases)("expect boolean %o to equal %s", async (initial, expected) => {
     await expectToEqualAsync({
+      store: {
+        value: initial
+      },
+      schema: {
+        boolean: {
+          path: "value"
+        }
+      },
+      expected
+    })
+
+    await expectToEqualAsync({
       initial,
       schema: {
-        boolean: true
+        boolean: true,
       },
       expected
     })

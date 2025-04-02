@@ -138,7 +138,7 @@ export type Schema = Partial<{
     dividedBy: SchemaDefinition | number
     asyncFunction: SchemaDefinition
     bindArg: SchemaDefinition
-    boolean: true
+    boolean: SchemaDefinition | true
     call: string | Propiedades | string[]
     childrenSchema: SchemaDefinition
     const: any
