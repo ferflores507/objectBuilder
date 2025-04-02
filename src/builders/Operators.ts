@@ -132,11 +132,7 @@ export class Operators implements WithTaskOptions<Operators> {
             : resultArray
     }
     unpackAsGetters = (obj: {}, b: string[]) => entry(obj).unpackAsGetters(b)
-    spread = (obj: {}, value: true | {}) => {
-        return value === true
-            ? { ...obj }
-            : spread(obj, value)
-    }
+    spread = (obj: {}, value: any) => spread(obj, value)
     spreadFlat = (a: any, b: any[]) => this.spread(a, b.flat())
     propiedadesFunction = {
         transform: (propiedades: Propiedades) => {

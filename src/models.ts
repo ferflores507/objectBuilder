@@ -215,7 +215,7 @@ export type Schema = Partial<{
     status: string
     store: Schema
     stringify: true
-    spread: SchemaDefinition | true
+    spread: SchemaDefinition | SchemaPrimitive
     spreadStart: SchemaDefinition
     spreadFlat: SchemaDefinition
     then: SchemaDefinition

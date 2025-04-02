@@ -1200,22 +1200,35 @@ test.skip("expect api response", async () => {
   `)
 })
 
-test("spread true", async () => {
-  const details = { id: 1 }
-  const builder = new ObjectBuilder()
-    .with({
-      store: {
-        details
-      },
+describe("spread", () => {
+  test("spread true on object just returns equals but not the same", async () => {
+    const details = { id: 1 }
+    const builder = new ObjectBuilder()
+      .with({
+        store: {
+          details
+        },
+        schema: {
+          path: "details",
+          spread: true
+        }
+      })
+  
+    const detailsCopy = await builder.buildAsync()
+  
+    expect(details).not.toBe(detailsCopy)
+    expect(details).toEqual(detailsCopy)
+  })
+  
+  test("spread true on array spreads true value", async () => {
+    await expectToEqualAsync({
       schema: {
-        path: "details",
+        const: [true, false],
         spread: true
-      }
+      },
+      expected: [true, false, true]
     })
-
-  const detailsCopy = await builder.buildAsync()
-
-  expect(details).not.toBe(detailsCopy)
+  })
 })
 
 test("expect keywords to be empty array when string is empty", async () => {
