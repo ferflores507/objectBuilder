@@ -2597,6 +2597,26 @@ test("with init", async () => {
   })
 })
 
+test("with init respects previous", async () => {
+  await expectToEqualAsync({
+    store: {
+      a: 2
+    },
+    schema: {
+      path: "a",
+      reduce: {
+        init: {
+          b: 3
+        },
+        plus: {
+          path: "$b"
+        }
+      }
+    },
+    expected: 5
+  })
+})
+
 test("array spread start", async () => {
   await expectToEqualAsync({
     schema: {
