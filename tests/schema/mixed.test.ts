@@ -425,9 +425,7 @@ describe("children schema", () => {
   test.each(cases)("children schema path: $path", async ({ path, expected, expectedResult }) => {
     const schema = {
       const: childrenSchema,
-      childrenSchema: {
-        const: path
-      }
+      childrenSchema: path
     }
 
     await expectToEqualAsync({ schema, expected })
@@ -1621,9 +1619,7 @@ test("patch todos", async () => {
                     path: "arg.newValue.completed",
                     and: {
                       path: "arg.previousValue.completed",
-                      or: {
-                        const: 456
-                      }
+                      or: 456
                     }
                   }
                 },
@@ -1965,9 +1961,7 @@ test("set array path", async () => {
         {
           definitions: [
             "detalles",
-            { 
-              const: "usuario" 
-            },
+            "usuario",
             { 
               path: "key"
             }
@@ -2456,10 +2450,7 @@ test("override spread operator", async () => {
       }
     },
     schema: {
-      const: [
-        1,
-        2
-      ],
+      const: [1, 2],
       spreadFlat: {
         const: [
           3,
@@ -2487,9 +2478,7 @@ test("is keywords of", async () => {
   await expectToEqualAsync({
     schema: {
       const: ["uno", "dos"],
-      isKeywordsOf: {
-        const: ["tres", "dos", "uno"]
-      }
+      isKeywordsOf: ["tres", "dos", "uno"]
     },
     expected: true
   })
@@ -2501,9 +2490,7 @@ test("is subset with", async () => {
       const: ["uno", "dos"],
       isSubsetOf: {
         propiedades: {
-          container: {
-            const: ["1 - uno", "2 - dos", "3 - tres"]
-          },
+          container: ["1 - uno", "2 - dos", "3 - tres"],
           match: {
             function: {
               path: "arg.containerItem",
@@ -2614,9 +2601,7 @@ test("array spread start", async () => {
   await expectToEqualAsync({
     schema: {
       const: [2, 3],
-      spreadStart: {
-        const: 1
-      }
+      spreadStart: 1
     },
     expected: [1, 2, 3]
   })
@@ -2855,10 +2840,7 @@ test("default schema", async () => {
 test("spread flat", async() => {
   await expectToEqualAsync({
     schema: {
-      const: [
-        1,
-        2
-      ],
+      const: [1, 2],
       spreadFlat: {
         const: [
           3,
@@ -2900,9 +2882,7 @@ describe("arithmetic", () => {
     await expectToEqualAsync({
       schema: {
         const: 8,
-        [method]: {
-          const: 2
-        }
+        [method]: 2
       },
       expected
     })
@@ -3079,12 +3059,8 @@ describe("schema string join", () => {
     test.fails.each(cases)("fails to expect '%s'", async (expected) => {
       await expectToEqualAsync({
         schema: {
-          const: [
-            "Fernando",
-            "Flores"
-          ],
-          join: {
-          }
+          const: ["Fernando", "Flores"],
+          join: {}
         },
         expected
       })
@@ -4065,12 +4041,8 @@ test("spread item to array", async () => {
   await expectToEqualAsync({
     store: {},
     schema: {
-      const: [
-        1, 2, 3
-      ],
-      spread: {
-        const: 4
-      }
+      const: [1, 2, 3],
+      spread: 4
     },
     expected: [1, 2, 3, 4]
   })
@@ -4230,20 +4202,11 @@ describe("add schema", () => {
     await expectToEqualAsync({
       store: {},
       schema: {
-        const: [
-          1,
-          2
-        ],
+        const: [1, 2],
         select: {
-          multiple: {
-            const: true
-          },
-          max: {
-            const: 2
-          },
-          value: {
-            const: 3
-          }
+          multiple: true,
+          max: 2,
+          value: 3
         }
       },
       expected: [1, 2]
@@ -4254,17 +4217,10 @@ describe("add schema", () => {
     await expectToEqualAsync({
       store: {},
       schema: {
-        const: [
-          1,
-          2
-        ],
+        const: [1, 2],
         select: {
-          multiple: {
-            const: true
-          },
-          value: {
-            const: 3
-          }
+          multiple: true,
+          value: 3
         }
       },
       expected: [1, 2, 3]
@@ -4279,9 +4235,7 @@ describe("add schema", () => {
         {
           const: [4],
           select: {
-            value: {
-              const: 3
-            }
+            value: 3
           },
         }
       ],
@@ -4305,9 +4259,7 @@ describe("add schema", () => {
       schema: {
         const: [],
         select: {
-          value: {
-            const: 3
-          }
+          value: 3
         }
       },
       expected: [3]
