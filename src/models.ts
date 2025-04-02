@@ -100,13 +100,6 @@ export type ArraySchema = Partial<{
     groupJoin: Join
 }>
 
-export type Consulta = { url: string } & Partial<{
-    metodo: 'get' | 'post'
-    query: Record<string, any>
-    body: Record<string, any>
-    headers: Record<string, any>
-}>
-
 export type SchemaDefinition = Schema | { [n: number]: Schema | SchemaPrimitive }
 
 export type SchemaPrimitive = string | number | bigint | boolean | null
@@ -146,7 +139,6 @@ export type Schema = Partial<{
     asyncFunction: SchemaDefinition
     bindArg: SchemaDefinition
     boolean: true
-    consulta: Consulta
     call: string | Propiedades | string[]
     childrenSchema: SchemaDefinition
     const: any
