@@ -336,16 +336,10 @@ export class ObjectBuilder implements Builder {
     }
 
     withDelay(ms: number | undefined) {
-        const delay = (ms: number) => new Promise<void>((resolve, reject) => {
-            setTimeout(resolve, ms)
-        })
-
         return ms
-            ? this.add(async (target) => {
-                await delay(ms)
-
-                return target
-            })
+            ? this.add(current => new Promise<void>(resolve => {
+                setTimeout(() => resolve(current), ms)
+            }))
             : this
     }
 
