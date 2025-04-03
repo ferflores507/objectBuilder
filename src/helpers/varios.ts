@@ -192,7 +192,7 @@ const getPaths = (path: string | string[], separator = ".") => {
 }
 
 const setPathValueFromPaths = (obj: Record<string, any>, path: string[], value: any) => {
-    const first = path[0]
+    const [first] = path
 
     if (path.length === 1) {
         obj[first] = value;
