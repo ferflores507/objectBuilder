@@ -1238,25 +1238,6 @@ describe("format propiedades", () => {
   })
 })
 
-test("if with current", async () => {
-  await expectToEqualAsync({
-    schema: {
-      const: 2,
-      if: {
-        const: 1,
-        lessThan: 3,
-      },
-      then: {
-        path: "current"
-      },
-      else: {
-        const: "error"
-      }
-    },
-    expected: 2
-  })
-})
-
 test("patch todos", async () => {
   await expectToEqualAsync({
     initial: [
@@ -3989,40 +3970,71 @@ describe("schema select", () => {
 })
 
 describe("if schema", () => {
-  const [ok, invalid] = ["ok", "invalid"]
-  const cases = [1, 2, 3].map(num => [num, num % 2 == 0 ? ok : invalid] as const)
 
-  test.each(cases)("if as string (path)", async (id, expected) => {
-    const store = { isValid: id % 2 == 0 }
-    
-    await expectToEqualAsync({
-      store,
-      schema: {
-        if: "isValid",
-        then: {
-          const: ok
+  describe("if is invalid then 'ok' or 'invalid'", () => {
+
+    const [ok, invalid] = ["ok", "invalid"]
+    const cases = [1, 2, 3].map(num => [num, num % 2 == 0 ? ok : invalid] as const)
+  
+    test.each(cases)("if %d % 2 == 0 %s", async (id, expected) => {
+      const store = { isValid: id % 2 == 0 }
+  
+      await expectToEqualAsync({
+        store,
+        schema: {
+          if: "isValid",
+          then: ok,
+          else: invalid
         },
-        else: {
-          const: invalid
-        }
-      },
-      expected
+        expected
+      })
+      
+      await expectToEqualAsync({
+        store,
+        schema: {
+          if: "isValid",
+          then: {
+            const: ok
+          },
+          else: {
+            const: invalid
+          }
+        },
+        expected
+      })
+  
+      await expectToEqualAsync({
+        store,
+        schema: {
+          if: {
+            path: "isValid"
+          },
+          then: {
+            const: ok
+          },
+          else: {
+            const: invalid
+          }
+        },
+        expected
+      })
     })
+  })
 
+  test("if with current", async () => {
     await expectToEqualAsync({
-      store,
       schema: {
+        const: 2,
         if: {
-          path: "isValid"
+          const: 1,
+          lessThan: 3,
         },
         then: {
-          const: ok
+          path: "current"
         },
-        else: {
-          const: invalid
-        }
+        else: "error"
       },
-      expected
+      expected: 2
     })
   })
 })

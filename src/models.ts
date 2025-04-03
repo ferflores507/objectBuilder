@@ -157,7 +157,7 @@ export type Schema = Partial<{
     default: SchemaDefinition | SchemaPrimitive
     definitions: (Schema | SchemaPrimitive)[]
     delay: number
-    else: SchemaDefinition
+    else: SchemaDefinition | SchemaPrimitive
     entries: true
     equals: SchemaDefinition | SchemaPrimitive
     filterPropiedades: SchemaDefinition | SchemaPrimitive
@@ -218,7 +218,7 @@ export type Schema = Partial<{
     spread: SchemaDefinition | SchemaPrimitive
     spreadStart: SchemaDefinition | SchemaPrimitive
     spreadFlat: SchemaDefinition
-    then: SchemaDefinition
+    then: SchemaDefinition | SchemaPrimitive
     trim: true
     unpack: string[]
     unpackAsGetters: SchemaDefinition

@@ -358,16 +358,21 @@ export class ObjectBuilder implements Builder {
             return typeof (value) == "string" ? { path: value } : value
         }
 
-        const { if: condition, then: thenCondition, else: elseCondition } = schema ?? {}
-
-        return condition
+        return schema?.if
             ? this
                 .addMerge()
-                .withSchema(schemaOrPath(condition))
-                .withUnshift((result, prev) => this.with({
-                    initial: prev,
-                    schema: result ? thenCondition : elseCondition
-                }))
+                .withSchema(schemaOrPath(schema.if))
+                .withUnshift((result, prev) => {
+                    const { then, else: elseSchema } = {
+                        then: { const: prev },
+                        else: { const: prev },
+                        ...schema
+                    }
+
+                    return this
+                        .with({ initial: prev })
+                        .withSchemaOrDefault(result ? then : elseSchema)
+                })
             : this
     }
 
