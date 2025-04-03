@@ -88,7 +88,7 @@ export type FilterSchema = {
 
 export type ArraySchema = Partial<{
     select: {
-        [P in keyof SelectSchema]: Schema;
+        [P in keyof SelectSchema]: Schema | SelectSchema[P];
     },
     filter: Schema,
     find: Schema,
@@ -216,7 +216,7 @@ export type Schema = Partial<{
     store: Schema
     stringify: true
     spread: SchemaDefinition | SchemaPrimitive
-    spreadStart: SchemaDefinition
+    spreadStart: SchemaDefinition | SchemaPrimitive
     spreadFlat: SchemaDefinition
     then: SchemaDefinition
     trim: true
