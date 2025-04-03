@@ -3,12 +3,8 @@ import { createServer, IncomingMessage, ServerResponse } from "http"
 const port = process.env.PORT || 8000;
 
 type HandlerMiddleWare = (path: string, res: ServerResponse, payload: any) => void
-const sleep = () => new Promise(resolve => {
-    setTimeout(resolve, 50)
-})
 
 const useRouter = () => {
-
     type RouteHandler = Record<string, (res: ServerResponse, payload: any) => void>
 
     const handlers: RouteHandler = {
@@ -34,7 +30,7 @@ const useRouter = () => {
     }
     
     const route: HandlerMiddleWare = async (path, res, payload) => {
-        await sleep()
+        await new Promise(resolve => { setTimeout(resolve, 50) })
         const handler = handlers[path]
 
         handler ? handler(res, payload) : failed(path, res)
@@ -63,10 +59,10 @@ function setUpServer(route: HandlerMiddleWare) {
     return createServer(handleReq);
 }
 
-const { route } = useRouter()
-
 export const setupServer = () => {
+    const { route } = useRouter()
     const server = setUpServer(route)
+
     return {
         listen: () => server.listen(port, /* () => console.log(`App running on port ${port}`) */),
         close: () => server.close()
