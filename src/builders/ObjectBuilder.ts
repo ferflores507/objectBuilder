@@ -117,7 +117,6 @@ export class ObjectBuilder implements Builder {
             import: importPath,
             store,
             log,
-            default: defaultSchema,
             ...rest
         } = schema ?? {}
 
@@ -130,7 +129,7 @@ export class ObjectBuilder implements Builder {
                 .withDelay(delay)
                 .withBinary({ path, pathFrom })
                 .withImport(importPath)
-                .withDefault(defaultSchema)
+                .withDefault(schema)
                 .withInitialSchema(schema)
                 .withSchemaFrom(schemaFrom)
                 .withSelectSet(selectSet)
@@ -165,9 +164,9 @@ export class ObjectBuilder implements Builder {
             : this
     }
 
-    withDefault(schema: SchemaDefinition | SchemaPrimitive | undefined) {
-        return schema != null
-            ? this.withUnshift(initial => initial ?? this.with({ initial }).withSchemaOrDefault(schema))
+    withDefault(schema: Schema | undefined) {
+        return schema?.hasOwnProperty("default")
+            ? this.withUnshift(initial => initial ?? this.with({ initial }).withSchemaOrDefault(schema.default))
             : this
     }
 

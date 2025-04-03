@@ -7,6 +7,16 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades, Schema } from '../../src/models'
 
+test("default null", async () => {
+  await expectToEqualAsync({
+    schema: {
+      path: "not.found",
+      default: null
+    },
+    expected: null
+  })
+})
+
 describe("path from", () => {
   test("with array", async () => {
     await expectToEqualAsync({
