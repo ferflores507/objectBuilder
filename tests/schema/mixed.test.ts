@@ -7,6 +7,22 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades, Schema } from '../../src/models'
 
+test("function with primitive", async () => {
+  await expectToEqualAsync({
+    schema: {
+      reduce: [
+        {
+          function: 7
+        },
+        {
+          call: "current"
+        }
+      ]
+    },
+    expected: 7
+  })
+})
+
 test("default null", async () => {
   await expectToEqualAsync({
     schema: {

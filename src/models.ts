@@ -144,7 +144,7 @@ export type Schema = Partial<{
     minus: SchemaDefinition | number
     times: SchemaDefinition | number
     dividedBy: SchemaDefinition | number
-    asyncFunction: SchemaDefinition
+    asyncFunction: SchemaDefinition | SchemaPrimitive
     bindArg: SchemaDefinition
     boolean: SchemaDefinition | true
     call: string | Propiedades | string[]
@@ -163,7 +163,7 @@ export type Schema = Partial<{
     filterPropiedades: SchemaDefinition | SchemaPrimitive
     formatPropiedades: Schema
     flat: true
-    function: SchemaDefinition
+    function: SchemaDefinition | SchemaPrimitive
     greaterThan: SchemaDefinition | SchemaPrimitive
     lessThan: SchemaDefinition | SchemaPrimitive
     if: SchemaDefinition | string

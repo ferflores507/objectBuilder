@@ -308,9 +308,9 @@ export class ObjectBuilder implements Builder {
             ? this.add(() => (arg: any, options?: BuilderOptions) => {
                 const builder = this.with({
                     arg,
-                    ...options,
-                    schema: targetSchema
+                    ...options
                 })
+                .withSchemaOrDefault(targetSchema)
 
                 return asyncFunction ? builder.buildAsync() : builder.build()
             })
