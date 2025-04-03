@@ -3,10 +3,9 @@ import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync
 import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { entry } from '../../src/helpers/varios'
 import { ObjectBuilder } from '../../src/builders/ObjectBuilder'
-import { Schema } from '../..'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
-import { Propiedades } from '../../src/models'
+import { Propiedades, Schema } from '../../src/models'
 
 describe("map key value", () => {
 
@@ -3786,26 +3785,23 @@ test("UUID", async () => {
 
 describe("increment or decrement", () => {
 
-  const operations = ["increment", "decrement"]
+  const operations = ["increment", "decrement"] as const
+  const store = { total: 7 }
 
   test.each(operations)("%s", async (operation) => {
-    const store = { total: 7 }
-    const schema: Schema = {
+    const schema = {
       [operation]: "total",
       reduce: {
         path: "total"
       }
     }
-    const builder = new ObjectBuilder()
-      .with({
-        store,
-        schema
-      })
-    const amount = schema.increment ? 1 : -1
+  
+    const amount = operation === "increment" ? 1 : -1
+    const builder = new ObjectBuilder().with({ store, schema })
     const expected = store.total + amount
-    const resultados = [builder.build(), await builder.with({ schema }).buildAsync()]
+    const results = [builder.build(), await builder.with({ schema}).buildAsync()]
 
-    expect(resultados).toEqual([expected, expected + amount])
+    expect(results).toEqual([expected, expected + amount])
   })
 
 })
@@ -4080,8 +4076,7 @@ describe("select", () => {
 describe("propiedades builder", () => {
 
   type CaseOptions = {
-    target?: any,
-    source?: any,
+    store?: any,
     propiedades: Propiedades
     expected: Record<string, any>
   }
@@ -4099,8 +4094,7 @@ describe("propiedades builder", () => {
 
   test("options value path", async () => {
     await expectResultsAsync({
-      store: { dos: 2 },
-      value: { detalles: { titulo: "Hola" } },
+      store: { dos: 2, detalles: { titulo: "Hola" } },
       propiedades: {
         uno: 1,
         unoCopy: {
@@ -4110,10 +4104,10 @@ describe("propiedades builder", () => {
           path: "dos"
         },
         saludo: {
-          path: "value.detalles.titulo",
+          path: "store.detalles.titulo",
         },
         saludoNested: {
-          path: "value.detalles",
+          path: "store.detalles",
           propiedades: {
             titulo: {
               path: "current.titulo"
@@ -4743,12 +4737,11 @@ describe("array", () => {
 
   test("reduce: filtrar array y luego asignar a nuevo objeto con propiedad 'total' con valor de length", async () => {
     const melany = { nombre: "Melany" }
-    const source = [melany, { nombre: "Fernando" }, melany, melany]
+    const items = [melany, { nombre: "Fernando" }, melany, melany]
 
     await expectToEqualAsync({
-      source,
       schema: {
-        const: source,
+        const: items,
         filter: {
           path: "arg.nombre",
           equals: "Melany"
@@ -4761,7 +4754,7 @@ describe("array", () => {
           }
         }
       },
-      expected: { total: source.length - 1 }
+      expected: { total: items.length - 1 }
     })
   })
 })

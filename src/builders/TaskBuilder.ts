@@ -14,7 +14,7 @@ export class TaskBuilder implements BuilderBase {
     errorTasks: Queue = new Queue()
     cleanupTasks: Queue = new Queue()
 
-    with({ target = this.target, tasks = new Queue() } : { target?: any, tasks: Queue }) {
+    with({ target = this.target, tasks = new Queue() } : { target?: any, tasks?: Queue }) {
         this.target = target
         this.tasks = tasks
 

@@ -113,7 +113,6 @@ export class ObjectBuilder implements Builder {
             increment,
             init,
             decrement,
-            consulta,
             import: importPath,
             store,
             log,
@@ -175,7 +174,7 @@ export class ObjectBuilder implements Builder {
         return Object.entries(tasks)
             .map(([key, options]) => ({
                 options,
-                definition: schema?.hasOwnProperty(key) ? schema[key] : null
+                definition: schema?.hasOwnProperty(key) ? schema[key as keyof Schema] : null
             }))
             .filter(({ definition }) => definition != null)
             .map(({ options, definition }) => typeof options == "function"
@@ -463,7 +462,7 @@ export class ObjectBuilder implements Builder {
             : this
     }
 
-    withDefinitions(schemas: Schema[] | undefined) {
+    withDefinitions(schemas: (SchemaDefinition | SchemaPrimitive)[] | undefined) {
         return schemas
             ? this.withUnshiftArray(initial => schemas?.map(schema => {
                 return this.with({ initial }).withSchemaOrDefault(schema)
