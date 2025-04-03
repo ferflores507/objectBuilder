@@ -3889,7 +3889,7 @@ describe("not", () => {
   })
 
   describe("simple not", () => {
-    const schemas: Schema[] = [
+    const schemas = [
       {
         const: false
       },
@@ -3898,24 +3898,25 @@ describe("not", () => {
       }
     ]
 
-    test.each(schemas)("schema: $schema", async (schema: Schema) => {
+    test.each(schemas)("schema: $schema", async (schema) => {
       const store = { activated: false }
-      const builder = new ObjectBuilder()
-        .with({ store })
+      const results = await buildResultsAsync({ store, schema })
 
-      const results = [
-        !builder.with({ schema }).build(),
-        !(await builder.with({ schema }).buildAsync()),
-        builder.with({ schema: { not: schema } }).build(),
-        await builder.with({ schema: { not: schema } }).buildAsync()
-      ]
+      const resultsNot = await buildResultsAsync({
+        store,
+        schema: {
+          not: schema
+        }
+      })
 
-      expect(new Set(results).size).toBe(1)
+      const mergedResults = [...results.map(r => !r), ...resultsNot]
+
+      expect(new Set(mergedResults).size).toBe(1)
     })
   })
 })
 
-describe("add schema", () => {
+describe("schema select", () => {
 
   test("multiple with max", async () => {
     await expectToEqualAsync({
@@ -3989,15 +3990,13 @@ describe("add schema", () => {
 
 describe("if schema", () => {
   const [ok, invalid] = ["ok", "invalid"]
-  const cases = [1, 2, 3].map(num => {
-    return [num, num % 2 == 0 ? ok : invalid] as [number, string]
-  })
+  const cases = [1, 2, 3].map(num => [num, num % 2 == 0 ? ok : invalid] as const)
 
-  test.each(cases)("if as string (path)", async (id: number, expected: string) => {
+  test.each(cases)("if as string (path)", async (id, expected) => {
+    const store = { isValid: id % 2 == 0 }
+    
     await expectToEqualAsync({
-      store: {
-        isValid: id % 2 == 0
-      },
+      store,
       schema: {
         if: "isValid",
         then: {
@@ -4009,21 +4008,12 @@ describe("if schema", () => {
       },
       expected
     })
-  })
 
-  const modCases = [1, 2, 3].map(num => {
-    const mod = num % 2
-
-    return [mod, mod == 0 ? ok : invalid] as [number, string]
-  })
-
-  test.each(modCases)("if as schema", async (mod: number, expected: string) => {
     await expectToEqualAsync({
-      store: { mod },
+      store,
       schema: {
-        const: mod,
         if: {
-          equals: 0
+          path: "isValid"
         },
         then: {
           const: ok
@@ -4044,12 +4034,7 @@ test("getPathValue throws on null source", () => {
 })
 
 describe("select", () => {
-  const builder = new ObjectBuilder()
-    .with({
-      store: {
-        selected: [2]
-      },
-    })
+  const store = { selected: [2] }
 
   const cases = [
     { selected: [3] },
@@ -4057,8 +4042,9 @@ describe("select", () => {
   ]
 
   test.each(cases)("select value", ({ selected }) => {
-    const resultado = builder
+    const resultado = new ObjectBuilder()
       .with({
+        store,
         schema: {
           const: 3,
           selectSet: "selected",
