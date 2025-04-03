@@ -103,6 +103,7 @@ export class ObjectBuilder implements Builder {
             status,
             delay,
             path,
+            pathFrom,
             propiedades,
             propiedadesAsync,
             reduceOrDefault,
@@ -127,7 +128,7 @@ export class ObjectBuilder implements Builder {
                 .withUses(rest)
                 .withStore(store)
                 .withDelay(delay)
-                .withPath(path)
+                .withBinary({ path, pathFrom })
                 .withImport(importPath)
                 .withDefault(defaultSchema)
                 .withInitialSchema(schema)
@@ -140,7 +141,7 @@ export class ObjectBuilder implements Builder {
                 .withPropiedades(propiedades)
                 .withFunction(schema)
                 .withBindArg(bindArg)
-                .withBinary(schema)
+                .withBinary(rest)
                 .withConditional(schema)
                 .withEndSchema(schema)
                 .withLogical(schema)
@@ -505,14 +506,16 @@ export class ObjectBuilder implements Builder {
         })
     }
 
+    get(path: string, current?: any) {
+        const sources = [{ current, target: this.target }, this.options, this.options.variables]
+        const proxy = getterTrap(this.options.store, ...sources)
+
+        return varios.entry(proxy).get(path)
+    }
+
     withPath(path: string | undefined) {
         return path
-            ? this.add(current => {
-                const sources = [{ current, target: this.target }, this.options, this.options.variables]
-                const proxy = getterTrap(this.options.store, ...sources)
-
-                return varios.entry(proxy).get(path)
-            })
+            ? this.add(current => this.get(path, current))
             : this
     }
 }

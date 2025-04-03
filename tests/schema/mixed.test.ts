@@ -7,6 +7,134 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades, Schema } from '../../src/models'
 
+describe("path from", () => {
+  test("with array", async () => {
+    await expectToEqualAsync({
+      store: {
+        details: {
+          namePath: "current.name"
+        }
+      },
+      schema: {
+        const: {
+          name: "Melany"
+        },
+        reduce: {
+          pathFrom: ["details", "namePath"]
+        }
+      },
+      expected: "Melany"
+    })
+  })
+  
+  test("with array 2", async () => {
+    await expectToEqualAsync({
+      store: {
+        details: {
+          namePath: "current.name"
+        },
+        rootPath: "details"
+      },
+      schema: {
+        const: {
+          name: "Melany"
+        },
+        reduce: {
+          pathFrom: [
+            {
+              path: "rootPath"
+            },
+            {
+              const: "namePath"
+            }
+          ]
+        }
+      },
+      expected: "Melany"
+    })
+  })
+
+  test("with string", async () => {
+    await expectToEqualAsync({
+      store: {
+        namePath: "current.name"
+      },
+      schema: {
+        const: {
+          name: "Melany"
+        },
+        reduce: {
+          pathFrom: "namePath"
+        }
+      },
+      expected: "Melany"
+    })
+  })
+
+  test("with string 2", async () => {
+    await expectToEqualAsync({
+      store: {
+        namePath: "current.name"
+      },
+      schema: {
+        const: {
+          name: "Melany"
+        },
+        reduce: {
+          pathFrom: "namePath"
+        }
+      },
+      expected: "Melany"
+    })
+  })
+
+})
+
+describe("path with schema", () => {
+  test("with nested path trim", async () => {
+    await expectToEqualAsync({
+      store: {
+        user: {
+          name: "Melany"
+        },
+        dirtyPath: "  user.name  "
+      },
+      schema: {
+        path: {
+          path: "dirtyPath",
+          trim: true
+        }
+      },
+      expected: "Melany"
+    })
+  })
+
+  test("with definitions", async () => {
+    await expectToEqualAsync({
+      store: {
+        user: {
+          name: "Melany"
+        },
+        path1: "user",
+        path2: "name"
+      },
+      schema: {
+        path: {
+          definitions: [
+            {
+              path: "path1"
+            },
+            {
+              path: "path2"
+            }
+          ]
+        }
+      },
+      expected: "Melany"
+    })
+  })
+})
+
 describe("map key value", () => {
 
   const expected = [

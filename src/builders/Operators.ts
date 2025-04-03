@@ -27,6 +27,13 @@ export class Operators implements WithTaskOptions<Operators> {
     constructor(otherOperators = {}) {
         Object.assign(this, otherOperators)
     }
+    path = (initial: any, path: string, builder: Builder) => {      
+        return builder.get(path, initial)
+    }
+    pathFrom = {
+        transform: (schema: any) => ({ path: { path: schema }}),
+        task: (initial: any, current: any) => current
+    }
     assign: OperatorTask = (current, previous) => Object.assign(current, previous)
     boolean = {
         transform: (schema: any) => schema === true ? { path: "current" } : schema,
