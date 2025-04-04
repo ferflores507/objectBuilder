@@ -1292,7 +1292,7 @@ test("date format (strange character)", () => {
 })
 
 describe("format propiedades", () => {
-  const schemas = [
+  const schemas: Schema[] = [
     {
       path: "details",
       formatPropiedades: {

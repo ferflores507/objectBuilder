@@ -91,7 +91,7 @@ export type ArraySchema = Partial<{
         [P in keyof SelectSchema]: Schema | SelectSchema[P];
     },
     filter: Schema,
-    find: Schema,
+    find: SchemaDefinition,
     items: Schema,
     contains: Schema,
     // minMatches: number,
@@ -100,7 +100,7 @@ export type ArraySchema = Partial<{
     groupJoin: Join
 }>
 
-export type SchemaDefinition = Schema | { [n: number]: Schema | SchemaPrimitive }
+export type SchemaDefinition = Schema | Array<Schema | SchemaPrimitive>
 
 export type SchemaPrimitive = string | number | bigint | boolean | null
 export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive>
@@ -212,7 +212,7 @@ export type Schema = Partial<{
     propiedadesAsync: Propiedades
     propiedades: Propiedades
     propiedadesFunction: Propiedades
-    reduce: SchemaDefinition
+    reduce: Schema | Schema[]
     reduceOrDefault: SchemaDefinition
     removeAccents: true
     request: RequestSchema

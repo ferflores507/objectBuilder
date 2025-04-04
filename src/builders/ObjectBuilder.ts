@@ -94,7 +94,7 @@ export class ObjectBuilder implements Builder {
         return value
     }
 
-    withSchema(schema: Schema | Schema[] | undefined): ObjectBuilder {
+    withSchema(schema: SchemaDefinition | undefined): ObjectBuilder {
 
         schema = Array.isArray(schema) ? { definitions: schema } : schema
 
@@ -221,7 +221,7 @@ export class ObjectBuilder implements Builder {
             : this
     }
 
-    withUses(uses: Record<string, SchemaDefinition> | undefined) {
+    withUses(uses: Schema | undefined) {
         const { functions } = this.options
 
         Object.entries(uses ?? {})
@@ -387,11 +387,11 @@ export class ObjectBuilder implements Builder {
             : this
     }
 
-    withReduce(schema: SchemaDefinition | undefined) {
+    withReduce(schema: Schema | Schema[] | undefined) {
         return schema ? this.add(current => this.target = current).withManySchemas(schema) : this
     }
 
-    withManySchemas(definition: SchemaDefinition) {
+    withManySchemas(definition: Schema | Schema[]) {
         Array.isArray(definition) ? definition.map(schema => this.withSchema(schema)) : this.withSchema(definition)
 
         return this
