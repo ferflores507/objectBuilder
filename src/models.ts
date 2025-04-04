@@ -227,7 +227,6 @@ export type Schema = Partial<{
     sort: Schema | SchemaPrimitive
     sortBy: SchemaDefinition
     source: string
-    status: string
     store: Schema
     stringify: true
     spread: SchemaDefinition | SchemaPrimitive

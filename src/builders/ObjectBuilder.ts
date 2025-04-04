@@ -100,7 +100,6 @@ export class ObjectBuilder implements Builder {
 
         const {
             bindArg,
-            status,
             delay,
             path,
             pathFrom,
@@ -122,7 +121,6 @@ export class ObjectBuilder implements Builder {
 
         return schema ?
             this
-                .withStatus(status)
                 .withInit(init)
                 .withUses(rest)
                 .withStore(store)
@@ -315,23 +313,6 @@ export class ObjectBuilder implements Builder {
                 return asyncFunction ? builder.buildAsync() : builder.build()
             })
             : this
-    }
-
-    withStatus(path: string | undefined) {
-        if (path) {
-            this.add(target => {
-                // const value = this.getStoreValue(path) as number
-                // this.set(path, { loading: value + 1 })
-
-                // this.with({}).withIncrement(path).build()
-
-                this.with({ schema: { increment: path } }).build()
-
-                return target
-            })
-        }
-
-        return this
     }
 
     withDelay(ms: number | undefined) {
