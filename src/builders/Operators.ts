@@ -1,4 +1,4 @@
-import { Builder, ChildrenSchema, DebounceOptions, DebounceSchema, MapReduceOptions, OperatorTask, Propiedades, RequestInitWithUrl, RequestPlainOptions, Schema, SchemaDefinition, WithTaskOptions } from "../models"
+import { Builder, ChildrenSchema, DebounceOptions, DebounceSchema, MapReduceOptions, OperatorTask, PatchOptions, Propiedades, RequestInitWithUrl, RequestPlainOptions, Schema, SchemaDefinition, WithTaskOptions } from "../models"
 import { reduceRequest, type RequestInfo } from "../helpers/requestHelper"
 
 import {
@@ -15,13 +15,6 @@ import {
     spread,
     toArray
 } from "../helpers/varios"
-
-type PatchOptions = { 
-    key?: string
-    value: any 
-    transform?: (options: { previousValue: any, newValue: any }) => any
-    checkNotFound?: boolean
-}
 
 export class Operators implements WithTaskOptions<Operators> {
     constructor(otherOperators = {}) {
@@ -93,50 +86,53 @@ export class Operators implements WithTaskOptions<Operators> {
         return array.with(index, value)
     }
     patch = (array: any[], value: any) => {
-        return this.patchWith(array, { key: "id", value })
+        return this.patchWith.task(array, { key: "id", value })
     }
     patchOrAdd = (array: any[], value: any) => {
-        return this.patchWith(array, { key: "id", value, checkNotFound: false })
+        return this.patchWith.task(array, { key: "id", value, checkNotFound: false })
     }
-    patchWith = (array: any[], options: PatchOptions) => {
-        const { 
-            key = "id", 
-            value, 
-            transform = ({ previousValue, newValue }) => ({ ...previousValue, ...newValue }),
-            checkNotFound = true
-        } = options
-
-        const concreteValue = Array.isArray(value) ? value : [value]
-        const matchesToFind = [...concreteValue]
-        const resultArray = [...array]
-
-        for (let i = 0; i < array.length; i++) {
-            const index = matchesToFind.findIndex(matchToFind => matchToFind[key] === array[i][key])
-
-            if (index !== -1) {
-                resultArray[i] = transform({ 
-                    previousValue: resultArray[i],
-                    newValue: matchesToFind[index]
-                })
-                matchesToFind.splice(index, 1)
-
-                if (!matchesToFind.length) {
-                    break
+    patchWith = {
+        transform: (propiedades: Propiedades) => ({ propiedades }),
+        task: (array: any[], options: PatchOptions) => {
+            const { 
+                key = "id", 
+                value, 
+                replacer = ({ previousValue, newValue }) => ({ ...previousValue, ...newValue }),
+                checkNotFound = true
+            } = options
+    
+            const concreteValue = Array.isArray(value) ? value : [value]
+            const matchesToFind = [...concreteValue]
+            const resultArray = [...array]
+    
+            for (let i = 0; i < array.length; i++) {
+                const index = matchesToFind.findIndex(matchToFind => matchToFind[key] === array[i][key])
+    
+                if (index !== -1) {
+                    resultArray[i] = replacer({ 
+                        previousValue: resultArray[i],
+                        newValue: matchesToFind[index]
+                    })
+                    matchesToFind.splice(index, 1)
+    
+                    if (!matchesToFind.length) {
+                        break
+                    }
                 }
             }
-        }
-
-        if (matchesToFind.length && checkNotFound) {
-            throw {
-                msg: `Unable to patch. One or more items were not found.`,
-                array,
-                itemsNotFound: matchesToFind
+    
+            if (matchesToFind.length && checkNotFound) {
+                throw {
+                    msg: `Unable to patch. One or more items were not found.`,
+                    array,
+                    itemsNotFound: matchesToFind
+                }
             }
+    
+            return matchesToFind.length 
+                ? [...resultArray, ...matchesToFind]
+                : resultArray
         }
-
-        return matchesToFind.length 
-            ? [...resultArray, ...matchesToFind]
-            : resultArray
     }
     unpackAsGetters = (obj: {}, b: string[]) => entry(obj).unpackAsGetters(b)
     spread = (obj: {}, value: any) => spread(obj, value)

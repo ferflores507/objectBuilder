@@ -1411,48 +1411,46 @@ test("patch todos", async () => {
     ],
     schema: {
       patchWith: {
-        propiedades: {
-          value: {
-            const: [
-              {
-                id: 1,
-                title: "one",
-                completed: true
-              },
-              {
-                id: 2,
-                title: "dos",
-                completed: 456
-              },
-              {
-                id: 3,
-                completed: false
-              }
-            ]
-          },
-          transform: {
-            function: {
-              path: "arg.previousValue",
-              spread: {
-                propiedades: {
-                  title: {
-                    path: "arg.newValue.title",
-                    default: "",
-                    trim: true,
-                  },
-                  completed: {
-                    path: "arg.newValue.completed",
-                    and: {
-                      path: "arg.previousValue.completed",
-                      or: 456
-                    }
-                  }
-                },
-                filterPropiedades: {
-                  isNullOrEmpty: false
-                },
-              },
+        value: {
+          const: [
+            {
+              id: 1,
+              title: "one",
+              completed: true
+            },
+            {
+              id: 2,
+              title: "dos",
+              completed: 456
+            },
+            {
+              id: 3,
+              completed: false
             }
+          ]
+        },
+        replacer: {
+          function: {
+            path: "arg.previousValue",
+            spread: {
+              propiedades: {
+                title: {
+                  path: "arg.newValue.title",
+                  default: "",
+                  trim: true,
+                },
+                completed: {
+                  path: "arg.newValue.completed",
+                  and: {
+                    path: "arg.previousValue.completed",
+                    or: 456
+                  }
+                }
+              },
+              filterPropiedades: {
+                isNullOrEmpty: false
+              },
+            },
           }
         }
       }
@@ -1495,38 +1493,36 @@ test("patch with transform", async () => {
     ],
     schema: {
       patchWith: {
-        propiedades: {
-          value: {
-            const: [
-              {
-                id: 1,
-                es: "uno"
-              },
-              {
-                id: 2,
-                es: "dos"
-              },
-              {
-                id: 3,
-                es: "tres"
+        value: {
+          const: [
+            {
+              id: 1,
+              es: "uno"
+            },
+            {
+              id: 2,
+              es: "dos"
+            },
+            {
+              id: 3,
+              es: "tres"
+            }
+          ]
+        },
+        replacer: {
+          function: {
+            if: {
+              path: "arg.newValue.id",
+              lessThan: 3
+            },
+            then: {
+              path: "arg.previousValue",
+              spread: {
+                path: "arg.newValue"
               }
-            ]
-          },
-          transform: {
-            function: {
-              if: {
-                path: "arg.newValue.id",
-                lessThan: 3
-              },
-              then: {
-                path: "arg.previousValue",
-                spread: {
-                  path: "arg.newValue"
-                }
-              },
-              else: {
-                path: "arg.previousValue"
-              }
+            },
+            else: {
+              path: "arg.previousValue"
             }
           }
         }
@@ -2528,12 +2524,10 @@ describe("array patch and patchWith", () => {
       initial: [1, 2, 3].map(id => ({ testId: id, a: id, b: id })),
       schema: {
         patchWith: {
-          propiedades: {
-            key: "testId",
-            value: {
-              const: { testId: 2, b: "Dos" }
-            }
-          },
+          key: "testId",
+          value: {
+            const: { testId: 2, b: "Dos" }
+          }
         },
       },
       expected: [1, 2, 3].map(id => {
@@ -2548,11 +2542,9 @@ describe("array patch and patchWith", () => {
       initial: [1, 2, 3].map(id => ({ id, a: id, b: id })),
       schema: {
         patchWith: {
-          propiedades: {
-            value: {
-              const: { id: 2, b: "Dos" }
-            }
-          },
+          value: {
+            const: { id: 2, b: "Dos" }
+          }
         },
       },
       expected: [1, 2, 3].map(id => {

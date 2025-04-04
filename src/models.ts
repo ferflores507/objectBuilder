@@ -135,6 +135,20 @@ type MapReduceOptionsSchema = Partial<{
     items: SchemaDefinition
 }
 
+export type PatchOptions = { 
+    key?: string
+    value: any 
+    replacer?: (options: { previousValue: any, newValue: any }) => any
+    checkNotFound?: boolean
+}
+
+export type PatchOptionsSchema = { 
+    key?: Schema | PatchOptions["key"]
+    value: SchemaDefinition
+    replacer?: Schema
+    checkNotFound?: Schema | PatchOptions["checkNotFound"]
+}
+
 export type Schema = Partial<{
     allEqual: boolean
     allEqualTo: SchemaDefinition | SchemaPrimitive
@@ -193,7 +207,7 @@ export type Schema = Partial<{
     parse: true
     patch: Schema
     patchOrAdd: SchemaDefinition
-    patchWith: Schema
+    patchWith: PatchOptionsSchema
     prepend: Schema | SchemaPrimitive
     propiedadesAsync: Propiedades
     propiedades: Propiedades
