@@ -115,7 +115,6 @@ export class ObjectBuilder implements Builder {
             decrement,
             import: importPath,
             store,
-            log,
             ...rest
         } = schema ?? {}
 
