@@ -7,6 +7,40 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades, Schema } from '../../src/models'
 
+test("build propiedades with store as target", () => {
+  const store = {}
+  const builder = new ObjectBuilder()
+    .with({ store })
+  const propiedades = {
+    count: 1,
+    uno: {
+      path: "count",
+    },
+    countGet: {
+      isComputed: true,
+      path: "count"
+    }
+  }
+
+  const expected = {
+    count: 1,
+    countGet: 1,
+    uno: 1
+  }
+
+  new PropiedadesBuilder(propiedades, builder, store).build()
+
+  expect(store).toMatchObject(expected)
+
+  store.count = 2
+
+  expect(store).toMatchObject({
+    count: 2,
+    uno: 1,
+    countGet: 2
+  })
+})
+
 test("function with primitive", async () => {
   await expectToEqualAsync({
     schema: {

@@ -3,12 +3,12 @@ import { Propiedades, Schema, SchemaDefinition, SchemaPrimitive } from "../model
 import { Builder } from "./ObjectBuilder";
 
 export class PropiedadesBuilder {
-    constructor(propiedades: Propiedades, private readonly builder: Builder) {
+    constructor(propiedades: Propiedades, private readonly builder: Builder, target = {}) {
         const allEntries = Object.entries(propiedades)
         const { entries = [], computedEntries = [] } = this.groupByComputed(allEntries)
 
         this.entries = entries.filter(([key]) => key !== "$bind")
-        this.result = assignAll({}, ...this.getGetters(computedEntries))
+        this.result = assignAll(target, ...this.getGetters(computedEntries))
         this.builder = builder.with({ siblings: this.result })
 
         const bindEntry = entries.find(([key]) => key === "$bind")
