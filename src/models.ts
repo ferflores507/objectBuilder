@@ -103,7 +103,9 @@ export type ArraySchema = Partial<{
 export type SchemaDefinition = Schema | Array<Schema | SchemaPrimitive>
 
 export type SchemaPrimitive = string | number | bigint | boolean | null
-export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive>
+export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive> | {
+    $getters?: Record<string, SchemaDefinition | SchemaPrimitive>
+}
 export type DebounceOptions = {
     function: Function
     ms: number
@@ -181,7 +183,6 @@ export type Schema = Partial<{
     greaterThan: SchemaDefinition | SchemaPrimitive
     lessThan: SchemaDefinition | SchemaPrimitive
     if: SchemaDefinition | string
-    isComputed: true
     isEmpty: Schema | SchemaPrimitive
     isNull: Schema | SchemaPrimitive
     isNullOrEmpty: Schema | SchemaPrimitive

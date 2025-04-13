@@ -16,9 +16,10 @@ test("build propiedades with store as target", () => {
     uno: {
       path: "count",
     },
-    countGet: {
-      isComputed: true,
-      path: "count"
+    $getters: {
+      countGet: {
+        path: "count"
+      }
     }
   }
 
@@ -2949,7 +2950,7 @@ describe("schema string join", () => {
   })
 })
 
-test("schema isComputed property", () => {
+test("schema propiedades getter", () => {
   const store = {
     nombre: "Fernando"
   }
@@ -2959,9 +2960,10 @@ test("schema isComputed property", () => {
       store,
       schema: {
         propiedades: {
-          titulo: {
-            isComputed: true,
-            path: "nombre"
+          $getters: {
+            titulo: {
+              path: "nombre"
+            }
           }
         },
       },

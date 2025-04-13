@@ -1,33 +1,22 @@
 import { assignAll } from "../helpers/varios";
-import { Propiedades, Schema, SchemaDefinition, SchemaPrimitive } from "../models";
+import { Propiedades, SchemaDefinition, SchemaPrimitive } from "../models";
 import { Builder } from "./ObjectBuilder";
 
 export class PropiedadesBuilder {
     constructor(propiedades: Propiedades, private readonly builder: Builder, target = {}) {
-        const allEntries = Object.entries(propiedades)
-        const { entries = [], computedEntries = [] } = this.groupByComputed(allEntries)
+        const { $bind, $getters = {}, ...rest } = propiedades
 
-        this.entries = entries.filter(([key]) => key !== "$bind")
-        this.result = assignAll(target, ...this.getGetters(computedEntries))
+        this.entries = Object.entries(rest)
+        this.result = assignAll(target, ...this.getGetters(Object.entries($getters)))
         this.builder = builder.with({ siblings: this.result })
 
-        const bindEntry = entries.find(([key]) => key === "$bind")
-
-        if(bindEntry) {
-            const [key, val] = bindEntry
-
-            assignAll(this.result, this.builder.with({ schema: val }).build())
+        if($bind) {
+            assignAll(this.result, this.builder.with({ schema: $bind }).build())
         }
     }
 
     private readonly result: Record<string, any>
     private readonly entries: [string, SchemaDefinition | SchemaPrimitive][]
-
-    groupByComputed(entries: [string, SchemaDefinition | SchemaPrimitive][]) {
-        return Object.groupBy(entries, ([k, v]) => {
-            return (v as Schema)?.isComputed ? "computedEntries" : "entries"
-        })
-    }
 
     getGetters(entries: [string, SchemaDefinition | SchemaPrimitive][]) {        
         return entries.map(([key, schema]) => Object.defineProperty({}, key, {
