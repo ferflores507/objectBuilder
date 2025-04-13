@@ -16,7 +16,7 @@ export class PropiedadesBuilder {
         if(bindEntry) {
             const [key, val] = bindEntry
 
-            Object.assign(this.result, this.builder.with({ schema: val }).build())
+            assignAll(this.result, this.builder.with({ schema: val }).build())
         }
     }
 
@@ -41,7 +41,7 @@ export class PropiedadesBuilder {
      
     build() {
         for (const [k, v] of this.entries) {
-            this.result[k] = this.builder.withSchemaOrDefault(v).build()
+            assignAll(this.result, { [k]: this.builder.withSchemaOrDefault(v).build() })
         }
 
         return this.getResult()
@@ -49,7 +49,7 @@ export class PropiedadesBuilder {
 
     async buildAsync() {        
         for (const [k, v] of this.entries) {
-            this.result[k] = await this.builder.withSchemaOrDefault(v).buildAsync()
+            assignAll(this.result, { [k]: await this.builder.withSchemaOrDefault(v).build() })
         }
 
         return this.getResult()
