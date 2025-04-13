@@ -2636,9 +2636,7 @@ test("unpack as getters", () => {
       },
       schema: {
         path: "user",
-        unpackAsGetters: {
-          const: ["nombre", "id", "nombre", "id"]
-        }
+        unpackAsGetters: ["nombre", "id", "nombre", "id"]
       }
     })
     .build()
