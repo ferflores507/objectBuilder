@@ -63,19 +63,22 @@ export class Operators implements WithTaskOptions<Operators> {
             ms = true
         }
 
-        return createDebounce(fn, typeof ms == "number" ? ms : 500)
+        return this.debounceWith.task(null, { function: fn, ms })
     }
     debounceWith = {
-        transform: ({ function: fn, ms, target }: DebounceSchema) => {
+        transform: ({ function: fn, ms, target, report }: DebounceSchema) => {
             return {
                 propiedades: {
                     function: target ? target : { function: fn },
-                    ms
+                    ms,
+                    report
                 }
             }
         },
-        task: (initial: any, { function: fn, ms }: DebounceOptions) => {
-            return this.debounce(fn, ms)
+        task: (initial: any, { function: fn, ms, report }: DebounceOptions) => {
+            const obj = createDebounce(fn, typeof ms == "number" ? ms : 500, report)
+
+            return report ? obj : obj.fn
         }
     }
     entries = entries

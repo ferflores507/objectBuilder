@@ -9,8 +9,8 @@ test("expect create debounce function only gets called one time", () => {
   let total = 0
   
   const setTotal = (a: number, b: number) => total += (a + b)
-  const debounceSetTotal = createDebounce(setTotal, 500)
-  const otherFastDebounce = createDebounce(() => true, 50)
+  const { fn: debounceSetTotal} = createDebounce(setTotal, 500)
+  const { fn: otherFastDebounce} = createDebounce(() => true, 50)
 
   debounceSetTotal(1, 2)
   debounceSetTotal(2, 3)

@@ -89,13 +89,20 @@ const argsPairFn = () => {
 
 export const argsPair = argsPairFn()
 
-export const createDebounce = (callback: Function, ms: number) => {
+export const createDebounce = (callback: Function, ms: number, reportStatus = false) => {
     let timeoutId: NodeJS.Timeout
 
-    return (...args: any[]) => {
-        clearTimeout(timeoutId)
-        
-        timeoutId = setTimeout(() => callback(...args), ms)
+    return {
+        pending: false,
+        fn: function (...args: any[]) {
+            reportStatus && (this.pending = true)
+            clearTimeout(timeoutId)
+            
+            timeoutId = setTimeout(() => {
+                callback(...args)
+                reportStatus && (this.pending = false)
+            }, ms)
+        }
     }
 }
 

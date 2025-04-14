@@ -108,11 +108,13 @@ export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive> | {
 }
 export type DebounceOptions = {
     function: Function
-    ms: number
+    ms: number | true
+    report?: true
 }
 
 export type DebounceSchema = {
     ms: SchemaDefinition | number
+    report: SchemaDefinition | true
 } & ({
     function: SchemaDefinition
     target?: undefined
