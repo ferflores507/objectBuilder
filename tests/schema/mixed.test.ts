@@ -1579,7 +1579,7 @@ test("patch todos", async () => {
   })
 })
 
-test("patch with transform", async () => {
+test("patch with replacer", async () => {
   await expectToEqualAsync({
     initial: [
       {
