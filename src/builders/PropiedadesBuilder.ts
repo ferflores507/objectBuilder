@@ -38,7 +38,7 @@ export class PropiedadesBuilder {
 
     async buildAsync() {        
         for (const [k, v] of this.entries) {
-            assignAll(this.result, { [k]: await this.builder.withSchemaOrDefault(v).build() })
+            assignAll(this.result, { [k]: await this.builder.withSchemaOrDefault(v).buildAsync() })
         }
 
         return this.getResult()
