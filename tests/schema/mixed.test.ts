@@ -7,6 +7,75 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades, Schema } from '../../src/models'
 
+test("patch title items with preserver", async () => {
+  await expectToEqualAsync({
+    initial: [
+      {
+        id: 1,
+        title: "one"
+      },
+      {
+        id: 2,
+      },
+      {
+        id: 3,
+        title: "three"
+      }
+    ],
+    schema: {
+      patchWith: {
+        value: {
+          const: [
+            {
+              id: 1,
+              title: "uno"
+            },
+            {
+              id: 2,
+              title: "   "
+            },
+            {
+              id: 3,
+              title: "tres",
+              en: "three"
+            }
+          ]
+        },
+        preserver: {
+          function: {
+            path: "arg.title",
+            reduceOrDefault: {
+              trim: true
+            }
+          }
+        },
+        replacer: {
+          function: {
+            path: "arg.previousValue",
+            spread: {
+              propiedades: {
+                title: {
+                  path: "arg.newValue.title"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    expected: [
+      {
+        id: 1,
+        title: "uno",
+      },
+      {
+        id: 3,
+        title: "tres"
+      }
+    ],
+  })
+})
+
 test("build propiedades with store as target", () => {
   const store = {}
   const builder = new ObjectBuilder()

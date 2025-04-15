@@ -100,6 +100,7 @@ export class Operators implements WithTaskOptions<Operators> {
             const { 
                 key = "id", 
                 value, 
+                preserver = (value: any) => true,
                 replacer = ({ previousValue, newValue }) => ({ ...previousValue, ...newValue }),
                 checkNotFound = true
             } = options
@@ -116,6 +117,12 @@ export class Operators implements WithTaskOptions<Operators> {
                         previousValue: resultArray[i],
                         newValue: matchesToFind[index]
                     })
+
+                    if(!preserver(resultArray[i])) {
+                        // resultArray.splice(i, 1) // Doesn't work, it messes up with next matches
+                        delete resultArray[i] // make sure to return Object.values to remove gaps
+                    }
+
                     matchesToFind.splice(index, 1)
     
                     if (!matchesToFind.length) {
@@ -134,7 +141,7 @@ export class Operators implements WithTaskOptions<Operators> {
     
             return matchesToFind.length 
                 ? [...resultArray, ...matchesToFind]
-                : resultArray
+                : Object.values(resultArray)
         }
     }
     unpackAsGetters = (obj: {}, b: string[]) => entry(obj).unpackAsGetters(b)
