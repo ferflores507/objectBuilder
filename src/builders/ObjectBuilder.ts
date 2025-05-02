@@ -114,7 +114,7 @@ export class ObjectBuilder implements Builder {
             init,
             decrement,
             import: importPath,
-            store,
+            useStore,
             ...rest
         } = schema ?? {}
 
@@ -123,7 +123,7 @@ export class ObjectBuilder implements Builder {
                 .withInit(init)
                 .withUses(rest)
                 .withDelay(delay)
-                .withBinary({ store, path, pathFrom })
+                .withBinary({ useStore, path, pathFrom })
                 .withImport(importPath)
                 .withDefault(schema)
                 .withInitialSchema(schema)

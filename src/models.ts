@@ -232,7 +232,7 @@ export type Schema = Partial<{
     sort: Schema | SchemaPrimitive
     sortBy: SchemaDefinition
     source: string
-    store: Schema
+    useStore: Schema
     stringify: true
     spread: SchemaDefinition | SchemaPrimitive
     spreadStart: SchemaDefinition | SchemaPrimitive

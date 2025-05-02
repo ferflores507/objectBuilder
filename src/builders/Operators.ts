@@ -20,7 +20,7 @@ export class Operators implements WithTaskOptions<Operators> {
     constructor(otherOperators = {}) {
         Object.assign(this, otherOperators)
     }
-    store = (initial: any, current: any, builder: Builder) => {
+    useStore = (initial: any, current: any, builder: Builder) => {
         builder.setStore(current)
 
         return initial

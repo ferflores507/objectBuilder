@@ -3214,7 +3214,7 @@ test("import with multiple stores", async () => {
       path: "userSchema",
       propiedades: {
         currentUser: {
-          store: {
+          useStore: {
             path: "stores.user"
           },
           schemaFrom: {
@@ -3222,7 +3222,7 @@ test("import with multiple stores", async () => {
           }
         },
         topUser: {
-          store: {
+          useStore: {
             path: "stores.allUsers.0"
           },
           schemaFrom: {
@@ -3230,7 +3230,7 @@ test("import with multiple stores", async () => {
           }
         },
         mari: {
-          store: {
+          useStore: {
             const: {
               nombre: "Mari",
               cedula: "9-750-104"
@@ -3375,7 +3375,7 @@ test("nested stores with call to root store", async () => {
       reduce: {
         propiedades: {
           child: {
-            store: {
+            useStore: {
               propiedades: {
                 nombre: "Melany",
                 setName: {
@@ -3473,7 +3473,7 @@ test("schema with multiple stores", async () => {
         return {
           ...obj,
           ["grandParent" + id]: {
-            store: {
+            useStore: {
               const: {
                 id
               }
@@ -3513,7 +3513,7 @@ test("schema with multiple stores", async () => {
 test("schema withStore", async () => {
   await expectToEqualAsync({
     schema: {
-      store: {
+      useStore: {
         propiedades: {
           nombre: "Melany"
         }
