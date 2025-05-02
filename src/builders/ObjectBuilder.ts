@@ -122,9 +122,8 @@ export class ObjectBuilder implements Builder {
             this
                 .withInit(init)
                 .withUses(rest)
-                .withStore(store)
                 .withDelay(delay)
-                .withBinary({ path, pathFrom })
+                .withBinary({ store, path, pathFrom })
                 .withImport(importPath)
                 .withDefault(schema)
                 .withInitialSchema(schema)
@@ -273,16 +272,6 @@ export class ObjectBuilder implements Builder {
                     }
 
                     return func(arg)
-                })
-            : this
-    }
-
-    withStore(schema: Schema | undefined) {
-        return schema 
-            ? this.add(initial => {
-                this.setStore(this.with({ initial, schema }).build())
-
-                return initial
                 })
             : this
     }

@@ -20,7 +20,12 @@ export class Operators implements WithTaskOptions<Operators> {
     constructor(otherOperators = {}) {
         Object.assign(this, otherOperators)
     }
-    path = (initial: any, path: string, builder: Builder) => {      
+    store = (initial: any, current: any, builder: Builder) => {
+        builder.setStore(current)
+
+        return initial
+    }
+    path = (initial: any, path: string, builder: Builder) => {
         return builder.get(path, initial)
     }
     pathFrom = {
