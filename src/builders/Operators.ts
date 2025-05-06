@@ -168,7 +168,11 @@ export class Operators implements WithTaskOptions<Operators> {
         transform: (propiedades: Propiedades) => ({ propiedades }),
         task: (initial: any, options: RequestPlainOptions) => buildRequest(options)
     }
-    reduceFetch = (requestInit: RequestInitWithUrl, id: any, builder: Builder) => {
+    reduceFetch = (initial: any, current: any, builder: Builder) => {
+        const [requestInit, id] = typeof current === "object"
+            ? [current, current.url] 
+            : [initial, current]
+
         const requestInfo: RequestInfo = {
             id,
             controller: new AbortController(),
