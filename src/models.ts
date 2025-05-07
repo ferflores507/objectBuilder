@@ -97,6 +97,7 @@ export type ArraySchema = Partial<{
     // minMatches: number,
     // maxMatches: number
     map: Schema
+    mapAsync: SchemaDefinition
     groupJoin: Join
 }>
 

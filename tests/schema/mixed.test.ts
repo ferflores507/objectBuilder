@@ -7,6 +7,58 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades, Schema } from '../../src/models'
 
+test("map async with array as current value", async () => {
+  const initial = [1, 2]
+  const promises = await new ObjectBuilder()
+    .with({
+      schema: {
+        const: initial,
+        mapAsync: [
+          {
+            const: "Hola",
+            reduce: {
+              delay: 100,
+            }
+          },
+          { 
+            path: "arg" 
+          }
+        ]
+      }
+    })
+    .buildAsync()
+
+  const expected = initial.map(val => ["Hola", val])
+  const result = await Promise.all(promises)
+
+  expect(result).toEqual(expected)
+})
+
+test("map async", async () => {
+  const initial = [1, 2]
+  const promises = await new ObjectBuilder()
+    .with({
+      schema: {
+        const: initial,
+        mapAsync: {
+          reduce: [
+            {
+              const: "Hola",
+            },
+            {
+              delay: 50
+            }
+          ]
+        }
+      }
+    })
+    .buildAsync()
+
+    const result = await Promise.all(promises)
+
+    expect(result).toEqual(initial.map(val => "Hola"))
+})
+
 test("patch title items with preserver", async () => {
   await expectToEqualAsync({
     initial: [
