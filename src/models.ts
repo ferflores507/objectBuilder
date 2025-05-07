@@ -215,6 +215,7 @@ export type Schema = Partial<{
     patchOrAdd: SchemaDefinition
     patchWith: PatchOptionsSchema
     prepend: Schema | SchemaPrimitive
+    promiseAll: SchemaDefinition
     propiedadesAsync: Propiedades
     propiedades: Propiedades
     propiedadesFunction: Propiedades

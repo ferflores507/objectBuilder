@@ -391,6 +391,11 @@ export class Operators implements WithTaskOptions<Operators> {
         
         return  Array.from(map.values());
     }
+    promiseAll = (initial: any, current: Promise<any>[] | true) => {
+        const promises = current === true ? initial as Promise<any>[] : current
+
+        return Promise.all(promises)
+    }
     sort = (array: any[], option: true | "descending" = true) => {
         return this.sortBy(array, { descending: option === "descending" })
     }

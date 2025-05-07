@@ -7,6 +7,59 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades, Schema } from '../../src/models'
 
+test("promise all with map async with array as current value", async () => {
+  const initial = [1, 2]
+  const result = await new ObjectBuilder()
+    .with({
+      schema: {
+        promiseAll: {
+          const: initial,
+          mapAsync: [
+            {
+              const: "Hola",
+              reduce: {
+                delay: 100,
+              }
+            },
+            { 
+              path: "arg" 
+            }
+          ]
+        }
+      },
+    })
+    .buildAsync()
+    
+    const expected = initial.map(val => ["Hola", val])
+
+    expect(result).toEqual(expected)
+})
+
+test("promise all", async () => {
+  const initial = [1, 2]
+  const result = await new ObjectBuilder()
+    .with({
+      schema: {
+        const: initial,
+        promiseAll: {
+          mapAsync: {
+            reduce: [
+              {
+                const: "Hola",
+              },
+              {
+                delay: 50
+              }
+            ]
+          }
+        }
+      }
+    })
+    .buildAsync()
+
+    expect(result).toEqual(initial.map(val => "Hola"))
+})
+
 test("map async with array as current value", async () => {
   const initial = [1, 2]
   const promises = await new ObjectBuilder()
