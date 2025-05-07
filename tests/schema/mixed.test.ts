@@ -7,109 +7,69 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Propiedades, Schema } from '../../src/models'
 
-test("promise all with map async with array as current value", async () => {
-  const initial = [1, 2]
-  const result = await new ObjectBuilder()
-    .with({
+describe("map async and promise all", () => {
+  const initial = Array.from({ length: 2 })
+  const builder = new ObjectBuilder().with({ initial })
+
+  const cases = [
+    {
+      name: "reduce with last item with delay as schema",
       schema: {
-        promiseAll: {
-          const: initial,
-          mapAsync: [
-            {
-              const: "Hola",
-              reduce: {
-                delay: 100,
-              }
-            },
-            { 
-              path: "arg" 
-            }
-          ]
-        }
-      },
-    })
-    .buildAsync()
-    
-    const expected = initial.map(val => ["Hola", val])
-
-    expect(result).toEqual(expected)
-})
-
-test("promise all", async () => {
-  const initial = [1, 2]
-  const result = await new ObjectBuilder()
-    .with({
-      schema: {
-        const: initial,
-        promiseAll: {
-          mapAsync: {
-            reduce: [
-              {
-                const: "Hola",
-              },
-              {
-                delay: 50
-              }
-            ]
-          }
-        }
-      }
-    })
-    .buildAsync()
-
-    expect(result).toEqual(initial.map(val => "Hola"))
-})
-
-test("map async with array as current value", async () => {
-  const initial = [1, 2]
-  const promises = await new ObjectBuilder()
-    .with({
-      schema: {
-        const: initial,
-        mapAsync: [
+        reduce: [
           {
             const: "Hola",
-            reduce: {
-              delay: 100,
-            }
           },
-          { 
-            path: "arg" 
+          {
+            delay: 50
           }
         ]
-      }
-    })
-    .buildAsync()
-
-  const expected = initial.map(val => ["Hola", val])
-  const result = await Promise.all(promises)
-
-  expect(result).toEqual(expected)
-})
-
-test("map async", async () => {
-  const initial = [1, 2]
-  const promises = await new ObjectBuilder()
-    .with({
-      schema: {
-        const: initial,
-        mapAsync: {
-          reduce: [
-            {
-              const: "Hola",
-            },
-            {
-              delay: 50
-            }
-          ]
+      },
+      expected: initial.fill("Hola")
+    },
+    {
+      name: "array as schema",
+      schema: [
+        {
+          const: "Hola",
+          reduce: {
+            delay: 100,
+          }
+        },
+        {
+          path: "arg"
         }
-      }
+      ],
+      expected: initial.map(val => ["Hola", val])
+    }
+  ]
+
+  describe.each(cases)("with $name", ({ schema, expected }) => {
+    test("expect explicit await Promise.all of sync result to equal expected", async () => {
+      const result = builder
+        .with({ 
+          schema: { 
+            mapAsync: schema 
+          }
+        })
+        .build()
+  
+      expect(await Promise.all(result)).toEqual(expected)
     })
-    .buildAsync()
-
-    const result = await Promise.all(promises)
-
-    expect(result).toEqual(initial.map(val => "Hola"))
+  
+    test("expect schema with promiseAll to equal expected", async () => {
+      const result = await builder
+        .with({
+          schema: {
+            promiseAll: {
+              mapAsync: schema
+            }
+          }
+        })
+        .buildAsync()
+  
+      expect(result).toEqual(expected)
+    })
+  })
 })
 
 test("patch title items with preserver", async () => {
