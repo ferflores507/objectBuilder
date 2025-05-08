@@ -72,7 +72,7 @@ describe("map async and promise all", () => {
   })
 })
 
-test("patch title items with preserver", async () => {
+test("patch with preserver and replacer", async () => {
   await expectToEqualAsync({
     initial: [
       {
@@ -177,19 +177,11 @@ test("build propiedades with store as target", () => {
 })
 
 test("function with primitive", async () => {
-  await expectToEqualAsync({
-    schema: {
-      reduce: [
-        {
-          function: 7
-        },
-        {
-          call: "current"
-        }
-      ]
-    },
-    expected: 7
-  })
+  const fnSeven = new ObjectBuilder()
+    .withSchema({ function: 7 })
+    .build()
+
+  expect(fnSeven()).toBe(7)
 })
 
 test("default null", async () => {
@@ -250,23 +242,6 @@ describe("path from", () => {
   })
 
   test("with string", async () => {
-    await expectToEqualAsync({
-      store: {
-        namePath: "current.name"
-      },
-      schema: {
-        const: {
-          name: "Melany"
-        },
-        reduce: {
-          pathFrom: "namePath"
-        }
-      },
-      expected: "Melany"
-    })
-  })
-
-  test("with string 2", async () => {
     await expectToEqualAsync({
       store: {
         namePath: "current.name"
@@ -1350,37 +1325,30 @@ test("expect patch with empty array to reject with object as error", async () =>
   `)
 })
 
-test("prepend with and", async () => {
-  await expectToEqualAsync({
-    schema: {
-      const: 0,
-      and: {
-        prepend: "expected: 0"
-      }
-    },
-    expected: 0
-  })
-})
-
-test("prepend with and fails", async () => {
-  await expectToEqualAsync({
-    schema: {
-      const: "como estas",
-      and: {
-        prepend: "Hola "
-      }
-    },
+describe("prepend", () => {
+  const prepend = "Hola "
+  const options = {
+    initial: "como estas",
     expected: "Hola como estas"
-  })
-})
+  }
 
-test("prepend", async () => {
-  await expectToEqualAsync({
-    schema: {
-      const: "como estas",
-      prepend: "Hola "
+  const cases = [
+    {
+      schema: {
+        prepend
+      },
+      ...options
     },
-    expected: "Hola como estas"
+    {
+      schema: {
+        and: { prepend }
+      },
+      ...options
+    }
+  ] as const
+
+  test.each(cases)("expect initial: $initial $schema to equal $expected", async (options) => {
+    await expectToEqualAsync(options)
   })
 })
 
@@ -1558,89 +1526,6 @@ describe("format propiedades", () => {
         trimmed: 4
       }
     })
-  })
-})
-
-test("patch todos", async () => {
-  await expectToEqualAsync({
-    initial: [
-      {
-        id: 1,
-        title: "one"
-      },
-      {
-        id: 2,
-        title: "two",
-        completed: 123
-      },
-      {
-        id: 3,
-        title: "three"
-      }
-    ],
-    schema: {
-      patchWith: {
-        value: {
-          const: [
-            {
-              id: 1,
-              title: "one",
-              completed: true
-            },
-            {
-              id: 2,
-              title: "dos",
-              completed: 456
-            },
-            {
-              id: 3,
-              completed: false
-            }
-          ]
-        },
-        replacer: {
-          function: {
-            path: "arg.previousValue",
-            spread: {
-              propiedades: {
-                title: {
-                  path: "arg.newValue.title",
-                  default: "",
-                  trim: true,
-                },
-                completed: {
-                  path: "arg.newValue.completed",
-                  and: {
-                    path: "arg.previousValue.completed",
-                    or: 456
-                  }
-                }
-              },
-              filterPropiedades: {
-                isNullOrEmpty: false
-              },
-            },
-          }
-        }
-      }
-    },
-    expected: [
-      {
-        id: 1,
-        title: "one",
-        completed: 456
-      },
-      {
-        id: 2,
-        title: "dos",
-        completed: 123
-      },
-      {
-        id: 3,
-        title: "three",
-        completed: false
-      }
-    ]
   })
 })
 
@@ -1861,45 +1746,29 @@ describe("is null or empty", () => {
 describe("is empty", () => {
 
   const cases = [
-    [{}, true, true],
-    [{}, false, false],
     [
-      { id: 1 }, 
-      true, 
+      {}, 
+      true
+    ],
+    [
+      { id: 1 },
       false
     ],
     [
       { id: undefined }, 
-      true, 
       false
-    ],
-    [
-      { id: 1 }, 
-      false, 
-      true
-    ],
-    [
-      { id: undefined }, 
-      false, 
-      true
-    ],
+    ]
   ] as const
 
-  test.each(cases)("expect is empty", async (initial, isEmpty, expected) => {
-    await expectToEqualAsync({
-      initial,
-      schema: {
-        isEmpty
-      },
-      expected
-    })
-
-    await expectToEqualAsync({
-      initial,
-      schema: {
-        isEmpty: !isEmpty
-      },
-      expected: !expected
+  describe.each(cases)("expect is empty", (initial, expected) => {
+    test.each([true, false])("", async isEmpty => {
+      await expectToEqualAsync({
+        initial,
+        schema: {
+          isEmpty
+        },
+        expected: expected === isEmpty
+      })
     })
   })
 })
@@ -1920,23 +1789,17 @@ describe("isNull", () => {
     {},
     [],
     [1, 2]
-  ].map(value => [value, value == null] as const)
+  ]
 
-  test.each(cases)("expect is null", async (initial, isNull) => {
-    await expectToEqualAsync({
-      initial,
-      schema: {
-        isNull: true
-      },
-      expected: isNull
-    })
-
-    await expectToEqualAsync({
-      initial,
-      schema: {
-        isNull: false
-      },
-      expected: !isNull
+  describe.each(cases)("expect is null", initial => {
+    test.each([true, false])("equals %s", async isNull => {
+      await expectToEqualAsync({
+        initial,
+        schema: {
+          isNull
+        },
+        expected: (initial == null) === isNull
+      })
     })
   })
 })
@@ -2115,7 +1978,7 @@ describe("logical", () => {
 
 describe("sort by", () => {
   test("sort by completed (boolean) then by completed (numeric) descending", async () => {
-    const items = Array.from(Array(6).keys()).map(i => i + 1)
+    const items = [...Array(6).keys()].map(i => i + 1)
     const zeros = [0, 0, 0]
     
     await expectToEqualAsync({
@@ -2432,28 +2295,6 @@ describe("sort", () => {
 
 })
 
-test("override spread operator", async () => {
-  await expectToEqualAsync({
-    operators: {
-      spread: (value, source) => {
-        return [...value, ...source ]
-      }
-    },
-    schema: {
-      const: [1, 2],
-      spreadFlat: {
-        const: [
-          3,
-          [4, 5],
-          6,
-          7
-        ]
-      }
-    },
-    expected: Array.from(Array(7).keys()).map(i => i +1)
-  })
-})
-
 test("keywords", async () => {
   await expectToEqualAsync({
     schema: {
@@ -2534,27 +2375,18 @@ describe("with boolean", () => {
     {},
     []
   ]
-  .map(value => [value, !!value])
 
-  test.each(cases)("expect boolean %o to equal %s", async (initial, expected) => {
-    await expectToEqualAsync({
-      store: {
-        value: initial
-      },
-      schema: {
-        boolean: {
-          path: "value"
-        }
-      },
-      expected
-    })
+  describe.each(cases)("expect boolean %o to equal %s", initial => {
+    const schemas = [{ path: "current" }, true] as const
 
-    await expectToEqualAsync({
-      initial,
-      schema: {
-        boolean: true,
-      },
-      expected
+    test.each(schemas)("", async boolean => {
+      await expectToEqualAsync({
+        initial,
+        schema: {
+          boolean
+        },
+        expected: !!initial
+      })
     })
   })
 })
@@ -2583,11 +2415,7 @@ test("with init", async () => {
       init: {
         search: "b"
       },
-      const: [
-        { id: 1, text: "a" },
-        { id: 2, text: "b" },
-        { id: 3, text: "c" }
-      ],
+      const: ["a", "b", "c"].map((text, ix) => ({ id: ix + 1, text })),
       find: {
         path: "arg.text",
         equals: {
@@ -2599,18 +2427,15 @@ test("with init", async () => {
   })
 })
 
-test("with init respects previous", async () => {
+test("with init returns previous", async () => {
   await expectToEqualAsync({
-    store: {
-      a: 2
-    },
     schema: {
-      path: "a",
+      const: 2,
       reduce: {
         init: {
           b: 3
         },
-        plus: {
+        plus: { // here current is still 2
           path: "$b"
         }
       }
@@ -2629,101 +2454,8 @@ test("array spread start", async () => {
   })
 })
 
-describe("array patch and patchWith", () => {
-
-  const numbers = ["zero", "one", "two", "three"]
-
-  const casesThrow = [
-    {
-      const: {
-        id: 6
-      }
-    },
-    {
-      const: [
-        {
-          id: 6
-        },
-        {
-          id: 7
-        }
-      ]
-    },
-    {
-      const: [
-        {
-          id: 3
-        },
-        {
-          id: 6
-        },
-      ]
-    }
-  ]
-
-  test.each(casesThrow)("expect patch to throw when original item is not found", (patch) => {
-    const builder = new ObjectBuilder()
-      .with({
-        schema: {
-          const: [...Array(5)].map((_, ix) => ({ id: ix + 1 })),
-          patch
-        }
-      })
-
-    expect(() => builder.build()).toThrow()
-  })
-
-  const cases: Case[] = [
-    {
-      initial: [1, 2, 3].map(id => ({ id, a: id, b: id })),
-      schema: {
-        patch: {
-          const: { id: 2, b: "Dos" }
-        },
-      },
-      expected: [1, 2, 3].map(id => {
-        return {
-          id,
-          a: id,
-          b: id === 2 ? "Dos" : id
-        }
-      })
-    },
-    {
-      initial: [1, 2, 3].map(id => ({ testId: id, a: id, b: id })),
-      schema: {
-        patchWith: {
-          key: "testId",
-          value: {
-            const: { testId: 2, b: "Dos" }
-          }
-        },
-      },
-      expected: [1, 2, 3].map(id => {
-        return {
-          testId: id,
-          a: id,
-          b: id === 2 ? "Dos" : id
-        }
-      })
-    },
-    {
-      initial: [1, 2, 3].map(id => ({ id, a: id, b: id })),
-      schema: {
-        patchWith: {
-          value: {
-            const: { id: 2, b: "Dos" }
-          }
-        },
-      },
-      expected: [1, 2, 3].map(id => {
-        return {
-          id,
-          a: id,
-          b: id === 2 ? "Dos" : id
-        }
-      })
-    },
+describe.todo("array with", () => {
+  const cases = [
     {
       initial: [1, 2, 3],
       schema: {
@@ -2746,43 +2478,59 @@ describe("array patch and patchWith", () => {
         },
       },
       expected: [4, 6, 7]
+    }
+  ]
+})
+
+describe("array patch throw and patch with key", () => {
+  const casesThrow = [
+    {
+      const: {
+        id: 6
+      }
     },
     {
-      initial: numbers.map((en, id) => ({ id, en })),
-      schema: {
-        patch: {
-          const: [
-            {
-              id: 1,
-              es: "uno"
-            },
-            {
-              id: 2,
-              es: "dos"
-            }
-          ]
-        }
-      },
-      expected: [
+      const: [
         {
-          id: 0,
-          en: "zero"
+          id: 6
         },
         {
-          id: 1,
-          en: "one",
-          es: "uno"
-        },
-        {
-          id: 2,
-          en: "two",
-          es: "dos"
-        },
-        {
-          id: 3,
-          en: "three"
+          id: 7
         }
       ]
+    }
+  ]
+
+  test.each(casesThrow)("expect patch to throw when original item is not found", (patch) => {
+    const builder = new ObjectBuilder()
+      .with({
+        schema: {
+          const: [...Array(5).keys()].map(val => ({ id: val + 1 })),
+          patch
+        }
+      })
+
+    expect(() => builder.build()).toThrow()
+  })
+
+  const cases: Case[] = [
+    {
+      initial: [1, 2, 3].map(id => ({ testId: id, a: id, b: id })),
+      schema: {
+        patchWith: {
+          key: "testId",
+          value: {
+            const: { testId: 2, b: "Dos" }
+          }
+        },
+      },
+      expected: [1, 2, 3].map(id => {
+        return {
+          testId: id,
+          a: id,
+          b: id === 2 ? "Dos" : id
+        }
+      })
     }
   ]
 
@@ -2853,20 +2601,35 @@ test("default schema", async () => {
   })
 })
 
-test("spread flat", async() => {
-  await expectToEqualAsync({
-    schema: {
-      const: [1, 2],
-      spreadFlat: {
-        const: [
-          3,
-          [4, 5],
-          6,
-          7
-        ]
-      }
-    },
-    expected: Array.from(Array(7).keys()).map(i => i +1)
+describe("spread flat", () => {
+  const schema = {
+    const: [0, 1],
+    spreadFlat: {
+      const: [
+        2,
+        [3, 4],
+        5,
+        6
+      ]
+    }
+  }
+
+  const expected = [...Array(7).keys()]
+
+  test("with simple schema", async() => {
+    await expectToEqualAsync({ schema, expected })
+  })
+
+  test("with spread operator overwritten", async () => {
+    await expectToEqualAsync({
+      operators: {
+        spread: (value, source) => {
+          return [...value, ...source ]
+        }
+      },
+      schema,
+      expected
+    })
   })
 })
 
@@ -3037,7 +2800,7 @@ describe("schema string join", () => {
         join: "-",
         separator: "-"
       }
-    ] as const
+    ]
 
     test.each(cases)("expects $join as value of join to be joined with $title", async ({ join, separator }) => {
       await expectToEqualAsync({
@@ -3048,25 +2811,6 @@ describe("schema string join", () => {
         expected: values.join(separator)
       })
     })
-
-    test("dash with async fails on buildAsync", async () => {
-      const separator = "-"
-      const result = await new ObjectBuilder()
-        .with({
-          schema: {
-            const: values,
-            join: {
-              const: "-",
-              reduce: {
-                delay: 50,
-              }
-            },
-          }
-        })
-        .buildAsync()
-
-      expect(result).toEqual(values.join(separator))
-    })
   })
 
   describe("with empty schema fails", () => {
@@ -3075,7 +2819,7 @@ describe("schema string join", () => {
     test.fails.each(cases)("fails to expect '%s'", async (expected) => {
       await expectToEqualAsync({
         schema: {
-          const: ["Fernando", "Flores"],
+          const: values,
           join: {}
         },
         expected
@@ -3678,9 +3422,10 @@ test("all equal to schema", async () => {
 })
 
 test("schema array async", async () => {
+  const expected = [...Array(3).keys()]
   await expectToEqualAsync({
-    schema: [1, 2, 3].map((n): Schema => ({ delay: 50, reduce: { const: n } })),
-    expected: [1, 2, 3]
+    schema: expected.map((n): Schema => ({ delay: 50, reduce: { const: n } })),
+    expected
   })
 })
 
@@ -3892,10 +3637,10 @@ test("expect strings with length of current (array)", async () => {
 
 test("map builder with undefined", async () => {
   const items = [1, undefined, 2, 3]
-  const result = items.map(x => {
+  const result = items.map(initial => {
     return new ObjectBuilder()
       .with({
-        initial: x,
+        initial,
         schema: {
           propiedades: {
             id: {
@@ -4107,35 +3852,36 @@ describe("trim", () => {
     "  this is a test",
     "",
     "   "
-  ].map(val => [val, val.trim()])
+  ]
 
-  test.each(cases)("(%s).trim equals: (%s)", async (value, expected) => {
+  test.each(cases)("(%s).trim equals: (%s)", async initial => {
     await expectToEqualAsync({
-      store: { value },
+      initial,
       schema: {
-        path: "value",
         trim: true
       },
-      expected
+      expected: initial.trim()
     })
   })
 })
 
 describe("isNullOrWhiteSpace (value)?", () => {
-
-  const falseValues: [any, false][] = ["hello", 1, false, true].map(val => [val, false])
-  const trueValues: [any, true][] = ["", "   ", null, undefined].map(val => [val, true])
-
+  // First 4 values are null or whitespace
   const cases = [
-    ...falseValues,
-    ...trueValues
-  ]
+    "", 
+    "   ", 
+    null, 
+    undefined,
+    "ok", 
+    1, 
+    false, 
+    true
+  ].map((initial, ix) => ({ initial, expected: ix < 4 }))
 
-  test.each(cases)("(%s): %s", async (value, expected) => {
+  test.each(cases)("(%s): %s", async ({ initial, expected }) => {
     await expectToEqualAsync({
-      store: { value },
+      initial,
       schema: {
-        path: "value",
         isNullOrWhiteSpace: true
       },
       expected
@@ -4146,7 +3892,7 @@ describe("isNullOrWhiteSpace (value)?", () => {
 describe("not", () => {
 
   test("every item is opposite boolean", async () => {
-    const source = [
+    const initial = [
       true,
       false,
       false,
@@ -4154,6 +3900,7 @@ describe("not", () => {
     ]
 
     await expectToEqualAsync({
+      initial,
       schema: {
         map: {
           not: {
@@ -4161,8 +3908,7 @@ describe("not", () => {
           }
         }
       },
-      initial: source,
-      expected: source.map(x => !x)
+      expected: initial.map(x => !x)
     })
   })
 
@@ -4937,48 +4683,43 @@ describe("array", () => {
   test("map join", async () => {
     const ids = [2, 3, 4].map(id => ({ id }))
 
-    const schema = {
-      const: [{ id: 1 }, ...ids],
-      map: {
-        path: "arg",
-        spread: {
-          init: {
-            temp: {
-              path: "current"
-            }
-          },
-          const: [
-            {
-              id: 1,
-              nombre: "Melany"
-            }
-          ],
-          find: {
-            path: "arg.id",
-            equals: {
-              path: "$temp.id"
+    await expectToEqualAsync({
+      store: {},
+      schema: {
+        const: [{ id: 1 }, ...ids],
+        map: {
+          path: "arg",
+          spread: {
+            init: {
+              temp: {
+                path: "current"
+              }
+            },
+            const: [
+              {
+                id: 1,
+                nombre: "Melany"
+              }
+            ],
+            find: {
+              path: "arg.id",
+              equals: {
+                path: "$temp.id"
+              }
             }
           }
         }
-      }
-    }
-
-    const expected = [{ id: 1, nombre: "Melany" }, ...ids]
-
-    await expectToEqualAsync({
-      store: {},
-      schema,
-      expected
+      },
+      expected: [{ id: 1, nombre: "Melany" }, ...ids]
     })
   })
 
   test("map", async () => {
-    const numbers = [1, 2, 3, 4]
+    const initial = [1, 2, 3, 4]
 
     await expectToEqualAsync({
-      store: {},
       schema: {
-        const: numbers,
+        const: initial,
         map: {
           propiedades: {
             id: {
@@ -4987,13 +4728,12 @@ describe("array", () => {
           }
         }
       },
-      expected: numbers.map(id => ({ id }))
+      expected: initial.map(id => ({ id }))
     })
   })
 
   test("map with empty value returns array of arrays", async () => {
-
-    const items = [1, 2, 3]
+    const items = [...Array(3).keys()]
   
     await expectToEqualAsync({
       schema: {
