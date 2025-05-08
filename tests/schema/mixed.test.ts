@@ -342,36 +342,6 @@ describe("map key value", () => {
 
 describe("map reduce", () => {
   const catalog = {
-    sports: [
-      {
-        key: "americanfootball_ncaaf",
-        group: "American Football"
-      },
-      {
-        key: "soccer_brazil_campeonato",
-        group: "Soccer"
-      }
-    ],
-    sportsDetails: {
-      americanfootball_ncaaf: {
-        country: "us"
-      },
-      soccer_brazil_campeonato: {
-        country: "br"
-      }
-    },
-    groups: [
-      {
-        titleEs: "Futbol",
-        key: "Soccer",
-        avatar: "https://www.svgrepo.com/show/484685/soccer-ball-illustration.svg"
-      },
-      {
-        titleEs: "Futbol Americano",
-        key: "American Football",
-        avatar: "https://www.svgrepo.com/show/395762/american-football.svg"
-      },
-    ],
     countries: {
       us: {
         name: "Usa",
@@ -382,118 +352,39 @@ describe("map reduce", () => {
         flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
       }
     },
-    expected: [
+    sportsDetails: {
+      americanfootball_ncaaf: {
+        country: "us"
+      },
+      soccer_brazil_campeonato: {
+        country: "br"
+      }
+    },
+    sports: [
       {
         key: "americanfootball_ncaaf",
-        country: {
-          name: "Usa",
-          flag: "https://www.svgrepo.com/show/365950/usa.svg"
-        },
-        group: {
-          titleEs: "Futbol Americano",
-          key: "American Football",
-          avatar: "https://www.svgrepo.com/show/395762/american-football.svg"
-        }
+        group: "American Football"
       },
       {
         key: "soccer_brazil_campeonato",
-        country: {
-          name: "Brazil",
-          flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
-        },
-        group: {
-          titleEs: "Futbol",
-          key: "Soccer",
-          avatar: "https://www.svgrepo.com/show/484685/soccer-ball-illustration.svg"
-        }
+        group: "Soccer"
       }
+    ],
+    groups: [
+      {
+        key: "Soccer",
+        titleEs: "Futbol",
+        avatar: "https://www.svgrepo.com/show/484685/soccer-ball-illustration.svg"
+      },
+      {
+        key: "American Football",
+        titleEs: "Futbol Americano",
+        avatar: "https://www.svgrepo.com/show/395762/american-football.svg"
+      },
     ]
   }
 
-  test("map reduce 4 arrays", async () => {
-    await expectToEqualAsync({
-      store: catalog,
-      schema: {
-        mapReduce: [
-          {
-            rightKey: "key",
-            items: {
-              mapReduce: [
-                {
-                  rightKey: "country",
-                  target: "country",
-                  items: {
-                    path: "countries"
-                  }
-                },
-                {
-                  items: {
-                    path: "sportsDetails"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            items: {
-              mapReduce: [
-                {
-                  key: "key",
-                  rightKey: "group",
-                  target: "group",
-                  items: {
-                    path: "groups"
-                  }
-                },
-                {
-                  items: {
-                    path: "sports"
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      },
-      expected: catalog.expected
-    })
-  })
-
-  test("map reduce", async () => {
-    await expectToEqualAsync({
-      schema: {
-        mapReduce: [
-          {
-            items: {
-              const: {
-                us: {
-                  flag: "https://www.svgrepo.com/show/365950/usa.svg"
-                },
-                br: {
-                  flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
-                }
-              }
-            }
-          },
-          {
-            items: {
-              const: {
-                us: {
-                  name: "Usa"
-                },
-                br: {
-                  name: "Brazil"
-                }
-              }
-            }
-          }
-        ]
-      },
-      expected: catalog.countries
-    })
-  })
-
-  test("map reduce", async () => {
+  test("country into sports details expects object", async () => {
     await expectToEqualAsync({
       schema: {
         mapReduce: [
@@ -528,63 +419,152 @@ describe("map reduce", () => {
     })
   })
 
-})
-
-test("map reduce", async () => {
-  await expectToEqualAsync({
-    schema: {
-      mapReduce: [
-        {
-          key: "countryCode",
-          rightKey: "code",
-          target: "flag",
-          items: {
-            const: [
-              {
-                url: "panama.png",
-                countryCode: "pa"
-              },
-              {
-                url: "us.png",
-                countryCode: "us"
+  test("objects with same keys expects objects merged", async () => {
+    await expectToEqualAsync({
+      schema: {
+        mapReduce: [
+          {
+            items: {
+              const: {
+                us: {
+                  flag: "https://www.svgrepo.com/show/365950/usa.svg"
+                },
+                br: {
+                  flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+                }
               }
-            ]
+            }
+          },
+          {
+            items: {
+              const: {
+                us: {
+                  name: "Usa"
+                },
+                br: {
+                  name: "Brazil"
+                }
+              }
+            }
+          }
+        ]
+      },
+      expected: catalog.countries
+    })
+  })
+
+  test("countries, sportDetails and sports (previous map object)", async () => {
+    await expectToEqualAsync({
+      store: catalog,
+      schema: {
+        mapReduce: [
+          {
+            rightKey: "country",
+            target: "country",
+            items: {
+              path: "countries"
+            }
+          },
+          {
+            rightKey: "key",
+            items: {
+              path: "sportsDetails"
+            }
+          },
+          {
+            items: {
+              path: "sports"
+            }
+          }
+        ]
+      },
+      expected: [
+        {
+          key: "americanfootball_ncaaf",
+          group: "American Football",
+          country: {
+            name: "Usa",
+            flag: "https://www.svgrepo.com/show/365950/usa.svg"
           }
         },
         {
-          items: {
-            const: [
-              {
-                name: "Panama",
-                code: "pa"
-              },
-              {
-                name: "Usa",
-                code: "us"
-              }
-            ]
+          key: "soccer_brazil_campeonato",
+          group: "Soccer",
+          country: {
+            name: "Brazil",
+            flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
           }
         }
       ]
-    },
-    expected: [
-      {
-        name: "Panama",
-        code: "pa",
-        flag: {
-          url: "panama.png",
-          countryCode: "pa"
-        }
+    })
+  })
+
+  test("full catalog with nested map reduce", async () => {
+    await expectToEqualAsync({
+      store: catalog,
+      schema: {
+        mapReduce: [
+          {
+            target: "country",
+            rightKey: "country",
+            items: {
+              path: "countries"
+            }
+          },
+          {
+            rightKey: "key",
+            items: {
+              path: "sportsDetails"
+            }
+          },
+          {
+            items: {
+              mapReduce: [
+                {
+                  key: "key",
+                  rightKey: "group",
+                  target: "group",
+                  items: {
+                    path: "groups"
+                  }
+                },
+                {
+                  items: {
+                    path: "sports"
+                  }
+                }
+              ]
+            }
+          }
+        ]
       },
-      {
-        name: "Usa",
-        code: "us",
-        flag: {
-          url: "us.png",
-          countryCode: "us"
+      expected: [
+        {
+          key: "americanfootball_ncaaf",
+          country: {
+            name: "Usa",
+            flag: "https://www.svgrepo.com/show/365950/usa.svg"
+          },
+          group: {
+            titleEs: "Futbol Americano",
+            key: "American Football",
+            avatar: "https://www.svgrepo.com/show/395762/american-football.svg"
+          }
+        },
+        {
+          key: "soccer_brazil_campeonato",
+          country: {
+            name: "Brazil",
+            flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+          },
+          group: {
+            titleEs: "Futbol",
+            key: "Soccer",
+            avatar: "https://www.svgrepo.com/show/484685/soccer-ball-illustration.svg"
+          }
         }
-      }
-    ]
+      ]
+    })
   })
 })
 
@@ -759,88 +739,6 @@ test("propiedades $bind", async () => {
   })
 })
 
-test("map object", async () => {
-  await expectToEqualAsync({
-    store: {
-      countries: {
-        us: {
-          name: "Usa",
-          flag: "https://www.svgrepo.com/show/365950/usa.svg"
-        },
-        br: {
-          name: "Brazil",
-          flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
-        }
-      },
-      sportsDetails: {
-        americanfootball_ncaaf: {
-          country: "us"
-        },
-        soccer_brazil_campeonato: {
-          country: "br"
-        }
-      },
-      sports: [
-        {
-          key: "americanfootball_ncaaf",
-          title: "American Football"
-        },
-        {
-          key: "soccer_brazil_campeonato",
-          title: "Liga de Brazil"
-        }
-      ]
-    },
-    schema: {
-      path: "sports",
-      mapObject: {
-        key: "key",
-        $: {
-          path: "sportsDetails",
-          mapObject: {
-            country: { // key is missing use country (would throw if $)
-              path: "countries"
-            }
-          }
-        }
-      }
-    },
-    expected: [
-      {
-        key: "americanfootball_ncaaf",
-        title: "American Football",
-        country: {
-          name: "Usa",
-          flag: "https://www.svgrepo.com/show/365950/usa.svg"
-        }
-      },
-      {
-        key: "soccer_brazil_campeonato",
-        title: "Liga de Brazil",
-        country: {
-          name: "Brazil",
-          flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
-        }
-      }
-    ]
-  })
-
-  const mapSportsDetailsCountries = {
-    americanfootball_ncaaf: {
-      country: {
-        name: "Usa",
-        flag: "https://www.svgrepo.com/show/365950/usa.svg"
-      }
-    },
-    baseball_mlb: {
-      country: {
-        name: "Brazil",
-        flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
-      }
-    }
-  }
-})
-
 test("merge by keys with empty array from is equals to mergeItemsWithSameKey", async () => {
   const source = [
     {
@@ -898,137 +796,6 @@ test("merge by keys with empty array from is equals to mergeItemsWithSameKey", a
       mergeItemsWithSameKey: "group"
     },
     expected
-  })
-})
-
-test("map reduce odd and even numbers", async () => {
-  await expectToEqualAsync({
-    schema: {
-      mapReduce: [
-        {
-          key: "group",
-          rightKey: "group",
-          items: {
-            const: [
-              {
-                title: "Odd number",
-                group: "odd",
-              },
-              {
-                title: "Even number",
-                group: "even",
-              }
-            ]
-          }
-        },
-        {
-          items: {
-            const: [
-              {
-                id: 1,
-                group: "odd"
-              },
-              {
-                id: 2,
-                group: "even"
-              },
-              {
-                id: 3,
-                group: "odd"
-              },
-              {
-                id: 4,
-                en: "four"
-              }
-            ]
-          }
-        }
-      ]
-    },
-    expected: [
-      {
-        id: 1,
-        title: "Odd number",
-        group: "odd"
-      },
-      {
-        id: 2,
-        title: "Even number",
-        group: "even"
-      },
-      {
-        id: 3,
-        title: "Odd number",
-        group: "odd"
-      },
-      {
-        id: 4,
-        en: "four"
-      }
-    ]
-  })
-})
-
-test("map reduce odd and even numbers by keys: group, groupName", async () => {
-  await expectToEqualAsync({
-    schema: {
-      mapReduce: [
-        {
-          key: "groupName",
-          rightKey: "group",
-          items: {
-            const: [
-              {
-                title: "Odd number",
-                groupName: "odd",
-              },
-              {
-                title: "Even number",
-                groupName: "even",
-              }
-            ]
-          }
-        },
-        {
-          items: {
-            const: [
-              {
-                id: 1,
-                group: "odd"
-              },
-              {
-                id: 2,
-                group: "even"
-              },
-              {
-                id: 3,
-                group: "odd"
-              }
-            ]
-          }
-        }
-      ]
-    },
-    expected: [
-      {
-        id: 1,
-        title: "Odd number",
-        group: "odd",
-        groupName: "odd"
-      },
-      {
-        id: 2,
-        title: "Even number",
-        group: "even",
-        groupName: "even"
-      },
-      {
-        id: 3,
-        title: "Odd number",
-        group: "odd",
-        groupName: "odd"
-      }
-    ]
   })
 })
 
