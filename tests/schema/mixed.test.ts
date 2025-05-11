@@ -384,20 +384,18 @@ describe("map reduce", () => {
     ]
   }
 
-  test("country into sports details expects object", async () => {
+  test("countries into sports details expects object", async () => {
     await expectToEqualAsync({
       schema: {
         mapReduce: [
           {
-            target: "country",
-            rightKey: "country",
-            items: {
-              const: catalog.countries
-            }
+            const: catalog.sportsDetails
           },
           {
+            target: "country",
+            leftKey: "country",
             items: {
-              const: catalog.sportsDetails
+              const: catalog.countries
             }
           }
         ]
@@ -424,6 +422,16 @@ describe("map reduce", () => {
       schema: {
         mapReduce: [
           {
+            const: {
+              us: {
+                name: "Usa"
+              },
+              br: {
+                name: "Brazil"
+              }
+            }
+          },
+          {
             items: {
               const: {
                 us: {
@@ -434,18 +442,6 @@ describe("map reduce", () => {
                 }
               }
             }
-          },
-          {
-            items: {
-              const: {
-                us: {
-                  name: "Usa"
-                },
-                br: {
-                  name: "Brazil"
-                }
-              }
-            }
           }
         ]
       },
@@ -453,50 +449,224 @@ describe("map reduce", () => {
     })
   })
 
-  test("countries, sportDetails and sports (previous map object)", async () => {
+  test("expect arrays without key to be zipped", async () => {
     await expectToEqualAsync({
-      store: catalog,
       schema: {
         mapReduce: [
           {
-            rightKey: "country",
-            target: "country",
-            items: {
-              path: "countries"
-            }
-          },
-          {
-            rightKey: "key",
-            items: {
-              path: "sportsDetails"
-            }
+            const: [
+              {
+                name: "Usa"
+              },
+              {
+                name: "Brazil"
+              }
+            ]
           },
           {
             items: {
-              path: "sports"
+              const: [
+                {
+                  flag: "https://www.svgrepo.com/show/365950/usa.svg"
+                },
+                {
+                  flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+                }
+              ]
             }
           }
         ]
       },
-      expected: [
-        {
-          key: "americanfootball_ncaaf",
-          group: "American Football",
-          country: {
-            name: "Usa",
-            flag: "https://www.svgrepo.com/show/365950/usa.svg"
-          }
-        },
-        {
-          key: "soccer_brazil_campeonato",
-          group: "Soccer",
-          country: {
-            name: "Brazil",
-            flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
-          }
-        }
-      ]
+      expected: Object.values(catalog.countries)
     })
+  })
+
+  test("expects object with property with value same as key merged into object", async () => {
+    await expectToEqualAsync({
+      schema: {
+        mapReduce: [
+          {
+            const: {
+              us: {
+                name: "Usa"
+              },
+              br: {
+                name: "Brazil"
+              }
+            }
+          },
+          {
+            key: "key",
+            items: {
+              const: {
+                us: {
+                  key: "us",
+                  flag: "https://www.svgrepo.com/show/365950/usa.svg"
+                },
+                br: {
+                  key: "br",
+                  flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+                }
+              }
+            }
+          }
+        ]
+      },
+      expected: {
+        us: {
+          name: "Usa",
+          key: "us",
+          flag: "https://www.svgrepo.com/show/365950/usa.svg"
+        },
+        br: {
+          name: "Brazil",
+          key: "br",
+          flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+        }
+      }
+    })
+  })
+
+  test("expects object with key different than object key merged into object", async () => {
+    await expectToEqualAsync({
+      schema: {
+        mapReduce: [
+          {
+            const: {
+              us: {
+                name: "Usa"
+              },
+              br: {
+                name: "Brazil"
+              }
+            }
+          },
+          {
+            key: "key",
+            items: {
+              const: {
+                uno: {
+                  key: "us",
+                  flag: "https://www.svgrepo.com/show/365950/usa.svg"
+                },
+                dos: {
+                  key: "br",
+                  flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+                }
+              }
+            }
+          }
+        ]
+      },
+      expected: {
+        us: {
+          name: "Usa",
+          key: "us",
+          flag: "https://www.svgrepo.com/show/365950/usa.svg"
+        },
+        br: {
+          name: "Brazil",
+          key: "br",
+          flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+        }
+      }
+    })
+  })
+
+  test("expect array merged into object", async () => {
+    await expectToEqualAsync({
+      schema: {
+        mapReduce: [
+          {
+            const: {
+              us: {
+                name: "Usa"
+              },
+              br: {
+                name: "Brazil"
+              }
+            }
+          },
+          {
+            key: "key",
+            items: {
+              const: [
+                {
+                  key: "us",
+                  flag: "https://www.svgrepo.com/show/365950/usa.svg"
+                },
+                {
+                  key: "br",
+                  flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      expected: {
+        us: {
+          name: "Usa",
+          key: "us",
+          flag: "https://www.svgrepo.com/show/365950/usa.svg"
+        },
+        br: {
+          name: "Brazil",
+          key: "br",
+          flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+        }
+      }
+    })
+  })
+
+  test("countries, sportDetails and sports (previous map object)", async () => {
+
+    const result = await new ObjectBuilder()
+      .with({
+        store: catalog,
+        schema: {
+          mapReduce: [
+            {
+              path: "sports"
+            },
+            {
+              leftKey: "key",
+              items: {
+                path: "sportsDetails"
+              }
+            },
+            {
+              leftKey: "country",
+              target: "country",
+              items: {
+                path: "countries"
+              }
+            }
+          ]
+        },
+      })
+      .buildAsync()
+
+    const expected = [
+      {
+        key: "americanfootball_ncaaf",
+        group: "American Football",
+        country: {
+          name: "Usa",
+          flag: "https://www.svgrepo.com/show/365950/usa.svg"
+        }
+      },
+      {
+        key: "soccer_brazil_campeonato",
+        group: "Soccer",
+        country: {
+          name: "Brazil",
+          flag: "https://www.svgrepo.com/show/401552/flag-for-brazil.svg"
+        }
+      }
+    ]
+
+    expect(result).toEqual(expected)
   })
 
   test("full catalog with nested map reduce", async () => {
@@ -505,35 +675,27 @@ describe("map reduce", () => {
       schema: {
         mapReduce: [
           {
-            target: "country",
-            rightKey: "country",
+            path: "sports"
+          },
+          {
+            key: "key",
+            leftKey: "group",
+            target: "group",
             items: {
-              path: "countries"
+              path: "groups"
             }
           },
           {
-            rightKey: "key",
+            leftKey: "key",
             items: {
               path: "sportsDetails"
             }
           },
           {
+            target: "country",
+            leftKey: "country",
             items: {
-              mapReduce: [
-                {
-                  key: "key",
-                  rightKey: "group",
-                  target: "group",
-                  items: {
-                    path: "groups"
-                  }
-                },
-                {
-                  items: {
-                    path: "sports"
-                  }
-                }
-              ]
+              path: "countries"
             }
           }
         ]

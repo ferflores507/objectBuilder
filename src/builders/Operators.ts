@@ -1,4 +1,4 @@
-import { Builder, ChildrenSchema, DebounceOptions, DebounceSchema, MapReduceOptions, OperatorTask, PatchOptions, Propiedades, RequestInitWithUrl, RequestPlainOptions, Schema, SchemaDefinition, WithTaskOptions } from "../models"
+import { Builder, ChildrenSchema, DebounceOptions, DebounceSchema, MapReduceOption, OperatorTask, PatchOptions, Propiedades, RequestInitWithUrl, RequestPlainOptions, Schema, SchemaDefinition, WithTaskOptions } from "../models"
 import { reduceRequest, type RequestInfo } from "../helpers/requestHelper"
 
 import {
@@ -300,48 +300,72 @@ export class Operators implements WithTaskOptions<Operators> {
         return [new Map(), ...concreteKeys] as const
     }
     mapReduce = {
-        transform: (schema: SchemaDefinition) => {
+        transform: (schema: Propiedades[] | Schema) => {
             return Array.isArray(schema)
-                ? schema.map(propiedades => ({ propiedades }))
+                ? schema.map((val, ix) => {
+                    return ix === 0 
+                        ? val 
+                        : { 
+                            propiedades: {
+                                ...val
+                            } 
+                        }
+                })
                 : schema
         },
-        task: (initial: any, options: MapReduceOptions[]) => {
-            const result = options.reduce((prev, curr) => {
-                const { key, rightKey, target } = prev
-                let map = new Map()
-    
-                if (key) {
-                    (prev.items as []).forEach(item => map.set(item[key], item))
+        task: (initial: any, options: [Record<string, any>, ...MapReduceOption[]]) => {
+            type GetKeyFn = (key: string, val: any) => any
+            
+            const getKeyFn = (keyOrFn: string | Function | undefined) => {
+                const functions: Record<string, GetKeyFn> = {
+                    undefined: key => key,
+                    string: (key, val) => val[keyOrFn as string],
+                    function: (key, val) => (keyOrFn as Function)({ key, val })
                 }
-                else {
-                    map = new Map(Object.entries(prev.items))
-                }
-    
-                const spreadValue = (val: any, index: any) => {
-                    const result = map.get(rightKey ? val[rightKey] : index)
-    
-                    return { 
+
+                return functions[typeof keyOrFn]
+            }
+
+            const getCurrentItemsMap = (items: Record<string, any>, getKey: GetKeyFn) => {
+                const entries = Object
+                    .entries(items)
+                    .map(([key, val]) => [getKey(key, val), val] as const)
+
+                return new Map(entries)
+            }
+
+            const getMatchesMap = (entries: [string, any][], sourceMap: Map<string, any>, getKey: GetKeyFn, target?: string) => {
+                const map = new Map()
+
+                entries.forEach(([key, val]) => {
+                    const result = sourceMap.get(getKey(key, val))
+                    
+                    result && map.set(key, { 
                         ...val, 
-                        ...(target ? { [target]: result } : result) 
-                    }
+                        ...(target ? { [target]: result } : result)
+                    })
+                })
+
+                return map
+            }
+            
+            return options.reduce((leftItems, curr) => {
+                const { items, leftKey, key, target } = curr as MapReduceOption // to force types assertions
+                const leftEntries = Object.entries(leftItems)
+                
+                const map = getCurrentItemsMap(items, getKeyFn(key))
+                const matchesMap = getMatchesMap(leftEntries, map, getKeyFn(leftKey), target)
+
+                const results = {
+                    left: () => new Map([...leftEntries, ...matchesMap.entries()]),
+                    inner: () => matchesMap,
                 }
-    
-                const { items } = curr
-    
-                return {
-                    ...curr,
-                    items: Array.isArray(items)
-                        ? items.map(spreadValue)
-                        : Object
-                            .entries(items)
-                            .reduce((prev, [key, val]) => ({
-                                ...prev,
-                                [key]: spreadValue(val, key)
-                            }), {})
-                }
+                const result = results.left()
+                
+                return Array.isArray(leftItems) 
+                    ? [...result.values()] 
+                    : Object.fromEntries([...result.entries()])
             })
-    
-            return result.items
         }
 
     }

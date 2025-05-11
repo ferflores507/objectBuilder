@@ -124,21 +124,23 @@ export type DebounceSchema = {
     target: SchemaDefinition
 })
 
-export type MapReduceOptions = Partial<{
+export type MapReduceOption = {
+    items: Record<string, any>
+} & Partial<{
     key: string
-    rightKey: string
+    leftKey: string
     target: string
-}> & { 
-    items: any[] | Record<string, unknown> 
-}
+}>
 
-type MapReduceOptionsSchema = Partial<{
-    key: MapReduceOptions["key"] | Schema
-    rightKey: MapReduceOptions["rightKey"] | Schema
-    target: MapReduceOptions["target"] | Schema
-}> & { 
+type MapReduceOptionsSchema = {
     items: SchemaDefinition
-}
+} & Partial<{
+    key: MapReduceOption["key"] | Schema
+    leftKey: MapReduceOption["leftKey"] | Schema
+    target: MapReduceOption["target"] | Schema
+}>
+
+type MapReduceSchema = [Schema, ...MapReduceOptionsSchema[]]
 
 export type PatchOptions = { 
     key?: string
@@ -203,7 +205,7 @@ export type Schema = Partial<{
     log: SchemaDefinition | SchemaPrimitive
     mapKeyValue: SchemaDefinition | true
     mapObject: Propiedades
-    mapReduce: MapReduceOptionsSchema[]
+    mapReduce: MapReduceSchema
     mergeItemsWithSameKey: Schema | SchemaPrimitive
     mergeByKeys: SchemaDefinition | SchemaPrimitive
     not: SchemaDefinition
