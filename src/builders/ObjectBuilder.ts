@@ -475,7 +475,7 @@ export class ObjectBuilder implements Builder {
     }
 
     get(path: string, current?: any) {
-        const sources = [{ current, target: this.target }, this.options, this.options.variables]
+        const sources = [{ current }, this.options, this.options.variables]
         const proxy = getterTrap(this.options.store, ...sources)
 
         return varios.entry(proxy).get(path)

@@ -3595,23 +3595,6 @@ test("initial defined and const with undefined", async () => {
   })
 })
 
-test("map path target", async () => {
-
-  await expectToEqualAsync({
-    schema: {
-      const: 1,
-      reduce: {
-        const: [1, 2, 3, 4],
-        map: {
-          path: "target"
-        }
-      }
-    },
-    expected: [1, 1, 1, 1],
-  })
-
-})
-
 describe("includes", () => {
 
   const keywords = ["h", "o", "l", "a", "ho", "ol", "la", "hol", "ola", "hola"]
