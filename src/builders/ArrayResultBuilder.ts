@@ -65,10 +65,9 @@ export class ArrayResultBuilder extends ArrayBuilderBase {
     }
 
     private withMapOptions(schema: ArraySchema) {
-        const { map, groupJoin } = schema
+        const { groupJoin } = schema
 
         this.items = new ArrayMapBuilder(this.items, this.builder)
-            .withMap(map)
             .withGroupJoin(groupJoin)
             .build()
 

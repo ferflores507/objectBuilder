@@ -463,6 +463,9 @@ export class Operators implements WithTaskOptions<Operators> {
         return { ...obj, [key]: target[key] }
     }, {})
     UUID = () => crypto.randomUUID()
+    map = (items: any[], matchFunction: () => any) => {
+        return items.map(matchFunction)
+    }
     set: OperatorTask = (initial, value, builder) => {
         const [path, arg] = argsPair(value, initial)
 

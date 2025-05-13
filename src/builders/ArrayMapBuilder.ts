@@ -25,21 +25,6 @@ export class ArrayMapBuilder extends ArrayBuilderBase {
         return this
     }
 
-    withMap(schema: Schema | undefined) {
-        if(schema) {
-            const matchFunction = this.builder
-                .with({
-                    initial: this.items,
-                    schema: { function: schema }
-                })
-                .build()
-
-            this.items = this.items.map(matchFunction)
-        }
-
-        return this
-    }
-
     withGroupJoin(join: Join | undefined) {
         if(join) {
             const target = this.builder.with({ schema: join.items }).build()

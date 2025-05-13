@@ -3014,9 +3014,11 @@ test("init search then map with filter", async () => {
       },
       const: Array.from(Array(3).keys()),
       map: {
-        propiedades: {
-          id: {
-            path: "arg"
+        function: {
+          propiedades: {
+            id: {
+              path: "arg"
+            }
           }
         }
       },
@@ -3038,9 +3040,11 @@ test("map then filter", async () => {
     schema: {
       const: Array.from(Array(3).keys()),
       map: {
-        propiedades: {
-          id: {
-            path: "arg"
+        function: {
+          propiedades: {
+            id: {
+              path: "arg"
+            }
           }
         }
       },
@@ -3810,8 +3814,10 @@ describe("not", () => {
       initial,
       schema: {
         map: {
-          not: {
-            path: "arg"
+          function: {
+            not: {
+              path: "arg"
+            }
           }
         }
       },
@@ -4459,27 +4465,29 @@ describe("array", () => {
             }
           ],
           map: {
-            path: "arg",
-            spread: {
-              init: {
-                temp: {
-                  path: "current"
-                }
-              },
-              const: [
-                {
-                  nombre: "nombre",
-                  valor: "Melany"
+            function: {
+              path: "arg",
+              spread: {
+                init: {
+                  temp: {
+                    path: "current"
+                  }
                 },
-                {
-                  nombre: "nombre",
-                  valor: "Melany"
-                }
-              ],
-              find: {
-                path: "arg.nombre",
-                equals: {
-                  path: "$temp.nombre"
+                const: [
+                  {
+                    nombre: "nombre",
+                    valor: "Melany"
+                  },
+                  {
+                    nombre: "nombre",
+                    valor: "Melany"
+                  }
+                ],
+                find: {
+                  path: "arg.nombre",
+                  equals: {
+                    path: "$temp.nombre"
+                  }
                 }
               }
             }
@@ -4595,23 +4603,25 @@ describe("array", () => {
       schema: {
         const: [{ id: 1 }, ...ids],
         map: {
-          path: "arg",
-          spread: {
-            init: {
-              temp: {
-                path: "current"
-              }
-            },
-            const: [
-              {
-                id: 1,
-                nombre: "Melany"
-              }
-            ],
-            find: {
-              path: "arg.id",
-              equals: {
-                path: "$temp.id"
+          function: {
+            path: "arg",
+            spread: {
+              init: {
+                temp: {
+                  path: "current"
+                }
+              },
+              const: [
+                {
+                  id: 1,
+                  nombre: "Melany"
+                }
+              ],
+              find: {
+                path: "arg.id",
+                equals: {
+                  path: "$temp.id"
+                }
               }
             }
           }
@@ -4628,9 +4638,11 @@ describe("array", () => {
       schema: {
         const: initial,
         map: {
-          propiedades: {
-            id: {
-              path: "arg"
+          function: {
+            propiedades: {
+              id: {
+                path: "arg"
+              }
             }
           }
         }
@@ -4645,30 +4657,45 @@ describe("array", () => {
     await expectToEqualAsync({
       schema: {
         const: initial,
-        map: [
-          {
-            path: "arg"
-          },
-          {
-            path: "arg",
-            plus: 1
-          }
-        ]
+        map: {
+          function: [
+            {
+              path: "arg"
+            },
+            {
+              path: "arg",
+              plus: 1
+            }
+          ]
+        }
       },
       expected: initial.map(id => [id, id + 1])
     })
   })
 
-  test("map with empty value returns array of arrays", async () => {
-    const items = [...Array(3).keys()]
-  
-    await expectToEqualAsync({
+  test("map with empty array to return equal array", async () => {
+    const array = [] as const
+    const results = await  buildResultsAsync({
       schema: {
-        const: items,
-        map: {}
-      },
-      expected: items.map(() => items)
+        const: array,
+        map: {
+          function: 1
+        }
+      }
     })
+
+    expect(results).toEqual([array, array])
+  })
+
+  test("map with empty value fails", async () => {  
+    const promise = buildResultsAsync({
+      schema: {
+        const: [...Array(3).keys()],
+        map: {}
+      }
+    })
+
+    await expect(promise).rejects.toThrow()
   })
 
   test("array contains", async () => {

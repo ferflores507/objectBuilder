@@ -5,7 +5,7 @@ import { ArrayFilterResultBuilder, ArrayResultBuilder } from "./ArrayResultBuild
 export class ArrayBuilder extends ArrayBuilderBase {
 
     validar(schema: ArraySchema | undefined) {
-        const keys: (keyof Schema)[] = ["filter", "items", "contains", "map", "groupJoin"]
+        const keys: (keyof Schema)[] = ["filter", "items", "contains", "groupJoin"]
         const isEmpty = keys.every(x => schema?.[x] == null)
 
         return Array.isArray(this.items) || isEmpty
