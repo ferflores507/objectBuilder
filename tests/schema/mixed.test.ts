@@ -4661,6 +4661,26 @@ describe("array", () => {
     })
   })
 
+  test("map with array", async () => {
+    const initial = [1, 2, 3, 4]
+
+    await expectToEqualAsync({
+      schema: {
+        const: initial,
+        map: [
+          {
+            path: "arg"
+          },
+          {
+            path: "arg",
+            plus: 1
+          }
+        ]
+      },
+      expected: initial.map(id => [id, id + 1])
+    })
+  })
+
   test("map with empty value returns array of arrays", async () => {
     const items = [...Array(3).keys()]
   
