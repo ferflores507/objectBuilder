@@ -3647,19 +3647,15 @@ describe("array filter property 'keywords' contains string", () => {
 
   const items = [
     {
-      match: true,
       keywords: ["Melany", "uno"]
     },
     {
-      match: false,
       keywords: ["uno", "dos"]
     },
     {
-      match: true,
       keywords: ["uno", "Melany"]
     },
     {
-      match: false,
       keywords: ["tres", "cuatro"]
     }
   ]
@@ -3667,10 +3663,10 @@ describe("array filter property 'keywords' contains string", () => {
   const cases = [
     {
       items,
-      expected: items.filter(i => i.match === true)
+      expected: items.filter(i => i.keywords.includes("Melany"))
     },
     {
-      items: items.filter(i => i.match === false),
+      items: items.filter(i => i.keywords.includes("Melany") === false),
       expected: []
     }
   ]
