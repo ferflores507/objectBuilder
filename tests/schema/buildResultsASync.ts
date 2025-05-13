@@ -8,7 +8,10 @@ export const buildResultsAsync = async (options: CaseOptions) => {
 
     const builder = new ObjectBuilder()
 
-    return [builder.with(options).build(), await builder.with(options).buildAsync()]
+    return await Promise.all([
+        builder.with(options).build(), 
+        builder.with(options).buildAsync()
+    ])
 }
 
 export type Case = { expected: any } & CaseOptions
