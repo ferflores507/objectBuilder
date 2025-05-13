@@ -3689,32 +3689,31 @@ describe("array filter property 'keywords' contains string", () => {
 })
 
 test("schema as value", async () => {
-  const schema: Schema = {
-    schema: {
-      propiedades: {
-        value: {
-          path: "id"
-        },
-        nombre: "Melany"
-      }
+  const schema = {
+    propiedades: {
+      value: {
+        path: "id"
+      },
+      nombre: "Melany"
     }
   }
 
   await expectToEqualAsync({
-    store: {},
-    schema,
-    expected: schema.schema
+    schema: {
+      schema
+    },
+    expected: schema
   })
 })
 
 test("spread item to array", async () => {
+  const initial = [...Array(3).keys()]
   await expectToEqualAsync({
-    store: {},
     schema: {
-      const: [1, 2, 3],
-      spread: 4
+      const: initial,
+      spread: 3
     },
-    expected: [1, 2, 3, 4]
+    expected: [0, 1, 2, 3]
   })
 })
 
