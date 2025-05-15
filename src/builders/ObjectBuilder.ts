@@ -423,15 +423,12 @@ export class ObjectBuilder implements Builder {
     withPropiedadesAsync(propiedades: Propiedades | undefined) {
         return propiedades
             ? this.withUnshift(initial => {
-                    const entries = Object.entries(propiedades)
-                    const definitions = entries.map(([key, schema]) => schema)
+                    const definitions = Object.entries(propiedades)
 
                     return this
                         .with({ initial })
                         .withDefinitions(definitions)
-                        .add((values: []) => entries.reduce((prev, [key], index) => {
-                            return { ...prev, [key]: values[index] }
-                        }, {})) 
+                        .add(entries => Object.fromEntries(entries))
                 })
             : this
     }
