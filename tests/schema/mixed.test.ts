@@ -142,28 +142,32 @@ test("patch with preserver and replacer", async () => {
 })
 
 test("build propiedades with store as target", () => {
-  const store = {}
-  const builder = new ObjectBuilder()
-    .with({ store })
-  const propiedades = {
-    count: 1,
-    uno: {
-      path: "count",
-    },
-    $getters: {
-      countGet: {
-        path: "count"
+  const store = {} as Record<string, any>
+
+  new ObjectBuilder()
+    .with({
+      store,
+      schema: {
+        propiedades: {
+          count: 1,
+          uno: {
+            path: "count",
+          },
+          $getters: {
+            countGet: {
+              path: "count"
+            }
+          }
+        }
       }
-    }
-  }
+    })
+    .build()
 
   const expected = {
     count: 1,
     countGet: 1,
     uno: 1
   }
-
-  new PropiedadesBuilder(propiedades, builder, store).build()
 
   expect(store).toMatchObject(expected)
 
