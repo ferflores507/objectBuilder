@@ -1,11 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest'
 import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync'
-import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { entry } from '../../src/helpers/varios'
 import { ObjectBuilder } from '../../src/builders/ObjectBuilder'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
-import { Propiedades, Schema } from '../../src/models'
+import { Schema } from '../../src/models'
 
 describe("map async and promise all", () => {
   const initial = Array.from({ length: 2 })
@@ -142,37 +141,40 @@ test("patch with preserver and replacer", async () => {
 })
 
 test("build propiedades with store as target", () => {
-  const store = {}
-  const builder = new ObjectBuilder()
-    .with({ store })
-  const propiedades = {
-    count: 1,
-    uno: {
-      path: "count",
-    },
-    $getters: {
-      countGet: {
-        path: "count"
+  const store = { count: 1 } as Record<string, any>
+
+  const result = new ObjectBuilder()
+    .with({
+      store,
+      schema: {
+        propiedades: {
+          $bind: {
+            getters: {
+              count: {
+                path: "count"
+              }
+            }
+          },
+          initialCount: {
+            path: "count",
+          },
+        }
       }
-    }
-  }
+    })
+    .build()
 
   const expected = {
-    count: 1,
-    countGet: 1,
-    uno: 1
+    initialCount: 1,
+    count: 1
   }
 
-  new PropiedadesBuilder(propiedades, builder, store).build()
-
-  expect(store).toMatchObject(expected)
+  expect(result).toMatchObject(expected)
 
   store.count = 2
 
-  expect(store).toMatchObject({
-    count: 2,
-    uno: 1,
-    countGet: 2
+  expect(result).toMatchObject({
+    initialCount: 1,
+    count: 2
   })
 })
 
@@ -2043,7 +2045,7 @@ describe("sort by", () => {
   })
 })
 
-test("propiedadesAsync", async () => {
+test("propiedades with async call", async () => {
 
   const result = await new ObjectBuilder()
     .with({
@@ -2056,7 +2058,7 @@ test("propiedadesAsync", async () => {
             }
           }
         },
-        propiedadesAsync: {
+        propiedades: {
           total: {
             call: "$getNum",
             reduce: {
@@ -2097,34 +2099,6 @@ test("definitions with async call works", async () => {
     .buildAsync()
 
   expect(result).toEqual([2])
-})
-
-test.fails("propiedades fails with async call", async () => {
-
-  const result = await new ObjectBuilder()
-    .with({
-      schema: {
-        init: {
-          getNum: {
-            asyncFunction: {
-              delay: 50,
-              const: 1
-            }
-          }
-        },
-        propiedades: {
-          total: {
-            call: "$getNum",
-            reduce: {
-              plus: 1
-            }
-          }
-        }
-      }
-    })
-    .buildAsync()
-
-  expect(result).toEqual({ total: 2 })
 })
 
 describe("sort", () => {
@@ -2766,13 +2740,11 @@ test("schema propiedades getter", () => {
     .with({
       store,
       schema: {
-        propiedades: {
-          $getters: {
-            titulo: {
-              path: "nombre"
-            }
+        getters: {
+          titulo: {
+            path: "nombre"
           }
-        },
+        }
       },
     })
     .build()
@@ -2887,27 +2859,6 @@ describe("define property", () => {
     expect(obj.nombre).toEqual("Fer")
   })
 
-})
-
-test("object with function to set sibling", () => {
-  const obj = new ObjectBuilder()
-    .with({
-      schema: {
-        propiedades: {
-          nombre: "Melany",
-          setNombre: {
-            function: {
-              set: "sibling.nombre"
-            }
-          }
-        }
-      }
-    })
-    .build()
-
-  obj.setNombre("Fer")
-
-  expect(obj.nombre).toEqual("Melany")
 })
 
 test("import with multiple stores", async () => {
@@ -4044,91 +3995,6 @@ describe("select", () => {
   })
 })
 
-describe("propiedades builder", () => {
-
-  type CaseOptions = {
-    store?: any,
-    propiedades: Propiedades
-    expected: Record<string, any>
-  }
-
-  const expectResultsAsync = async (options: CaseOptions) => {
-    const { propiedades, expected, ...rest } = options
-    const builder = new ObjectBuilder()
-      .with(rest)
-      
-    const propiedadesBuilder = new PropiedadesBuilder(propiedades, builder)
-    const results = [propiedadesBuilder.build(), await propiedadesBuilder.buildAsync()]
-
-    expect(results).toEqual([expected, expected])
-  }
-
-  test("options value path", async () => {
-    await expectResultsAsync({
-      store: { dos: 2, detalles: { titulo: "Hola" } },
-      propiedades: {
-        uno: 1,
-        unoCopy: {
-          path: "siblings.uno"
-        },
-        dos: {
-          path: "dos"
-        },
-        saludo: {
-          path: "store.detalles.titulo",
-        },
-        saludoNested: {
-          path: "store.detalles",
-          propiedades: {
-            titulo: {
-              path: "current.titulo"
-            }
-          }
-        }
-      },
-      expected: {
-        uno: 1,
-        unoCopy: 1,
-        dos: 2,
-        saludo: "Hola",
-        saludoNested: { titulo: "Hola" }
-      }
-    })
-  })
-
-  test("sibling", async () => {
-    await expectResultsAsync({
-      propiedades: {
-        uno: 1,
-        dos: {
-          path: "siblings.uno"
-        },
-        tres: 3
-      },
-      expected: {
-        uno: 1,
-        dos: 1,
-        tres: 3
-      }
-    })
-  })
-
-  test("basico", async () => {
-    await expectResultsAsync({
-      propiedades: {
-        uno: 1,
-        dos: 2,
-        tres: 3
-      },
-      expected: {
-        uno: 1,
-        dos: 2,
-        tres: 3
-      }
-    })
-  })
-})
-
 describe("use", () => {
 
   const cases = [
@@ -4155,71 +4021,6 @@ describe("use", () => {
       functions: {
         first: (array: any[]) => array[0],
         last: (array: any[]) => array[array.length - 1]
-      }
-    })
-  })
-
-})
-
-test("sibling nested", async () => {
-  const idCopy = {
-    path: "siblings.id"
-  }
-  let id = 1
-
-  await expectToEqualAsync({
-    store: {},
-    schema: {
-      propiedades: {
-        id: id++,
-        idCopy,
-        children: {
-          propiedades: {
-            id: id++,
-            idCopy,
-            children: {
-              propiedades: {
-                id: id++,
-                idCopy
-              }
-            }
-          }
-        }
-      }
-    },
-    expected: {
-      id: 1,
-      idCopy: 1,
-      children: {
-        id: 2,
-        idCopy: 2,
-        children: {
-          id: 3,
-          idCopy: 3
-        }
-      }
-    }
-  })
-})
-
-describe("sibling", () => {
-
-  test("set value from a sibling property", async () => {
-    await expectToEqualAsync({
-      store: {},
-      schema: {
-        propiedades: {
-          title: "One",
-          value: 1,
-          titleCopy: {
-            path: "siblings.title"
-          }
-        }
-      },
-      expected: {
-        title: "One",
-        value: 1,
-        titleCopy: "One"
       }
     })
   })

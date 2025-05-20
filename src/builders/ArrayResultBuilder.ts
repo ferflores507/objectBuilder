@@ -2,7 +2,6 @@ import { ArraySchema, Schema, SelectSchema } from "../models"
 import { ArrayBuilderBase } from "./ArrayBuilderBase"
 import { ArrayFilterBuilder } from "./ArrayFilterBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
-import { PropiedadesBuilder } from "./PropiedadesBuilder"
 
 export class ArrayFilterResultBuilder extends ArrayBuilderBase {
 
@@ -53,7 +52,7 @@ export class ArrayResultBuilder extends ArrayBuilderBase {
         const { select } = schema
         
         if(select) {
-            const selectSchema = new PropiedadesBuilder(select, this.builder)
+            const selectSchema = this.builder.withPropiedades(select)
                 .build() as SelectSchema
 
             this.items = new ArrayMapBuilder(this.items, this.builder)
