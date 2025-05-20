@@ -187,6 +187,7 @@ export type Schema = Partial<{
     formatPropiedades: Schema
     flat: true
     function: SchemaDefinition | SchemaPrimitive
+    getters: Propiedades
     greaterThan: SchemaDefinition | SchemaPrimitive
     lessThan: SchemaDefinition | SchemaPrimitive
     if: SchemaDefinition | string

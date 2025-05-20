@@ -142,41 +142,40 @@ test("patch with preserver and replacer", async () => {
 })
 
 test("build propiedades with store as target", () => {
-  const store = {} as Record<string, any>
+  const store = { count: 1 } as Record<string, any>
 
-  new ObjectBuilder()
+  const result = new ObjectBuilder()
     .with({
       store,
       schema: {
         propiedades: {
-          count: 1,
-          uno: {
+          $bind: {
+            getters: {
+              count: {
+                path: "count"
+              }
+            }
+          },
+          initialCount: {
             path: "count",
           },
-          $getters: {
-            countGet: {
-              path: "count"
-            }
-          }
         }
       }
     })
     .build()
 
   const expected = {
-    count: 1,
-    countGet: 1,
-    uno: 1
+    initialCount: 1,
+    count: 1
   }
 
-  expect(store).toMatchObject(expected)
+  expect(result).toMatchObject(expected)
 
   store.count = 2
 
-  expect(store).toMatchObject({
-    count: 2,
-    uno: 1,
-    countGet: 2
+  expect(result).toMatchObject({
+    initialCount: 1,
+    count: 2
   })
 })
 
@@ -2742,13 +2741,11 @@ test("schema propiedades getter", () => {
     .with({
       store,
       schema: {
-        propiedades: {
-          $getters: {
-            titulo: {
-              path: "nombre"
-            }
+        getters: {
+          titulo: {
+            path: "nombre"
           }
-        },
+        }
       },
     })
     .build()

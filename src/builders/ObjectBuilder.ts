@@ -103,6 +103,7 @@ export class ObjectBuilder implements Builder {
             path,
             pathFrom,
             propiedades,
+            getters,
             reduceOrDefault,
             reduce,
             definitions,
@@ -131,6 +132,7 @@ export class ObjectBuilder implements Builder {
                 .withDecrement(decrement)
                 .withDefinitions(definitions)
                 .withPropiedades(propiedades)
+                .withGetters(getters)
                 .withFunction(schema)
                 .withBindArg(bindArg)
                 .withBinary(rest)
@@ -418,6 +420,20 @@ export class ObjectBuilder implements Builder {
                 .add(([[key, $bind], ...entries]) => {
                     return assignAll({}, $bind ?? {}, Object.fromEntries(entries))
                 })
+            : this
+    }
+
+    withGetters(propiedades: Propiedades | undefined) {
+        return propiedades
+            ? this.add(initial => {
+                return Object.entries(propiedades).reduce((getters, [key, schema]) => {
+                    const descriptor = {
+                        get: () => this.withSchemaOrDefault(schema).build()
+                    }
+                    
+                    return Object.defineProperty(getters, key, descriptor)
+                }, {})
+            })
             : this
     }
 
