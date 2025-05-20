@@ -1,6 +1,5 @@
 import type { ArraySchema, Builder, BuilderOptions, Propiedades, Schema, SchemaDefinition, SchemaPrimitive, TaskOptions, WithTaskOptions } from "../models"
 import * as varios from "../helpers/varios"
-import { PropiedadesBuilder } from "./PropiedadesBuilder"
 import { ArrayMapBuilder } from "./ArrayMapBuilder"
 import { ArrayBuilder } from "./ArrayBuilder"
 import { Task, TaskBuilder, BuilderBase } from "./TaskBuilder"
@@ -104,7 +103,6 @@ export class ObjectBuilder implements Builder {
             path,
             pathFrom,
             propiedades,
-            propiedadesAsync,
             reduceOrDefault,
             reduce,
             definitions,
@@ -132,7 +130,6 @@ export class ObjectBuilder implements Builder {
                 .withIncrement(increment)
                 .withDecrement(decrement)
                 .withDefinitions(definitions)
-                .withPropiedadesAsync(propiedadesAsync)
                 .withPropiedades(propiedades)
                 .withFunction(schema)
                 .withBindArg(bindArg)
@@ -150,7 +147,7 @@ export class ObjectBuilder implements Builder {
         return propiedades
             ? this
                 .addMerge()
-                .withPropiedadesAsync(propiedades)
+                .withPropiedades(propiedades)
                 .add((current, prev) => {
                     const entries = Object.entries(current).map(([key, val]) => ["$" + key, val])
                     Object.assign(this.options.variables, Object.fromEntries(entries))
@@ -416,19 +413,10 @@ export class ObjectBuilder implements Builder {
 
     withPropiedades(propiedades: Propiedades | undefined) {
         return propiedades
-            ? this.add(initial => new PropiedadesBuilder(propiedades, this.with({ initial })).build())
-            : this
-    }
-
-    withPropiedadesAsync(propiedades: Propiedades | undefined) {
-        return propiedades
-            ? this.withUnshift(initial => {
-                    const definitions = Object.entries(propiedades)
-
-                    return this
-                        .with({ initial })
-                        .withDefinitions(definitions)
-                        .add(entries => Object.fromEntries(entries))
+            ? this
+                .withDefinitions(Object.entries({ $bind: null, ...propiedades }))
+                .add(([[key, $bind], ...entries]) => {
+                    return assignAll({}, $bind ?? {}, Object.fromEntries(entries))
                 })
             : this
     }

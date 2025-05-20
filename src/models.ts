@@ -218,7 +218,6 @@ export type Schema = Partial<{
     patchWith: PatchOptionsSchema
     prepend: Schema | SchemaPrimitive
     promiseAll: SchemaDefinition
-    propiedadesAsync: Propiedades
     propiedades: Propiedades
     propiedadesFunction: Propiedades
     reduce: Schema | Schema[]

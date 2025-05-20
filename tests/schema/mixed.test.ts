@@ -5,7 +5,7 @@ import { entry } from '../../src/helpers/varios'
 import { ObjectBuilder } from '../../src/builders/ObjectBuilder'
 import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
-import { Propiedades, Schema } from '../../src/models'
+import { Schema } from '../../src/models'
 
 describe("map async and promise all", () => {
   const initial = Array.from({ length: 2 })
@@ -2047,7 +2047,7 @@ describe("sort by", () => {
   })
 })
 
-test("propiedadesAsync", async () => {
+test("propiedades with async call", async () => {
 
   const result = await new ObjectBuilder()
     .with({
@@ -2060,7 +2060,7 @@ test("propiedadesAsync", async () => {
             }
           }
         },
-        propiedadesAsync: {
+        propiedades: {
           total: {
             call: "$getNum",
             reduce: {
@@ -2101,34 +2101,6 @@ test("definitions with async call works", async () => {
     .buildAsync()
 
   expect(result).toEqual([2])
-})
-
-test.fails("propiedades fails with async call", async () => {
-
-  const result = await new ObjectBuilder()
-    .with({
-      schema: {
-        init: {
-          getNum: {
-            asyncFunction: {
-              delay: 50,
-              const: 1
-            }
-          }
-        },
-        propiedades: {
-          total: {
-            call: "$getNum",
-            reduce: {
-              plus: 1
-            }
-          }
-        }
-      }
-    })
-    .buildAsync()
-
-  expect(result).toEqual({ total: 2 })
 })
 
 describe("sort", () => {
@@ -4061,91 +4033,6 @@ describe("select", () => {
       .build()
 
     expect(resultado).toEqual(selected)
-  })
-})
-
-describe("propiedades builder", () => {
-
-  type CaseOptions = {
-    store?: any,
-    propiedades: Propiedades
-    expected: Record<string, any>
-  }
-
-  const expectResultsAsync = async (options: CaseOptions) => {
-    const { propiedades, expected, ...rest } = options
-    const builder = new ObjectBuilder()
-      .with(rest)
-      
-    const propiedadesBuilder = new PropiedadesBuilder(propiedades, builder)
-    const results = [propiedadesBuilder.build(), await propiedadesBuilder.buildAsync()]
-
-    expect(results).toEqual([expected, expected])
-  }
-
-  test("options value path", async () => {
-    await expectResultsAsync({
-      store: { dos: 2, detalles: { titulo: "Hola" } },
-      propiedades: {
-        uno: 1,
-        unoCopy: {
-          path: "siblings.uno"
-        },
-        dos: {
-          path: "dos"
-        },
-        saludo: {
-          path: "store.detalles.titulo",
-        },
-        saludoNested: {
-          path: "store.detalles",
-          propiedades: {
-            titulo: {
-              path: "current.titulo"
-            }
-          }
-        }
-      },
-      expected: {
-        uno: 1,
-        unoCopy: 1,
-        dos: 2,
-        saludo: "Hola",
-        saludoNested: { titulo: "Hola" }
-      }
-    })
-  })
-
-  test("sibling", async () => {
-    await expectResultsAsync({
-      propiedades: {
-        uno: 1,
-        dos: {
-          path: "siblings.uno"
-        },
-        tres: 3
-      },
-      expected: {
-        uno: 1,
-        dos: 1,
-        tres: 3
-      }
-    })
-  })
-
-  test("basico", async () => {
-    await expectResultsAsync({
-      propiedades: {
-        uno: 1,
-        dos: 2,
-        tres: 3
-      },
-      expected: {
-        uno: 1,
-        dos: 2,
-        tres: 3
-      }
-    })
   })
 })
 
