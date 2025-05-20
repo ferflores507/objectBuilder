@@ -14,7 +14,6 @@ export class ObjectBuilder implements Builder {
     constructor(private target?: any, options?: Partial<BuilderOptions>) {
         this.options = options ?? {
             store: {},
-            siblings: {},
             operators: new Operators(),
             variables: {}
         }

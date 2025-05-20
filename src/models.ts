@@ -34,7 +34,6 @@ export type ChildrenSchema = Partial<{
 
 export type BuilderOptions = {
     store: Record<string, any>
-    siblings: Record<string, any>
     target: any
     functions: Record<string, Function>
     schema: SchemaDefinition
@@ -104,9 +103,7 @@ export type ArraySchema = Partial<{
 export type SchemaDefinition = Schema | Array<Schema | SchemaPrimitive>
 
 export type SchemaPrimitive = string | number | bigint | boolean | null
-export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive> | {
-    $getters?: Record<string, SchemaDefinition | SchemaPrimitive>
-}
+export type Propiedades = Record<string, SchemaDefinition | SchemaPrimitive>
 export type DebounceOptions = {
     function: Function
     ms: number | true
@@ -231,7 +228,6 @@ export type Schema = Partial<{
     selectSet: string
     set: SchemaDefinition | SchemaPrimitive
     schema: SchemaDefinition
-    sibling: string
     some: any
     sort: Schema | SchemaPrimitive
     sortBy: SchemaDefinition

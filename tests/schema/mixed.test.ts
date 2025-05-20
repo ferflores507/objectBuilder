@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest'
 import { buildResultsAsync, Case, expectToEqualAsync } from './buildResultsASync'
-import { PropiedadesBuilder } from '../../src/builders/PropiedadesBuilder'
 import { entry } from '../../src/helpers/varios'
 import { ObjectBuilder } from '../../src/builders/ObjectBuilder'
 import { Queue } from '../../src/helpers/Queue'
@@ -2862,27 +2861,6 @@ describe("define property", () => {
 
 })
 
-test("object with function to set sibling", () => {
-  const obj = new ObjectBuilder()
-    .with({
-      schema: {
-        propiedades: {
-          nombre: "Melany",
-          setNombre: {
-            function: {
-              set: "sibling.nombre"
-            }
-          }
-        }
-      }
-    })
-    .build()
-
-  obj.setNombre("Fer")
-
-  expect(obj.nombre).toEqual("Melany")
-})
-
 test("import with multiple stores", async () => {
 
   const titulo = "detalles de store"
@@ -4059,71 +4037,6 @@ describe("use", () => {
       functions: {
         first: (array: any[]) => array[0],
         last: (array: any[]) => array[array.length - 1]
-      }
-    })
-  })
-
-})
-
-test("sibling nested", async () => {
-  const idCopy = {
-    path: "siblings.id"
-  }
-  let id = 1
-
-  await expectToEqualAsync({
-    store: {},
-    schema: {
-      propiedades: {
-        id: id++,
-        idCopy,
-        children: {
-          propiedades: {
-            id: id++,
-            idCopy,
-            children: {
-              propiedades: {
-                id: id++,
-                idCopy
-              }
-            }
-          }
-        }
-      }
-    },
-    expected: {
-      id: 1,
-      idCopy: 1,
-      children: {
-        id: 2,
-        idCopy: 2,
-        children: {
-          id: 3,
-          idCopy: 3
-        }
-      }
-    }
-  })
-})
-
-describe("sibling", () => {
-
-  test("set value from a sibling property", async () => {
-    await expectToEqualAsync({
-      store: {},
-      schema: {
-        propiedades: {
-          title: "One",
-          value: 1,
-          titleCopy: {
-            path: "siblings.title"
-          }
-        }
-      },
-      expected: {
-        title: "One",
-        value: 1,
-        titleCopy: "One"
       }
     })
   })
