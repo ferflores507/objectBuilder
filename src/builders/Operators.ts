@@ -8,6 +8,7 @@ import {
     entries, entry,
     fetchHelper,
     formatSortOptions,
+    isObject,
     Path,
     removeAccents,
     sortCompare,
@@ -466,10 +467,13 @@ export class Operators implements WithTaskOptions<Operators> {
     map = (items: any[], matchFunction: () => any) => {
         return items.map(matchFunction)
     }
-    set: OperatorTask = (initial, value, builder) => {
-        const [path, arg] = argsPair(value, initial)
+    set = {
+        transform: (value: any) => isObject(value) ? { propiedades: value } : value,
+        task: (initial: any, value: any, builder: Builder) => {
+            const [path, arg] = argsPair(value, initial)
 
-        return builder.set(path, arg)
+            return builder.set(path, arg)
+        }
     }
     log = (initial: any, current: any) => (console.log(current), initial)
 }

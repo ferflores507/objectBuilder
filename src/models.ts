@@ -226,7 +226,7 @@ export type Schema = Partial<{
     required: string[]
     schemaFrom: SchemaDefinition
     selectSet: string
-    set: SchemaDefinition | SchemaPrimitive
+    set: SchemaDefinition | SchemaPrimitive | Propiedades
     schema: SchemaDefinition
     some: any
     sort: Schema | SchemaPrimitive

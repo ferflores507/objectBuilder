@@ -1765,9 +1765,7 @@ test("set propiedades", async () => {
   await expectToEqualAsync({
     schema: {
       set: {
-        propiedades: {
-          nombre: "Melany"
-        }
+        nombre: "Melany"
       },
       reduce: {
         path: "nombre"
