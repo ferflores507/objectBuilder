@@ -199,20 +199,24 @@ const getPaths = (path: string | string[], separator = ".") => {
 }
 
 const setPathValueFromPaths = (obj: Record<string, any>, path: string[], value: any) => {
-    const [first] = path
+    const { length } = path
 
-    if (path.length === 1) {
-        obj[first] = value;
-    }
-    else if (path.length === 0) {
+    if(length === 0) {
         throw "No hay paths para actualizar el objeto";
     }
-    else {
-        obj[first] = obj[first] ?? {}
-
-        return setPathValueFromPaths(obj[first], path.slice(1), value);
+    
+    for(let i = 0; i < length; i++) {
+        const currentPath = path[i]
+        
+        if(i === length - 1) {
+            obj[currentPath] = value
+        }
+        else {
+            obj[currentPath] ??= {}
+            obj = obj[currentPath]
+        }
     }
-};
+}
 
 export type Path = string | string[]
 
