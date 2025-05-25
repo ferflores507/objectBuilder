@@ -194,11 +194,9 @@ export const getFormData = (source: {}) => {
     return data
 }
 
-const getPaths = (path: string | string[], separator = ".") => {
-    return Array.isArray(path) ? path : path.split(separator)
-}
+type Set = (obj: Record<string, any>, key: string) => any
 
-const setPathValueFromPaths = (obj: Record<string, any>, path: string[], value: any) => {
+const setPathValueFromPaths = (obj: Record<string, any>, path: string[], set: Set) => {
     const { length } = path
 
     if(length === 0) {
@@ -206,14 +204,14 @@ const setPathValueFromPaths = (obj: Record<string, any>, path: string[], value: 
     }
     
     for(let i = 0; i < length; i++) {
-        const currentPath = path[i]
+        const key = path[i]
         
         if(i === length - 1) {
-            obj[currentPath] = value
+            set(obj, key)
         }
         else {
-            obj[currentPath] ??= {}
-            obj = obj[currentPath]
+            obj[key] ??= {}
+            obj = obj[key]
         }
     }
 }
@@ -229,21 +227,29 @@ class Entry {
     private separator = "."
 
     with(path: Path) {
-        this.paths = getPaths(path, this.separator)
+        this.paths = Array.isArray(path) ? path : path.split(this.separator)
 
         return this
     }
 
     withSeparator(separator: string) {
-        this.separator = separator
+        this.separator = separator ?? this.separator
     }
 
     get(callback = (prev: any, curr: any) => prev?.[curr], initial = this.source) {
         return this.paths.reduce(callback, initial)
     }
 
-    set(value: any) {
-        return setPathValueFromPaths(this.source, this.paths, value)
+    set(value: unknown) {
+        return setPathValueFromPaths(this.source, this.paths, (obj, key) => obj[key] = value)
+    }
+
+    setValueOrGetter(valueOrFn: any) {
+        const set: Set = typeof valueOrFn == "function"
+            ? (obj, key) => Object.defineProperty(obj, key, { get: function() { return valueOrFn() } })
+            : (obj, key) => obj[key] = valueOrFn
+
+        // return setPathValueFromPaths(this.source, this.paths, set)
     }
 }
 
