@@ -92,6 +92,12 @@ export class ObjectBuilder implements Builder {
         return value
     }
 
+    setValueOrGetter(path: Path, valueOrGetter: any) {
+        varios.entry(this.options.store).setValueOrGetter(path, valueOrGetter)
+
+        return valueOrGetter
+    }
+
     withSchema(schema: SchemaDefinition | undefined): ObjectBuilder {
 
         schema = Array.isArray(schema) ? { definitions: schema } : schema

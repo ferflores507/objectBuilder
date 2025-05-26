@@ -475,5 +475,13 @@ export class Operators implements WithTaskOptions<Operators> {
             return builder.set(path, arg)
         }
     }
+    setValueOrGetter = {
+        transform: (value: any) => isObject(value) ? { propiedades: value } : value,
+        task: (initial: any, value: any, builder: Builder) => {
+            const [path, arg] = argsPair(value, initial)
+
+            return builder.setValueOrGetter(path, arg)
+        }
+    }
     log = (initial: any, current: any) => (console.log(current), initial)
 }

@@ -246,10 +246,10 @@ class Entry {
 
     setValueOrGetter(valueOrFn: any) {
         const set: Set = typeof valueOrFn == "function"
-            ? (obj, key) => Object.defineProperty(obj, key, { get: function() { return valueOrFn() } })
+            ? (obj, key) => assignAll(obj, { get [key]() { return valueOrFn() } })
             : (obj, key) => obj[key] = valueOrFn
 
-        // return setPathValueFromPaths(this.source, this.paths, set)
+        return setPathValueFromPaths(this.source, this.paths, set)
     }
 }
 
@@ -279,6 +279,9 @@ export const entry = (obj: Record<string, any>) => {
         },
         set(path: Path, value: any) {
             return entry.with(path).set(value)
+        },
+        setValueOrGetter(path: Path, value: any) {
+            return entry.with(path).setValueOrGetter(value)
         },
         unpackAsGetters(keys: string[] = Object.getOwnPropertyNames(obj)) {
             return assignAll({}, ...keys.map(key => ({ get [key]() { return obj[key] } })))
