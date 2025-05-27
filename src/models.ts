@@ -209,6 +209,7 @@ export type Schema = Partial<{
     not: SchemaDefinition
     or: SchemaDefinition | SchemaPrimitive
     path: SchemaDefinition | string
+    pathOrReturn: SchemaDefinition | string
     pathFrom: SchemaDefinition | string
     parse: true
     patch: Schema

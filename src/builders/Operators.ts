@@ -16,6 +16,7 @@ import {
     spread,
     toArray
 } from "../helpers/varios"
+import { ObjectBuilder } from "./ObjectBuilder"
 
 export class Operators implements WithTaskOptions<Operators> {
     constructor(otherOperators = {}) {
@@ -28,6 +29,9 @@ export class Operators implements WithTaskOptions<Operators> {
     }
     path = (initial: any, path: string, builder: Builder) => {
         return builder.get(path, initial)
+    }
+    pathOrReturn = (initial: any, path: string, builder: ObjectBuilder) => {
+        return builder.get(path, initial) ?? builder.taskBuilder.tasks.map.clear()
     }
     pathFrom = {
         transform: (schema: any) => ({ path: { path: schema }}),
