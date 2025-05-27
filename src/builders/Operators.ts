@@ -362,7 +362,7 @@ export class Operators implements WithTaskOptions<Operators> {
                 const { entries: leftEntries, matchesMap } = matchResult
 
                 const results = {
-                    left: () => new Map([...leftEntries, ...matchesMap.entries()]),
+                    left: () => new Map([...leftEntries]),
                     inner: () => matchesMap,
                 }
                 const result = results.left()
