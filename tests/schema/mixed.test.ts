@@ -6,6 +6,68 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Schema } from '../../src/models'
 
+test("map reduce expect target null on non matches", async () => {
+  await expectToEqualAsync({
+    schema: {
+      mapReduce: [
+        {
+          const: [
+            {
+              title: "Panameño",
+              country: "pa"
+            },
+            {
+              title: "Brasileño",
+              country: "br"
+            },
+            {
+              title: "American",
+              country: "us"
+            }
+          ]
+        },
+        {
+          leftKey: "country",
+          key: "key",
+          target: "country",
+          items: {
+            const: [
+              {
+                key: "pa",
+                name: "Panamá"
+              },
+              {
+                key: "us",
+                name: "Usa"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    expected: [
+      {
+        title: "Panameño",
+        country: {
+          key: "pa",
+          name: "Panamá"
+        }
+      },
+      {
+        title: "Brasileño",
+        country: null
+      },
+      {
+        title: "American",
+        country: {
+          key: "us",
+          name: "Usa"
+        }
+      }
+    ]
+  })
+})
+
 describe("map async and promise all", () => {
   const initial = Array.from({ length: 2 })
   const builder = new ObjectBuilder().with({ initial })

@@ -335,27 +335,31 @@ export class Operators implements WithTaskOptions<Operators> {
                 return new Map(entries)
             }
 
-            const getMatchesMap = (entries: [string, any][], sourceMap: Map<string, any>, getKey: GetKeyFn, target?: string) => {
+            const getMatchesMap = (items: Record<string, any>, sourceMap: Map<string, any>, getKey: GetKeyFn, target?: string) => {
                 const map = new Map()
 
-                entries.forEach(([key, val]) => {
+                const entries = Object.entries(items).map(([key, val]) => {
                     const result = sourceMap.get(getKey(key, val))
-                    
-                    result && map.set(key, { 
+                    const union = { 
                         ...val, 
-                        ...(target ? { [target]: result } : result)
-                    })
+                        ...(target ? { [target]: result ?? null } : result)
+                    }
+                    
+                    result && map.set(key, union)
+
+                    return [key, union] as const
                 })
 
-                return map
+                return { entries, matchesMap: map }
             }
             
             return options.reduce((leftItems, curr) => {
                 const { items, leftKey, key, target } = curr as MapReduceOption // to force types assertions
-                const leftEntries = Object.entries(leftItems)
                 
                 const map = getCurrentItemsMap(items, getKeyFn(key))
-                const matchesMap = getMatchesMap(leftEntries, map, getKeyFn(leftKey), target)
+                const matchResult = getMatchesMap(leftItems, map, getKeyFn(leftKey), target)
+                
+                const { entries: leftEntries, matchesMap } = matchResult
 
                 const results = {
                     left: () => new Map([...leftEntries, ...matchesMap.entries()]),
