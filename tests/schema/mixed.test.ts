@@ -6,6 +6,31 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Schema } from '../../src/models'
 
+describe("path or return", () => {
+  test("expects text trimmed", async () => {
+    await expectToEqualAsync({
+      store: {
+        text: " one "
+      },
+      schema: {
+        pathOrReturn: "text",
+        trim: true
+      },
+      expected: "one"
+    })
+  })
+
+  test("expects undefined without throwing error", async () => {
+    await expectToEqualAsync({
+      schema: {
+        pathOrReturn: "text",
+        trim: true
+      },
+      expected: undefined
+    })
+  })
+})
+
 test("map reduce expect target null on non matches", async () => {
   await expectToEqualAsync({
     schema: {
