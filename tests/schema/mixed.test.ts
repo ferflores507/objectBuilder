@@ -1848,7 +1848,7 @@ test("set array path", async () => {
   })
 })
 
-test("set propiedades", async () => {
+test("set single propiedades", async () => {
   await expectToEqualAsync({
     schema: {
       set: {
@@ -1859,6 +1859,28 @@ test("set propiedades", async () => {
       }
     },
     expected: "Melany"
+  })
+})
+
+test("set multiple propiedades", async () => {
+  await expectToEqualAsync({
+    schema: {
+      set: {
+        nombre: "Melany",
+        "details.id": 1
+      },
+      reduce: {
+        definitions: [
+          {
+            path: "nombre"
+          },
+          {
+            path: "details.id"
+          }
+        ]
+      }
+    },
+    expected: ["Melany", 1]
   })
 })
 
