@@ -460,8 +460,9 @@ describe("basico old", () => {
           apellido: "Flores"
         },
         schema: {
-          const: 1,
-          set: "detalles.id"
+          set: {
+            "detalles.id": 1
+          }
         }
       }
       

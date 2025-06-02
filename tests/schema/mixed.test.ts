@@ -1871,15 +1871,21 @@ describe("debounce", function () {
       {
         debounce: {
           function: {
-            path: "arg",
-            set: "nombre"
+            set: {
+              nombre: {
+                path: "arg"
+              }
+            }
           }
         }
       },
       {
         function: {
-          path: "arg",
-          set: "nombre"
+          set: {
+            nombre: {
+              path: "arg"
+            }
+          }
         },
         debounce: true
       },
@@ -1887,8 +1893,11 @@ describe("debounce", function () {
         debounceWith: {
           ms: 1000,
           function: {
-            path: "arg",
-            set: "nombre"
+            set: {
+              nombre: {
+                path: "arg"
+              }
+            }
           }
         }
       },
@@ -1899,8 +1908,11 @@ describe("debounce", function () {
               "setNombre",
               {
                 function: {
-                  path: "arg",
-                  set: "nombre"
+                  set: {
+                    nombre: {
+                      path: "arg"
+                    }
+                  }
                 }
               }
             ]
@@ -2869,8 +2881,11 @@ test("with bind arg", () => {
     .with({
       schema: {
         function: {
-          path: "arg",
-          set: "nombre"
+          set: {
+            nombre: {
+              path: "arg"
+            }
+          }
         },
         bindArg: {
           const: "Melany"
@@ -3145,10 +3160,16 @@ test("nested stores with call to root store", async () => {
   await expectToEqualAsync({
     store,
     schema: {
-      set: "setName",
-      function: {
-        set: "store.name",
-        path: "arg"
+      set: {
+        setName: {
+          function: {
+            set: {
+              "store.name": {
+                path: "arg"
+              }
+            }
+          }
+        }
       },
       reduce: {
         propiedades: {
@@ -3162,12 +3183,15 @@ test("nested stores with call to root store", async () => {
               }
             },
             reduce: {
-              set: "updateName",
-              function: {
-                call: {
-                  setName: {
-                    path: "nombre"
-                  }
+              set: {
+                updateName: {
+                  function: {
+                    call: {
+                      setName: {
+                        path: "nombre"
+                      }
+                    }
+                  },
                 }
               },
               reduce: {
@@ -3189,9 +3213,12 @@ describe("with call", () => {
       {
         store: {},
         schema: {
-          set: "getName",
-          function: {
-            path: "arg"
+          set: {
+            getName: {
+              function: {
+                path: "arg"
+              },
+            }
           },
           reduce: {
             call: {
@@ -3211,9 +3238,12 @@ describe("with call", () => {
           name: "Melany"
         },
         schema: {
-          set: "getName",
-          function: {
-            path: "arg"
+          set: {
+            getName: {
+              function: {
+                path: "arg"
+              },
+            }
           },
           reduce: {
             call: ["getName", "name"]
