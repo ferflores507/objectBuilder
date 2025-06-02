@@ -476,11 +476,10 @@ export class Operators implements WithTaskOptions<Operators> {
         return items.map(matchFunction)
     }
     set = {
-        transform: (value: any) => isObject(value) ? { propiedades: value } : value,
+        transform: (value: any) => isObject(value) ? { propiedades: value }: value,
         task: (initial: any, value: any, builder: Builder) => {
-            const [path, arg] = argsPair(value, initial)
-
-            return builder.set(path, arg)
+            const entries = isObject(value) ? Object.entries(value) : [value]
+            return entries.forEach(([key, val]) => builder.set(key, val)) 
         }
     }
     setValueOrGetter = {
