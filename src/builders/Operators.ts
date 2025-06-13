@@ -429,6 +429,9 @@ export class Operators implements WithTaskOptions<Operators> {
 
         return Promise.all(promises)
     }
+    packWith = (initial: Path, current: any) => {
+        return toArray(initial).reduce((prev, curr) => ({ ...prev, [curr]: current}), {})
+    }
     sort = (array: any[], option: true | "descending" = true) => {
         return this.sortBy(array, { descending: option === "descending" })
     }

@@ -6,6 +6,16 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Schema } from '../../src/models'
 
+test("packWith", async () => {
+  await expectToEqualAsync({
+    schema: {
+      const: ["a", "b", "c"],
+      packWith: 1
+    },
+    expected: { a: 1, b: 1, c: 1 }
+  })
+})
+
 describe("path or return", () => {
   test("expects text trimmed", async () => {
     await expectToEqualAsync({

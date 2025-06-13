@@ -208,6 +208,7 @@ export type Schema = Partial<{
     mergeByKeys: SchemaDefinition | SchemaPrimitive
     not: SchemaDefinition
     or: SchemaDefinition | SchemaPrimitive
+    packWith: SchemaDefinition | SchemaPrimitive
     path: SchemaDefinition | string
     pathOrReturn: SchemaDefinition | string
     pathFrom: SchemaDefinition | string
