@@ -9,8 +9,11 @@ import { Schema } from '../../src/models'
 test("message", async () => {
   await expectToEqualAsync({
     store: {
+      lang: "es",
       messages: {
-        saludo: "Hola"
+        es: {
+          saludo: "Hola"
+        }
       }
     },
     schema: {

@@ -433,7 +433,7 @@ export class Operators implements WithTaskOptions<Operators> {
         // entry with empty object only used to retrieve partial path normalized to array
         const { paths } = entry({}).getWithProperties(path)
         
-        return builder.get(["messages", ...paths])
+        return builder.get(["messages", builder.get("lang"), ...paths])
     }
     packWith = (initial: Path, current: any) => {
         return toArray(initial).reduce((prev, curr) => ({ ...prev, [curr]: current}), {})
