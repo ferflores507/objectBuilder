@@ -6,6 +6,20 @@ import { Queue } from '../../src/helpers/Queue'
 import { TaskBuilder } from '../../src/builders/TaskBuilder'
 import { Schema } from '../../src/models'
 
+test("message", async () => {
+  await expectToEqualAsync({
+    store: {
+      messages: {
+        saludo: "Hola"
+      }
+    },
+    schema: {
+      message: "saludo"
+    },
+    expected: "Hola"
+  })
+})
+
 test("packWith", async () => {
   await expectToEqualAsync({
     schema: {

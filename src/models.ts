@@ -201,6 +201,7 @@ export type Schema = Partial<{
     join: SchemaDefinition | SchemaPrimitive
     keywords: true
     log: SchemaDefinition | SchemaPrimitive
+    message: Schema | string
     mapKeyValue: SchemaDefinition | true
     mapObject: Propiedades
     mapReduce: MapReduceSchema

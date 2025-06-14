@@ -429,6 +429,10 @@ export class Operators implements WithTaskOptions<Operators> {
 
         return Promise.all(promises)
     }
+    message = {
+        transform: (path: Path) => ({ path: ["messages", ...toArray(path)] }),
+        task: (initial: any, value: any) => value
+    }
     packWith = (initial: Path, current: any) => {
         return toArray(initial).reduce((prev, curr) => ({ ...prev, [curr]: current}), {})
     }
