@@ -429,9 +429,11 @@ export class Operators implements WithTaskOptions<Operators> {
 
         return Promise.all(promises)
     }
-    message = {
-        transform: (path: Path) => ({ path: ["messages", ...toArray(path)] }),
-        task: (initial: any, value: any) => value
+    message = (initial: any, path: Path, builder: ObjectBuilder) => {
+        // entry with empty object only used to retrieve partial path normalized to array
+        const { paths } = entry({}).getWithProperties(path)
+        
+        return builder.get(["messages", ...paths])
     }
     packWith = (initial: Path, current: any) => {
         return toArray(initial).reduce((prev, curr) => ({ ...prev, [curr]: current}), {})
